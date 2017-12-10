@@ -3,7 +3,7 @@ function Avatar(pawn,heritages) {
 	if (pawn == undefined) {console.log('no pawn specified')};
 	this.pawn = pawn;
 
-	this.svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+	this.svgNodes = document.createElementNS('http://www.w3.org/2000/svg','g');
 	
 	this.parameters = {};
 	
@@ -180,6 +180,32 @@ function Avatar(pawn,heritages) {
 	
 	this.updateColoring();
 	
+	this.apparentEthnicities = function() {
+		var range, diff, diffs = {}, results = {very:[],somewhat:[],vaguely:[]};
+		var ethnicitiesList = Object.keys(data.ethnicities);
+		ethnicitiesList.splice(0,3);
+		for (var ethnicity of ethnicitiesList) {
+			diff = 0;
+			for (var parameter in data.ethnicities[ethnicity]) {
+				range = data.ethnicities.max[parameter] - data.ethnicities.min[parameter];
+				if (isNaN(range) == false) {
+					diff += Math.abs(this.parameters[parameter] - data.ethnicities[ethnicity][parameter]) / range;
+				};
+			};
+			diffs[ethnicity] = diff /  Object.keys(data.ethnicities[ethnicity]).length;
+		};
+		for (var ethnicity in diffs) {
+			if (diffs[ethnicity] < 0.15) {
+				results.very.push(ethnicity);
+			} else if (diffs[ethnicity] < 0.20) {
+				results.somewhat.push(ethnicity);
+			} else if (diffs[ethnicity] < 0.25) {
+				results.vaguely.push(ethnicity);
+			};
+		}
+		return results
+	};
+	
 	
 	
 	// The Monster
@@ -188,13 +214,14 @@ function Avatar(pawn,heritages) {
 	
 	this.draw = function() {
 
-		this.bodyConstants = {eyeline:33,neck:90};
+// 		this.bodyConstants = {eyeline:33,neck:90};
+		this.bodyConstants = {eyeline:-172,neck:-115};
 		var muzzle = false;
 		var noseStroke = false;
 
-		var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-		svg.setAttribute('viewBox','0 0 200 200');
-		
+		var svg = document.createElementNS('http://www.w3.org/2000/svg','g');
+		svg.setAttribute('transform','scale(0.25)');
+				
 		var defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
 		defs.id = 'defs';
 		svg.appendChild(defs);
@@ -203,7 +230,7 @@ function Avatar(pawn,heritages) {
 		var shadow = document.createElementNS('http://www.w3.org/2000/svg',"ellipse");
 			shadow.setAttribute("fill",'#000000');
 			shadow.setAttribute("opacity",0.2);
-			shadow.setAttribute("cx",100);
+			shadow.setAttribute("cx",0);
 			shadow.setAttribute("cy",95 + this.bodyConstants.neck);
 			shadow.setAttribute("rx",this.parameters.shoulders * 1.3);
 			shadow.setAttribute("ry",13);
@@ -288,8 +315,8 @@ function Avatar(pawn,heritages) {
 			var templeClearance = this.parameters.templePosition / -30 + 7 / 6;
 
 			// start 
-			var x = 100;
-			var y = 20;
+			var x = 0;
+			var y = this.bodyConstants.eyeline - 13;
 			var path = 'm '+x+','+y;
 			
 			// to above temple	
@@ -307,7 +334,7 @@ function Avatar(pawn,heritages) {
 			
 			// to bottom left
 			stepX = 0.2 * this.parameters.hairLength / (this.parameters.hairCurl * 3);
-			stepY = (this.parameters.hairLength + this.bodyConstants.eyeline) / (this.parameters.hairCurl * 3);
+			stepY = this.parameters.hairLength / (this.parameters.hairCurl * 3);
 			for (i=0;i<this.parameters.hairCurl*3;i++) {
 				x = stepX + (i % 3) - 1;
 				y = stepY;
@@ -352,7 +379,7 @@ function Avatar(pawn,heritages) {
 			
 			// to above right temple
 			stepX = 0.2 * this.parameters.hairLength / (this.parameters.hairCurl * 3);
-			stepY = (this.parameters.hairLength + this.bodyConstants.eyeline) / (this.parameters.hairCurl * -3);
+			stepY = this.parameters.hairLength / (this.parameters.hairCurl * -3);
 			for (i=0;i<this.parameters.hairCurl*3;i++) {
 				x = stepX + ((i+2) % 3) - 1;
 				y = stepY;
@@ -389,8 +416,8 @@ function Avatar(pawn,heritages) {
 		if (this.parameters.hindquarters > 0) {
 			
 			this.bodyConstants.crotch = {};
-			this.bodyConstants.crotch.x = 120;
-			this.bodyConstants.crotch.y = 145;
+			this.bodyConstants.crotch.x = 20;
+			this.bodyConstants.crotch.y = 45;
 			var hindLegs = this.legs();
 			hindLegs.rightLegPath.setAttribute('fill','inherit');
 			hindLegs.leftLegPath.setAttribute('fill','inherit');
@@ -410,7 +437,7 @@ function Avatar(pawn,heritages) {
 			hindquarters.setAttribute("stroke-width","1");
 			hindquarters.setAttribute("stroke-linecap","round");
 			
-			path = 'm 120,125 ';
+			path = 'm 20,125 ';
 			x = this.parameters.hips * 0.3;
 			c2x = x / 2;
 			path += 'c 2,0 '+c2x+',-2 '+x+',-2 ';
@@ -433,7 +460,7 @@ function Avatar(pawn,heritages) {
 			flank.setAttribute("stroke","#000000");
 			flank.setAttribute("stroke-width","1");
 			flank.setAttribute("stroke-linecap","round");
-			path = 'm 120,140 ';
+			path = 'm 20,140 ';
 			path += 'c 0,8 12,18 12,18 ';
 			flank.setAttributeNS(null,'d',path);
 			hindquartersGroup.appendChild(flank);
@@ -443,7 +470,7 @@ function Avatar(pawn,heritages) {
 			flank.setAttribute("fill",'inherit');
 			flank.setAttribute("stroke","none");
 			
-			var x = 120 + this.parameters.hips * 0.8;
+			var x = 20 + this.parameters.hips * 0.8;
 			var y = 128;
 			path = 'm '+x+','+y;
 			x = 18 + this.parameters.hips * -0.8
@@ -460,7 +487,7 @@ function Avatar(pawn,heritages) {
 			flankStroke.setAttribute("stroke-width","1");
 			flankStroke.setAttribute("stroke-linecap","round");
 			
-			var x = 120 + this.parameters.hips * 0.8;
+			var x = 20 + this.parameters.hips * 0.8;
 			var y = 128;
 			path = 'm '+x+','+y;
 			x = 18 + this.parameters.hips * -0.8
@@ -491,7 +518,7 @@ function Avatar(pawn,heritages) {
 		leftUpperArmPath.setAttribute("stroke-linecap","round");
 
 		// start 
-		x = 100 - this.parameters.shoulders + armWidth * 0.5;
+		x = 0 - this.parameters.shoulders + armWidth * 0.5;
 		y = this.bodyConstants.neck + 5;
 		var rightShoulderPivot = document.createElementNS('http://www.w3.org/2000/svg',"circle");
 			rightShoulderPivot.id = 'rightShoulderPivot';
@@ -503,7 +530,7 @@ function Avatar(pawn,heritages) {
 			rightArmGroup.appendChild(rightShoulderPivot);
 		path = 'm '+x+','+y;
 		
-		x = 100 + this.parameters.shoulders - armWidth * 0.5;
+		x = 0 + this.parameters.shoulders - armWidth * 0.5;
 		var leftShoulderPivot = document.createElementNS('http://www.w3.org/2000/svg',"circle");
 			leftShoulderPivot.id = 'leftShoulderPivot';
 			leftShoulderPivot.setAttribute("fill","none");
@@ -625,7 +652,7 @@ function Avatar(pawn,heritages) {
 		leftLowerArmPath.setAttribute("stroke-linecap","round");
 
 		// start 
-		x = 100 + armWidth * 0.5 - this.parameters.shoulders ;
+		x = 0 + armWidth * 0.5 - this.parameters.shoulders ;
 		y = this.bodyConstants.neck + 5 + upperArmLength;
 		var rightElbowPivot = document.createElementNS('http://www.w3.org/2000/svg',"circle");
 			rightElbowPivot.id = 'rightElbowPivot';
@@ -645,7 +672,7 @@ function Avatar(pawn,heritages) {
 			rightForearmGroup.appendChild(rightWristPivot);
 		path = 'm '+x+','+y;
 		
-		x = 100 - armWidth * 0.5 + this.parameters.shoulders ;
+		x = 0 - armWidth * 0.5 + this.parameters.shoulders ;
 		var leftElbowPivot = document.createElementNS('http://www.w3.org/2000/svg',"circle");
 			leftElbowPivot.id = 'leftElbowPivot';
 			leftElbowPivot.setAttribute("fill","none");
@@ -737,7 +764,7 @@ function Avatar(pawn,heritages) {
 				
 		// Legs
 		this.bodyConstants.crotch = {};
-		this.bodyConstants.crotch.x = 100;
+		this.bodyConstants.crotch.x = 0;
 		this.bodyConstants.crotch.y = this.bodyConstants.neck + 60;
 		var legs = this.legs();
 		bodyGroup.appendChild(legs.svg);
@@ -770,11 +797,11 @@ function Avatar(pawn,heritages) {
 		otherNewPath.setAttribute("stroke-linecap","round");
 
 		// start 
-		x = 80;
+		x = -20;
 		y = 25 + this.bodyConstants.eyeline;
 		path = 'm '+x+','+y;
 		
-		x = 120;
+		x = 20;
 		var otherPath = 'm '+x+','+y;
 
 		// to tip of ear
@@ -851,11 +878,11 @@ function Avatar(pawn,heritages) {
 		otherNewPath.setAttribute("stroke-linecap","round");
 
 		// start 
-		x = 80;
+		x = -20;
 		y = 25 + this.bodyConstants.eyeline;
 		path = 'm '+x+','+y;
 		
-		x = 120;
+		x = 20;
 		var otherPath = 'm '+x+','+y;
 
 		// to tip of ear
@@ -898,7 +925,7 @@ function Avatar(pawn,heritages) {
 		newPath.setAttribute("stroke","#000000");
 		newPath.setAttribute("stroke-width","1");
 
-		x = 75;
+		x = -25;
 		y = 25 + this.bodyConstants.eyeline;
 
 		var path = 'm '+x+','+y;
@@ -988,12 +1015,13 @@ function Avatar(pawn,heritages) {
 			otherNewPath = document.createElementNS('http://www.w3.org/2000/svg',"path");
 			otherNewPath.setAttribute('fill','none');
 			otherNewPath.setAttribute("stroke","#000000");
+			otherNewPath.setAttribute("stroke","fuschia");
 			otherNewPath.setAttribute("stroke-width","1");
 			otherNewPath.setAttribute("stroke-linecap","round");
 
 			// start 
-			var x = 100;
-			var y = 21;
+			var x = 0;
+			var y = this.bodyConstants.eyeline - 12;
 			var path = 'm '+x+','+y;
 			
 			var totalY = y;
@@ -1012,13 +1040,13 @@ function Avatar(pawn,heritages) {
 				totalY += y;
 			}
 			
-			x = 100 + 25 + this.parameters.templeWidth;
+			x = 0 + 25 + this.parameters.templeWidth;
 			y = totalY;
 			otherPath = 'm '+x+','+y;
 						
 			// to center bottom of bangs
 			stepX = (-25 - this.parameters.templeWidth) / this.parameters.hairCurl;
-			stepY = -1 * (totalY - 25) / this.parameters.hairCurl;
+			stepY = -1 * (totalY - (this.bodyConstants.eyeline-8)) / this.parameters.hairCurl;
 			for (i=0;i<this.parameters.hairCurl;i++) {
 				x = stepX;
 				y = stepY + (i % 3) - 1;
@@ -1040,7 +1068,7 @@ function Avatar(pawn,heritages) {
 			
 			// to left bottom of bangs
 			stepX = (-25 - this.parameters.templeWidth) / this.parameters.hairCurl;
-			stepY = (totalY - 25) / this.parameters.hairCurl;
+			stepY = (totalY - (this.bodyConstants.eyeline-8)) / this.parameters.hairCurl;
 			for (i=0;i<this.parameters.hairCurl;i++) {
 				x = stepX;
 				y = stepY + ((this.parameters.hairCurl - i) % 3) - 1;
@@ -1081,8 +1109,8 @@ function Avatar(pawn,heritages) {
 			newPath.setAttribute("stroke-linecap","round");
 		
 			// Start at Right Side
-			x = 100 - this.parameters.topHairBase;
-			y = 35;
+			x = 0 - this.parameters.topHairBase;
+			y = this.bodyConstants.eyeline + 2;
 			path = 'm '+x+','+y;
 						
 			// to top right
@@ -1195,11 +1223,11 @@ function Avatar(pawn,heritages) {
 			otherNewPath.setAttribute("stroke-linecap","round");
 
 			// start above top of horn
-			x = 85;
-			y = 37 - this.parameters.templePosition * 0.5;
+			x = -15;
+			y = this.bodyConstants.eyeline + 2 - this.parameters.templePosition * 0.5;
 			path = 'm '+x+','+y;
 			
-			x = 115;
+			x = 15;
 			otherPath = 'm '+x+','+y;
 
 			// out beyond horn base
@@ -1248,11 +1276,11 @@ function Avatar(pawn,heritages) {
 			otherNewPath.setAttribute("stroke-linecap","round");
 
 			// start at top
-			x = 80;
-			y = 40 - this.parameters.templePosition * 0.5;
+			x = -20;
+			y = this.bodyConstants.eyeline + 5 - this.parameters.templePosition * 0.5;
 			path = 'm '+x+','+y;
 			
-			x = 120;
+			x = 20;
 			otherPath = 'm '+x+','+y;
 
 			// to tip
@@ -1307,7 +1335,7 @@ function Avatar(pawn,heritages) {
 
 		// Eyes
 		for (i in [0,1]) {
-			if (i == 1) {cx = 100-this.parameters.eyeDistance} else {cx = 100+this.parameters.eyeDistance};
+			if (i == 1) {cx = 0-this.parameters.eyeDistance} else {cx = 0+this.parameters.eyeDistance};
 			cy = 25 + this.bodyConstants.eyeline;
 			
 			// Eyeball
@@ -1562,7 +1590,7 @@ function Avatar(pawn,heritages) {
 			
 			// Start under right nose
 			var muzzleWidth = Math.max(this.parameters.noseWidth * 2,this.parameters.mouthWidth * 1.5);
-			x = 100 - muzzleWidth;
+			x = 0 - muzzleWidth;
 			y = 22 + this.bodyConstants.eyeline + this.parameters.noseHeight * this.parameters.chinHeight / 100;
 			var muzzleLength = Math.max((25 + this.bodyConstants.eyeline + this.parameters.chinHeight) - y,20);
 
@@ -1625,7 +1653,7 @@ function Avatar(pawn,heritages) {
 		};
 		
 		// Start at Right Side
-		x = 100 - this.parameters.mouthWidth;
+		x = 0 - this.parameters.mouthWidth;
 		y = 25 + this.bodyConstants.eyeline - this.parameters.smile + (100 + this.parameters.noseHeight)/2 * this.parameters.chinHeight / 100;
 		path = 'm '+x+','+y;
 
@@ -1676,7 +1704,7 @@ function Avatar(pawn,heritages) {
 		newPath.setAttribute("stroke-linecap","round");
 		
 		// Start at Right Side
-		x = 100 - this.parameters.mouthWidth;
+		x = 0 - this.parameters.mouthWidth;
 		y = 25 + this.bodyConstants.eyeline - this.parameters.smile + (100 + this.parameters.noseHeight)/2 * this.parameters.chinHeight / 100;
 		path = 'm '+x+','+y;
 
@@ -1748,7 +1776,7 @@ function Avatar(pawn,heritages) {
 			newPath.setAttribute("stroke-linecap","round");
 
 			// start at right side
-			x = 100 - this.parameters.noseWidth;
+			x = 0 - this.parameters.noseWidth;
 			y = 25 + this.bodyConstants.eyeline + this.parameters.noseHeight * this.parameters.chinHeight / 100 + this.parameters.nostrilHeight * 0.5;
 			y -= this.parameters.nostrilHeight * 2;
 			path = 'm '+x+','+y;
@@ -1780,7 +1808,7 @@ function Avatar(pawn,heritages) {
 		};
 
 		// start at right inside nostril
-		x = 100 - this.parameters.noseWidth * 1.2;
+		x = 0 - this.parameters.noseWidth * 1.2;
 		y = 25 + this.bodyConstants.eyeline + this.parameters.noseHeight * this.parameters.chinHeight / 100;
 		path = 'm '+x+','+y;
 
@@ -1834,12 +1862,12 @@ function Avatar(pawn,heritages) {
 		otherNewPath.setAttribute("stroke-linecap","round");
 
 		// start at right inside nostril
-		x = 100 - this.parameters.noseWidth * 0.8;
+		x = 0 - this.parameters.noseWidth * 0.8;
 		y = 25 + this.bodyConstants.eyeline + this.parameters.noseHeight * this.parameters.chinHeight / 100;
 		path = 'm '+x+','+y;
 
 		// start at left inside nostril
-		x = 100 + this.parameters.noseWidth * 0.8;
+		x = 0 + this.parameters.noseWidth * 0.8;
 		var otherPath = 'm '+x+','+y;
 
 		// to right outside nostril
@@ -1896,7 +1924,7 @@ function Avatar(pawn,heritages) {
 			newPath.setAttribute("stroke-linecap","round");
 
 			// start at right side
-			x = 100 - this.parameters.noseWidth * 0.2;
+			x = 0 - this.parameters.noseWidth * 0.2;
 			y = 25 + this.bodyConstants.eyeline + this.parameters.noseHeight * this.parameters.chinHeight / 100;
 			path = 'm '+x+','+y;
 			
@@ -1929,7 +1957,7 @@ function Avatar(pawn,heritages) {
 			otherNewPath.setAttribute("stroke-linecap","round");
 
 			// start at midpoint of right nose crease
-			x = 100 - this.parameters.noseWidth * 1.6;
+			x = 0 - this.parameters.noseWidth * 1.6;
 			y = 25 + this.bodyConstants.eyeline + this.parameters.noseHeight * this.parameters.chinHeight / 100;
 			y -= this.parameters.nostrilHeight;
 			path = 'm '+x+','+y;
@@ -1974,7 +2002,7 @@ function Avatar(pawn,heritages) {
 			otherNewPath.setAttribute("stroke-linecap","round");
 
 			// start at midpoint of right nose crease
-			x = 100 - this.parameters.noseWidth * 1.6;
+			x = 0 - this.parameters.noseWidth * 1.6;
 			y = 25 + this.bodyConstants.eyeline + this.parameters.noseHeight * this.parameters.chinHeight / 100;
 			y -= this.parameters.nostrilHeight;
 			path = 'm '+x+','+y;
@@ -2013,7 +2041,7 @@ function Avatar(pawn,heritages) {
 			newPath.setAttribute("stroke-linecap","round");
 
 			// start at right side
-			x = 100 - this.parameters.noseWidth * 0.2;
+			x = 0 - this.parameters.noseWidth * 0.2;
 			y = 25 + this.bodyConstants.eyeline + this.parameters.noseHeight * this.parameters.chinHeight / 100;
 			y -= this.parameters.nostrilHeight * 2;
 			path = 'm '+x+','+y;
@@ -2049,11 +2077,11 @@ function Avatar(pawn,heritages) {
 			var tuskSize = this.parameters.teeth;
 		
 			// Start at Right Side
-			x = 100 - this.parameters.mouthWidth * 0.8;
+			x = 0 - this.parameters.mouthWidth * 0.8;
 			y = 25.5 + this.bodyConstants.eyeline - this.parameters.smile * 0.6 + (100 + this.parameters.noseHeight)/2 * this.parameters.chinHeight / 100;
 			path = 'm '+x+','+y;
 			
-			x = 100 + this.parameters.mouthWidth * 0.8;
+			x = 0 + this.parameters.mouthWidth * 0.8;
 			otherPath = 'm '+x+','+y;
 
 			// to top of tusk
@@ -2122,7 +2150,7 @@ function Avatar(pawn,heritages) {
 		newPath.setAttribute("stroke-linecap","round");
 		
 		// Start at Right Side
-		x = 100 - this.parameters.mouthWidth;
+		x = 0 - this.parameters.mouthWidth;
 		y = 25 + this.bodyConstants.eyeline - this.parameters.smile + (100 + this.parameters.noseHeight)/2 * this.parameters.chinHeight / 100;
 		path = 'm '+x+','+y;
 
@@ -2165,58 +2193,33 @@ function Avatar(pawn,heritages) {
 		newPath.setAttributeNS(null,"d",path);
 		headGroup.appendChild(newPath);
 		
-		
-		
 		// Bangs
 		if (this.parameters.hairBangsLength > this.parameters.topHairHeight * 3 && this.parameters.hairLength > 0) {
 		
+			// Top-of-Head to Top-of-Bangs Hair
+						
 			newPath = document.createElementNS('http://www.w3.org/2000/svg',"path");
 			newPath.setAttribute("fill",this.parameters.hairColor);
-			newPath.setAttribute("stroke",'none');
-			
-			path = 'm '+100+','+20;
-			
-			x = -23 - this.parameters.templeWidth;
-			y = totalY - 21;
-			c1x = -2;
-			c1y = 0;
-			c2x = x;
-			c2y = y-this.parameters.templeWidth;
-			path += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
-			
-			x = 23 + this.parameters.templeWidth + this.parameters.hairPart;
-			y = 0 - this.parameters.templeHeight;
-			path += 'l '+x+","+y
-			
-			x = 23 +  this.parameters.templeWidth - this.parameters.hairPart;
-			y = this.parameters.templeHeight;
-			path += 'l '+x+","+y
-			
-			x = -23 - this.parameters.templeWidth;
-			y = 21 - totalY;
-			c1x = 0;
-			c1y = 0 - this.parameters.templeWidth;
-			c2x = x+2;
-			c2y = y;
-			path += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
-			
-			newPath.setAttributeNS(null,"d",path);
-			headGroup.appendChild(newPath);
-			
-			newPath = document.createElementNS('http://www.w3.org/2000/svg',"path");
-			newPath.setAttribute("fill",this.parameters.hairColor);
-			newPath.setAttribute("stroke","#000000");
-			newPath.setAttribute("stroke-width","1");
-			newPath.setAttribute("stroke-linecap","round");
+			newPath.setAttribute("stroke","none");
 			
 			otherNewPath = document.createElementNS('http://www.w3.org/2000/svg',"path");
 			otherNewPath.setAttribute("fill",this.parameters.hairColor);
-			otherNewPath.setAttribute("stroke","#000000");
-			otherNewPath.setAttribute("stroke-width","1");
-			otherNewPath.setAttribute("stroke-linecap","round");
+			otherNewPath.setAttribute("stroke","none");
+
+			newPathStroke = document.createElementNS('http://www.w3.org/2000/svg',"path");
+			newPathStroke.setAttribute("fill",this.parameters.hairColor);
+			newPathStroke.setAttribute("stroke","#000000");
+			newPathStroke.setAttribute("stroke-width","1");
+			newPathStroke.setAttribute("stroke-linecap","round");
+			
+			otherNewPathStroke = document.createElementNS('http://www.w3.org/2000/svg',"path");
+			otherNewPathStroke.setAttribute("fill",this.parameters.hairColor);
+			otherNewPathStroke.setAttribute("stroke","#000000");
+			otherNewPathStroke.setAttribute("stroke-width","1");
+			otherNewPathStroke.setAttribute("stroke-linecap","round");
 
 			// start at top of part
-			x = 100 + this.parameters.hairPart;
+			x = 0 + this.parameters.hairPart;
 			y = totalY - 2 - this.parameters.templeHeight;
 			path = 'm '+x+','+y;
 			otherPath = 'm '+x+','+y;
@@ -2277,11 +2280,20 @@ function Avatar(pawn,heritages) {
 			c2x *= -1;
 			otherPath += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
 			
-			newPath.setAttributeNS(null,"d",path);
+			fillPath = path + ' L ' + 0 + ',' + (this.bodyConstants.eyeline - 12);
+			fillOtherPath = otherPath + ' L ' + 0 + ',' + (this.bodyConstants.eyeline - 12);
+			
+			newPath.setAttributeNS(null,"d",fillPath);
 			headGroup.appendChild(newPath);
 
-			otherNewPath.setAttributeNS(null,"d",otherPath);
+			otherNewPath.setAttributeNS(null,"d",fillOtherPath);
 			headGroup.appendChild(otherNewPath);
+			
+			newPathStroke.setAttributeNS(null,"d",path);
+			headGroup.appendChild(newPathStroke);
+
+			otherNewPathStroke.setAttributeNS(null,"d",otherPath);
+			headGroup.appendChild(otherNewPathStroke);
 			
 			
 		};
@@ -2519,7 +2531,7 @@ function Avatar(pawn,heritages) {
 		torsoPath.setAttribute("stroke-linecap","round");
 
 		// start 
-		x = 100;
+		x = 0;
 		y = this.bodyConstants.neck;
 		path = 'm '+x+','+y;
 
@@ -2635,11 +2647,11 @@ function Avatar(pawn,heritages) {
 			var startX = Math.max(this.parameters.bust * 0.5 , this.parameters.shoulders * 0.7);
 
 			// start 
-			x = 100 - startX;
+			x = 0 - startX;
 			y = this.bodyConstants.neck + 10;
 			path = 'm '+x+','+y;
 		
-			x = 100 + startX;
+			x = 0 + startX;
 			otherPath = 'm '+x+','+y;
 
 			// to outside of bust (if necessary)
@@ -2656,10 +2668,10 @@ function Avatar(pawn,heritages) {
 				c2x *= -1;
 				otherPath += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
 			} else {
-				x = 100 - (this.parameters.bust + this.parameters.shoulders * 0.7)/2;
+				x = 0 - (this.parameters.bust + this.parameters.shoulders * 0.7)/2;
 				y = this.bodyConstants.neck + this.parameters.shoulders * 0.55;
 				path = 'm '+x+','+y;
-				x = 100 + (this.parameters.bust + this.parameters.shoulders * 0.7)/2;
+				x = 0 + (this.parameters.bust + this.parameters.shoulders * 0.7)/2;
 				otherPath = 'm '+x+','+y;
 			};
 
@@ -2714,7 +2726,7 @@ function Avatar(pawn,heritages) {
 		newPath.setAttribute("stroke-linecap","round");
 
 		// start at bottom of thumb
-		x = 100 + (10 * 0.5 - this.parameters.shoulders) * reflect;
+		x = 0 + (10 * 0.5 - this.parameters.shoulders) * reflect;
 		y = this.bodyConstants.neck + 5 + 30 + 20;
 		path = 'm '+x+','+y;
 
@@ -3364,13 +3376,13 @@ function Avatar(pawn,heritages) {
 			otherNewPath.setAttribute("stroke-width","1");
 			otherNewPath.setAttribute("stroke-linecap","round");
 			
-			var startX = 100 - i * this.parameters.hips/3;
+			var startX = 0 - i * this.parameters.hips/3;
 			var startY = this.bodyConstants.neck + 70 + i * this.parameters.hips/-3 ;
 			
 			var path = 'm '+startX+','+startY;
 			path += ' l -10,10 l -3,-3 l 8,-12';
 			
-			var startX = 100 + i * this.parameters.hips/3;
+			var startX = 0 + i * this.parameters.hips/3;
 			
 			var otherPath = 'm '+startX+','+startY;
 			otherPath += ' l 10,10 l 3,-3 l -8,-12';
@@ -3390,7 +3402,7 @@ function Avatar(pawn,heritages) {
 		newPath.setAttribute("stroke-width","1");
 		newPath.setAttribute("stroke-linecap","round");
 		
-		var x = 100 - this.parameters.shoulders * 0.9;
+		var x = 0 - this.parameters.shoulders * 0.9;
 		var y = this.bodyConstants.neck + 3;
 		path = 'm '+x+','+y;
 		path += 'l 10,-2 l 2,20 l -12,0 z'
@@ -3404,7 +3416,7 @@ function Avatar(pawn,heritages) {
 		newPath.setAttribute("stroke-width","1");
 		newPath.setAttribute("stroke-linecap","round");
 		
-		var x = 100 + this.parameters.shoulders * 0.9;
+		var x = 0 + this.parameters.shoulders * 0.9;
 		var y = this.bodyConstants.neck + 3;
 		path = 'm '+x+','+y;
 		path += 'l -10,-2 l -2,20 l 12,0 z'
@@ -3432,7 +3444,7 @@ function Avatar(pawn,heritages) {
 			newPath.setAttribute("stroke-width","1");
 			newPath.setAttribute("stroke-linecap","round");
 			var overstepY = scraps[i].y + scraps[i].x - scraps[i+1].y;
-			path = 'm 100,'+startY;
+			path = 'm 0,'+startY;
 			x = scraps[i].x;
 			y = scraps[i].x;
 			var c2y = y + scraps[1].c1x;
@@ -3456,7 +3468,7 @@ function Avatar(pawn,heritages) {
 			newPath.setAttribute("stroke-width","1");
 			newPath.setAttribute("stroke-linecap","round");
 			var overstepY = scraps[i].y + scraps[i].x - scraps[i+1].y;
-			path = 'm 100,'+startY;
+			path = 'm 0,'+startY;
 			x = -1 * scraps[i].x;
 			y = scraps[i].x;
 			path += 'c -'+scraps[i].c1x+',0 '+x+',-'+y+' '+x+',-'+y;
@@ -3500,7 +3512,7 @@ function Avatar(pawn,heritages) {
 		};
 		
 		// start right top
-		x = 100 - this.parameters.hips;
+		x = 0 - this.parameters.hips;
 		y = this.bodyConstants.neck + 55;
 		var path = 'm '+x+','+y;
 		
@@ -3555,7 +3567,7 @@ function Avatar(pawn,heritages) {
 		svgNodes.appendChild(defs);
 		
 		// start right top
-		x = 100 - this.parameters.shoulders * 0.5;
+		x = 0 - this.parameters.shoulders * 0.5;
 		y = this.bodyConstants.neck;
 		var path = 'm '+x+','+y;
 		
@@ -3584,7 +3596,7 @@ function Avatar(pawn,heritages) {
 		bustline.setAttribute("stroke-linecap","round");
 					
 		// start right top
-		x = 100 - this.parameters.bust / 2;
+		x = 0 - this.parameters.bust / 2;
 		y = this.bodyConstants.neck + 22;
 		var depth = this.parameters.bust / 2 + 1.5;
 		var path = 'm '+x+','+y+' v'+depth+' h'+this.parameters.bust+' v-'+depth;
@@ -3613,7 +3625,7 @@ function Avatar(pawn,heritages) {
 		robePath.setAttribute("stroke-linecap","round");
 		
 		// start right hip
-		x = 100 - this.parameters.hips;
+		x = 0 - this.parameters.hips;
 		y = this.bodyConstants.neck + 53;
 		var path = 'm '+x+','+y;
 		
@@ -3693,7 +3705,7 @@ function Avatar(pawn,heritages) {
 		panelPath.setAttribute("stroke-linecap","round");
 		
 		// start right top
-		x = 92;
+		x = -8;
 		y = this.bodyConstants.neck;
 		var path = 'm '+x+','+y;
 		
@@ -3786,7 +3798,7 @@ function Avatar(pawn,heritages) {
 		};
 		
 		// start right top
-		x = 98 - this.parameters.hips;
+		x = -2 - this.parameters.hips;
 		y = this.bodyConstants.neck + 51;
 		var path = 'm '+x+','+y;
 		
@@ -3837,7 +3849,7 @@ function Avatar(pawn,heritages) {
 		};
 		
 		// start right top
-		x = 100 - this.parameters.hips;
+		x = 0 - this.parameters.hips;
 		y = this.bodyConstants.neck + 58;
 		var path = 'm '+x+','+y;
 		

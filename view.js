@@ -44,6 +44,10 @@ var view = {
 		var creationViewerDiv = document.createElement('div');
 		creationLeftDiv.appendChild(creationViewerDiv);
 		creationViewerDiv.id = 'creationViewerDiv';
+		var creationSVG = document.createElementNS('http://www.w3.org/2000/svg','svg');
+		creationViewerDiv.appendChild(creationSVG);
+		creationSVG.id = 'creationSVG';
+		creationSVG.setAttribute('viewBox','-25 -50 50 50');
 		
 		var creationNameDiv = document.createElement('div');
 		creationLeftDiv.appendChild(creationNameDiv);
@@ -124,6 +128,7 @@ var view = {
 			ears: ['Ears',"earSize", "earDip", "earTilt", "earWidth", "earLobe"],
 			hair: ['Hair',"hairCurl","hairLength", "hairPart", "hairBangs", "hairBangsLength", "hairSweep", "topHairHeight", "topHairBase", "topHairWidth","horns"],
 			body: ['Body',"shoulders", "bust", "belly", "hips", "feet", "hindquarters"],
+			social: ['Social'],
 		};
 		for (var category in characterParameters) {
 			var categoryDiv = document.createElement('div');
@@ -160,7 +165,7 @@ var view = {
 					parameterInput.type = 'range';
 					parameterInput.max = data.ethnicities.max[parameter];
 					parameterInput.min = data.ethnicities.min[parameter];
-					parameterInput.step = (data.ethnicities.max[parameter]-data.ethnicities.min[parameter])/100;
+					parameterInput.step = (data.ethnicities.max[parameter]-data.ethnicities.min[parameter])/1000;
 					parameterP.innerHTML += data.ethnicities.labelNames[parameter];
 					parameterP.setAttribute('oninput','handlers.updateAvatar()');
 					parameterP.setAttribute('onchange','handlers.updateAvatar()');
@@ -177,8 +182,7 @@ var view = {
 	displayCreation: function() {
 		document.getElementById('introDiv').style.display = 'none';
 		document.getElementById('creationDiv').style.display = 'block';
-		document.getElementById('creationViewerDiv').innerHTML = '';
-		document.getElementById('creationViewerDiv').appendChild(game.avatar.svg);
+		view.updateCreation();
 		for (var parameter in data.ethnicities.labelNames) {
 			document.getElementById(parameter+"Input").value = game.avatar.parameters[parameter];
 		};
@@ -186,6 +190,34 @@ var view = {
 	
 	hideCreation: function() {
 		document.getElementById('creationDiv').style.display = 'none';
+	},
+	
+	updateCreation: function() {
+		var tierList;
+		game.avatar.svg = game.avatar.draw();
+		game.avatar.updateColoring();
+		document.getElementById('creationSVG').innerHTML = '';
+		document.getElementById('creationSVG').appendChild(game.avatar.svg);
+		var apparentEthnicities = game.avatar.apparentEthnicities();
+		var apparentString = 'Your features appear';
+		for (var tier of ['very','somewhat','vaguely']) {
+			tierList = [];
+			if (apparentEthnicities[tier].length > 0) {apparentString += ' ' + tier;};
+			for (var ethnicity of apparentEthnicities[tier]) {
+				tierList.push(ethnicity);
+			};
+			apparentString += gamen.prettyList(tierList,'or');
+			if (apparentEthnicities[tier].length > 0 && tier !== 'vaguely') {apparentString += ';';};
+		};
+		apparentString += '.';
+		if (apparentEthnicities.very.length == 0 && apparentEthnicities.somewhat.length == 0 && apparentEthnicities.vaguely.length == 0) {
+			apparentString = "Your features are strange and exotic, not easily classified into a common ethnicity.";
+		};
+		var socialCategoryDiv = document.getElementById('socialCategoryDiv');
+		socialCategoryDiv.innerHTML = '';
+		var socialResultsP = document.createElement('p');
+		socialCategoryDiv.appendChild(socialResultsP);
+		socialResultsP.innerHTML  = apparentString;
 	},	
 	
 	toggleCreationCategory: function(category) {
@@ -479,8 +511,8 @@ var view = {
 		var pawn = document.createElementNS('http://www.w3.org/2000/svg','use');
 		firstPawnButton.appendChild(pawn);
 		pawn.setAttribute('x',85);
-		pawn.setAttribute('y',60);
-		pawn.setAttribute('transform','translate(42.5 30) scale(0.5)');
+		pawn.setAttribute('y',62);
+		pawn.setAttribute('transform',' translate(85 60) scale(0.17) translate(-85 -60)');
 		pawn.id = 'firstPawnButton';
 		
 		var endTurnButton = document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -516,9 +548,9 @@ var view = {
 	
 	buildStandees: function() {
 		for (var pawn of game.map.pawns) {
-			var pawnAvatarSVG = pawn.avatar.svg;
-			pawnAvatarSVG.id = pawn.id;
-			document.getElementById('globalDefs').appendChild(pawnAvatarSVG);
+			var pawnAvatarNodes = pawn.avatar.svgNodes;
+			pawnAvatarNodes.id = pawn.id;
+			document.getElementById('globalDefs').appendChild(pawnAvatarNodes);
 			pawn.sprite = pawn.id;
 		};
 		for (var tile of game.map.tiles) {
@@ -544,9 +576,7 @@ var view = {
 				};
 			};
 		};	
-// 		document.getElementById('firstPawnButton').setAttribute('href','#'+game.map.pawns[0].sprite);
 		view.setHref(document.getElementById('firstPawnButton'),game.map.pawns[0].sprite);
-		document.getElementById('firstPawnButton').setAttribute('fill',game.map.pawns[0].color);
 	},
 	
 	buildCharacterSheets: function() {
@@ -572,7 +602,6 @@ var view = {
 			sheet.setAttribute('stroke-width',0.25);
 			var portrait = document.createElementNS('http://www.w3.org/2000/svg','use');
 			sheetGroup.appendChild(portrait);
-// 			portrait.setAttribute('href','#'+pawn.sprite);
 			view.setHref(portrait,pawn.sprite);
 			portrait.setAttribute('x',-75);
 			portrait.setAttribute('y',160);

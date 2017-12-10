@@ -41,7 +41,7 @@ function Game() {
 	this.costumes.fight.equipment.garb = new Item('scrapArmor',this.costumes.fight);
 	this.costumes.pray.equipment.garb = new Item('initiatesRobes',this.costumes.pray);
 	this.avatar.pawn = this.costumes[['work','fight','pray'][Math.random() * 3 << 0]];
-	this.avatar.svg = this.avatar.draw();
+	this.avatar.svgNodes = this.avatar.draw();
 
 	this.loadMap = function() {
 		this.map = new Map();

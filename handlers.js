@@ -16,10 +16,11 @@ var handlers = {
 			};
 			game.avatar.parameters[i] = value;
 		};
-		game.avatar.svg = game.avatar.draw();
-		game.avatar.updateColoring();
-		document.getElementById('creationViewerDiv').innerHTML = '';
-		document.getElementById('creationViewerDiv').appendChild(game.avatar.svg);
+// 		game.avatar.svg = game.avatar.draw();
+// 		game.avatar.updateColoring();
+// 		document.getElementById('creationSVG').innerHTML = '';
+// 		document.getElementById('creationSVG').appendChild(game.avatar.svg);
+		view.updateCreation();
 	},
 	
 	randomCharacter: function() {
@@ -28,9 +29,11 @@ var handlers = {
 		for (var c of ['work','fight','pray']) {
 			game.costumes[c].avatar = game.avatar;
 		};
-		game.avatar.svg = game.avatar.draw();
-		document.getElementById('creationViewerDiv').innerHTML = '';
-		document.getElementById('creationViewerDiv').appendChild(game.avatar.svg);
+// 		game.avatar.svg = game.avatar.draw();
+// 		game.avatar.updateColoring();
+// 		document.getElementById('creationSVG').innerHTML = '';
+// 		document.getElementById('creationSVG').appendChild(game.avatar.svg);
+		view.updateCreation();
 		var parameters = data.ethnicities.labelNames;
 		for (var i in parameters) {
 			document.getElementById( i + "Input" ).value = game.avatar.parameters[i];
@@ -55,9 +58,11 @@ var handlers = {
 	selectClass: function(key) {
 		key = key.toLowerCase();
 		game.avatar.pawn = game.costumes[key];
-		game.avatar.svg = game.avatar.draw();
-		document.getElementById('creationViewerDiv').innerHTML = '';
-		document.getElementById('creationViewerDiv').appendChild(game.avatar.svg);
+// 		game.avatar.svg = game.avatar.draw();
+// 		game.avatar.updateColoring();
+// 		document.getElementById('creationSVG').innerHTML = '';
+// 		document.getElementById('creationSVG').appendChild(game.avatar.svg);
+		view.updateCreation();
 	},
 	
 	enablePlayButton: function() {
