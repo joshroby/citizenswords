@@ -1,0 +1,51 @@
+<html>
+
+	<head>
+		<title>GFX Test</title>
+		<link rel="stylesheet" href="style.css">
+		<script src="gamen.js"></script>
+		<link rel="stylesheet" href="gamen.css">
+		<script src="handlers.js"></script>
+		<script src="data.js"></script>
+		<script src="draw.js"></script>
+		<script src="model.js"></script>
+		<script src="view.js"></script>
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:creator" content="@joshroby" />
+		<meta property="og:image" content="http://joshroby.com/citizenswords/openGraphImage.png">
+	</head>
+
+	<body onload='gamen.init()'>
+		
+		<div id='mainMenuDiv'>
+		
+			<h4 id='titleHead'></h4>
+		
+			<button onclick = 'handlers.newGame()'>New Game</button>
+			<button id = 'saveButton' disabled onclick = 'gamen.saveGame()'>Save Game</button>
+			<button disabled onclick='handlers.toggleOptions()' >Options</button>
+			<button disabled id='gamenSupportBtn' hidden onclick='gamen.support()'>Support</button>
+			
+			<div id='optionsDiv'></div>
+			
+		
+		</div>
+		
+		<div id='gameDiv'>		
+			
+		</div>
+		
+		<div id='gamenModalBacksplash'>
+		
+			<div id='gamenModalDiv'>
+			
+				<div id='gamenModalBustDiv'></div>
+				<div id='gamenModalTextDiv'></div>
+			
+			</div>
+		
+		</div>
+	
+	</body>
+
+</html>

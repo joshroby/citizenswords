@@ -1,0 +1,193 @@
+/* Basic Stuff */
+body {
+	font-family: sans-serif;
+	padding-top: 5vw;
+	}
+
+div:after {
+	content: "";
+	display: table;
+	clear: both;
+	}
+
+/* Main Menu Bar */
+#mainMenuDiv {
+	background-color: darkslategray;
+	color: white;
+	height: 3vw;
+	text-align: center;
+	padding-top: 1vw;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	}
+
+#titleHead {
+	display: inline;
+	padding-right: 15vw;
+	}
+
+/*  Game Div */
+
+#gameDiv {
+	}
+
+
+/* Save & Load Game */
+#loadGameDiv {
+	width:100%;
+	margin-top: 5%;
+}
+
+#loadGameHeader {
+	background-color: darkslategray;
+	background: linear-gradient(white,darkslategray);
+	color: white;
+	text-align: center;
+	width: 100%;
+}
+
+.loadGameItem {
+	margin: 1%;
+	width: 40%;
+	float: left;
+}
+
+.loadGameTimeDiv {
+	margin: 1%;
+	width: 25%;
+	float: left;
+	font-size: 0.8em;
+}
+
+.loadGameBtn {
+	float: left;
+	margin: 1vw;
+}
+
+
+/* Passages */
+#gamenModalBacksplash {
+	display: none;
+	position: fixed;
+	z-index: 2000;
+	left:0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	-webkit-animation-name: fadeIn;
+	-webKit-animation-duration: 0.4s;
+	animation-name: fadeIn;
+	animation-duration: 0.4s;
+	}
+
+#gamenModalDiv {
+	position:fixed;
+	bottom:0;
+	margin-left: 20%;
+	width: 60%;
+	max-height: 70%;
+	overflow-y: auto;
+	-webkit-animation-name: slideIn;
+	-webKit-animation-duration: 0.4s;
+	animation-name: slideIn;
+	animation-duration: 0.4s;
+	}
+	}
+
+@-webkit-keyframes slideIn {
+	from {bottom: -300px; opacity: 0}
+	to {bottom:0; opacity: 1}
+	}
+
+@keyframes slideIn {
+	from {bottom: -300px; opacity: 0}
+	to {bottom: 0; opacity: 1}
+	}
+	
+@-webkit-keyframes fadeIn {
+	from {opacity: 0}
+	to {opacity: 1}
+	}
+
+@keyframes fadeIn {
+	from {opacity: 0}
+	to {opacity: 1}
+	}
+
+.gameModalBustDiv {
+	width: 10vw;
+	height: 10vw;
+	border: 5px solid darkorange;
+	background: white;
+	}
+
+.gamenModalBustLeft {
+	float: left;
+	margin-right: 2vw;
+	}
+
+.gamenModalBustRight {
+	float: right;
+	margin-left: 2vw;
+	}
+
+#gamenModalTextDiv {
+	background: white;
+	border-top: 10px solid darkorange;
+	border-left: 10px solid darkorange;
+	border-right: 10px solid darkorange;
+	height: 100%;
+	margin-top: 2.5vw;
+	margin-left: 2.5vw;
+	margin-right: 2.5vw;
+	min-height: 10vw;
+	padding: 2.5vw;
+	text-align: left;
+	font-size: 1.2em;
+	}
+
+#gamenModalChoicesDiv {
+	margin-top: 1vh;
+	text-align: right;
+	}
+
+#gamenModalChoicesDiv button {
+	margin: 0.5vw;
+	}
+	
+.gamenModalSpeakerSpan {
+	font-weight: bold;
+	font-size: 1.5em;
+	}
+
+#gamenModalCloseDiv {
+	background: white;
+	border-left: 10px solid darkorange;
+	border-right: 10px solid darkorange;
+	margin-left: 2.5vw;
+	margin-right: 2.5vw;
+	padding: 2.5vw;
+	text-align: right;
+	}
+
+/* Tool Tips */
+.tipAnchor {
+	}
+
+.tipAnchor span.tooltip {
+	display: none;
+	z-index: 100;
+	}
+
+a.tipAnchor:hover span.tooltip {
+	position: absolute;
+	margin-top: 2vh;
+	display: inline;
+	background-color: white;
+	border: 1px solid darkorange;
+	padding: 0.5vh;
+	max-width: 15vw;
+	}

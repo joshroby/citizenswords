@@ -1,0 +1,26 @@
+TO DO LIST CITIZEN SWORDS REDUX
+
+- number key capture
+- morale
+- rally maneuver
+- heal maneuver
+- refresh maneuver
+- poison maneuver
+- knockback
+- create *Base stats on items for ablative stats (sharpness, blessing)
+- animated gradient for selected maneuvers
+- disarm to inventory (easy)
+- verbose wound descriptions
+- 'swap items' inventory lock
+
+- two-handed items
+- cover
+- tooltips for maneuvers and items
+- integrate original character designer
+- disarm to floor (requires items-on-floor architecture)
+- transparency of first-row obstacles (and select through somehow?)
+			
+GAMEN
+
+- generate main menu buttons
+- view.colors

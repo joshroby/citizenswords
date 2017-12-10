@@ -1,0 +1,122 @@
+/* MAP STYLES */
+.inventoryButton {
+	font-family: serif;
+}
+
+svg {
+	font-family: sans-serif;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+#gameDiv {
+	border: 1px solid #EEE;
+}
+
+/* CHARACTER CREATION LAYOUT */
+#creationLeftDiv {
+	width: 45%;
+	float: left;
+	text-align: center;
+}
+
+#creationViewerDiv {
+	width: 90%;
+	margin-left: 5%;
+}
+
+#creationLeftDiv div {
+	margin-bottom: 1%;
+}
+
+#creationLeftDiv h4 {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+#creationLeftDiv p {
+	font-size: 0.8em;
+}
+
+#creationLeftDiv input {
+	width: 35%;
+	
+}
+
+.classDiv {
+	float: left;
+	width: 25%;
+	margin-left: 2%;
+	margin-right: 2%;
+	padding-bottom: 2%;
+}
+
+.classDiv p {
+	padding-left: 10%;
+	padding-right: 10%;
+}
+
+#classWorkDiv {
+	border: 4px solid goldenrod;
+}
+
+#classWorkDiv h4 {
+	background-color: goldenrod;
+}
+
+#classFightDiv {
+	border: 4px solid indianred;
+}
+
+#classFightDiv h4 {
+	background-color: indianred;
+}
+
+#classPrayDiv {
+	border: 4px solid lightblue;
+}
+
+#classPrayDiv h4 {
+	background-color: lightblue;
+}
+
+#creationRightDiv {
+	float:left;
+	width: 40%;
+	height: 90%;
+	overflow-y: auto;
+	padding-left: 5%;
+	padding-right: 5%;
+}
+
+#creationRightDiv button {
+	margin-left: 3%;
+}
+
+#creationViewerDiv {
+}
+
+.creationHead {
+	background-color: maroon;
+	color: white;
+	padding: 1%;
+	margin-bottom: 0.5%;
+	margin-top: 0.5%;
+}
+
+.creationDiv p {
+	padding: 0;
+	margin: 0;
+}
+
+.creationDiv input {
+	width: 40%;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+.categoryContentsDiv {
+	padding-bottom: 3%;
+}
