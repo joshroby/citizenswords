@@ -12,14 +12,37 @@ TO DO LIST CITIZEN SWORDS REDUX
 - disarm to inventory (easy)
 - verbose wound descriptions
 - 'swap items' inventory lock
-
-- two-handed items
-- cover
-- tooltips for maneuvers and items
 - integrate original character designer
+- tooltips for maneuvers and items
+- when you change class in creation screen it carries over into game properly
+- centaur butts
+- swapping changes avatar
+- line wraps for tooltips
+- export avatar button
+- two-handed items
+- disable swap button when move<5
+- cover (untested)
+- buff, nerf, defeat, and revive animations
+- attack / projectile / beam animation
+- drag map cancels pan
+- defeated pawns do not block movement
+- pawns that aren't yours do not display maneuvers
+- pawns that aren't yours don't move for you / display move options
+
+
+- load level
+	- enemies / other teams
+	- events
+	- move costs
+- GAMEN SVG passages
+- contextual actions (loot, slaughter, bind, interact)
+- multi-hex targets
+- display move costs /remainingMove moveOptions
+- trading items between pawns
+	- shops
 - disarm to floor (requires items-on-floor architecture)
-- transparency of first-row obstacles (and select through somehow?)
-			
+- ai
+
 GAMEN
 
 - generate main menu buttons

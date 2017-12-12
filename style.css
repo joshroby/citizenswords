@@ -1,3 +1,15 @@
+#introDiv{
+	margin-left: 30%;
+	margin-right: 30%;
+	margin-top: 15%;
+}
+
+#introDiv button {
+	width: 30%;
+	margin-left: 34%;
+	margin-right: 34%;
+}
+
 /* MAP STYLES */
 .inventoryButton {
 	font-family: serif;
@@ -9,10 +21,6 @@ svg {
 
 .bold {
 	font-weight: bold;
-}
-
-#gameDiv {
-	border: 1px solid #EEE;
 }
 
 /* CHARACTER CREATION LAYOUT */
@@ -91,8 +99,12 @@ svg {
 	padding-right: 5%;
 }
 
+#creationRightDiv h2 {
+	margin-bottom: 0;
+}
+
 #creationRightDiv button {
-	margin-left: 3%;
+	margin-left: 10%;
 }
 
 #creationViewerDiv {

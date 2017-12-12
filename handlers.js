@@ -16,10 +16,6 @@ var handlers = {
 			};
 			game.avatar.parameters[i] = value;
 		};
-// 		game.avatar.svg = game.avatar.draw();
-// 		game.avatar.updateColoring();
-// 		document.getElementById('creationSVG').innerHTML = '';
-// 		document.getElementById('creationSVG').appendChild(game.avatar.svg);
 		view.updateCreation();
 	},
 	
@@ -29,10 +25,6 @@ var handlers = {
 		for (var c of ['work','fight','pray']) {
 			game.costumes[c].avatar = game.avatar;
 		};
-// 		game.avatar.svg = game.avatar.draw();
-// 		game.avatar.updateColoring();
-// 		document.getElementById('creationSVG').innerHTML = '';
-// 		document.getElementById('creationSVG').appendChild(game.avatar.svg);
 		view.updateCreation();
 		var parameters = data.ethnicities.labelNames;
 		for (var i in parameters) {
@@ -58,10 +50,6 @@ var handlers = {
 	selectClass: function(key) {
 		key = key.toLowerCase();
 		game.avatar.pawn = game.costumes[key];
-// 		game.avatar.svg = game.avatar.draw();
-// 		game.avatar.updateColoring();
-// 		document.getElementById('creationSVG').innerHTML = '';
-// 		document.getElementById('creationSVG').appendChild(game.avatar.svg);
 		view.updateCreation();
 	},
 	
@@ -74,10 +62,7 @@ var handlers = {
 	},
 	
 	confirmAndPlay: function() {
-		game.players[0].name = document.getElementById('nameInput');
-		game.players[0].heroes = [game.avatar.pawn];
-// 		game.players[0].heroes.push(new Pawn());
-// 		game.players[0].heroes[1].svg = game.players[0].heroes[1].avatar.draw();
+		game.confirmCreation(document.getElementById('nameInput').value);
 		view.hideCreation();
 		game.loadMap();
 	},
@@ -95,6 +80,7 @@ var handlers = {
 		view.camera.dragging = true;
 		view.camera.dragStartX = e.pageX;
 		view.camera.dragStartY = e.pageY;
+		view.camera.destinations = [];
 	},
 	
 	dragItemStart: function(e) {
@@ -135,7 +121,7 @@ var handlers = {
 				appropriateSlot = false;
 				if (view.itemDrag.item.slots.indexOf(slotType) !== -1) {
 					appropriateSlot = true;
-				} else if (view.itemDrag.item.slots.indexOf('leftRight') !== -1 && (slotType == 'left' || slotType == 'right') ) {
+				} else if (view.itemDrag.item.slots.indexOf('left+right') !== -1 && (slotType == 'left' || slotType == 'right') ) {
 					appropriateSlot = true;
 				} else if (view.itemDrag.item.slots.indexOf('aux') !== -1 && (slotType == 'belt' || slotType == 'pouch' || slotType == 'knapsack') ) {
 					appropriateSlot = true;
@@ -178,6 +164,7 @@ var handlers = {
 			} else if (view.itemDrag.selectedSlot !== undefined) {
 				view.focus.pawn.equip(view.itemDrag.item,view.itemDrag.selectedSlot);
 			};
+			view.redrawPawn(view.focus.pawn);
 		};
 	},
 
@@ -205,15 +192,15 @@ var handlers = {
 	},
 	
 	nextPawn: function() {
-		var pawnList = game.map.pawns;
+		var pawnList = game.map.heroes;
 		var currentIndex = pawnList.indexOf(view.focus.pawn);
-		var targetIndex = currentIndex + 1;
+		var targetIndex = parseInt(currentIndex) + 1;
 		if (targetIndex == pawnList.length) {targetIndex = 0};
 		handlers.pawnSelect(pawnList[targetIndex]);
 	},
 	
 	lastPawn: function() {
-		var pawnList = game.map.pawns;
+		var pawnList = game.map.heroes;
 		var currentIndex = pawnList.indexOf(view.focus.pawn);
 		var targetIndex = currentIndex - 1;
 		if (targetIndex == -1) {targetIndex = pawnList.length - 1};
@@ -245,7 +232,9 @@ var handlers = {
 			view.deselectManeuver(maneuver);
 			view.focus.maneuver = undefined;
 		} else {
-			view.deselectManeuver(view.focus.maneuver);
+			if (view.focus.maneuver !== undefined) {
+				view.deselectManeuver(view.focus.maneuver);
+			};
 			if (maneuver.maxRange > 0) {
 				view.focus.maneuver = maneuver;
 				view.clearMoveOptions();
@@ -280,7 +269,7 @@ var handlers = {
 	},
 	
 	swapItems: function(pawn) {
-		if (view.focus.swapping !== pawn) {
+		if (view.focus.swapping !== pawn && pawn.stats.move >= 5) {
 			view.focus.swapping = pawn;
 			view.selectManeuver('swap');
 			pawn.stats.move -= 5;
@@ -307,3 +296,17 @@ document.addEventListener('keydown',function(event) {
 		}
 	}
 });
+
+function saveSVG(svgElement, name) {
+    svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    var svgData = svgElement.outerHTML;
+    var preface = '<?xml version="1.0" standalone="no"?>\r\n';
+    var svgBlob = new Blob([preface, svgData], {type:"image/svg+xml;charset=utf-8"});
+    var svgUrl = URL.createObjectURL(svgBlob);
+    var downloadLink = document.createElement("a");
+    downloadLink.innerHTML = '<button>Export</button>';
+    downloadLink.href = svgUrl;
+    downloadLink.download = name;
+    document.getElementById('saveSpan').innerHTML = '';
+    document.getElementById('saveSpan').appendChild(downloadLink);
+}

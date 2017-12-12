@@ -208,6 +208,16 @@ var data = {
 
 	items: {
 		
+		birthdaySuit: {
+			name: "Birthday Suit",
+			slots: ['garb'],
+			colors: {
+			},
+			stats: {},
+			maneuvers: [],
+			svgNodes: undefined,
+		},
+		
 		cargoHook: {
 			name: "Cargo Hook",
 			slots: ['left','right'],
@@ -236,14 +246,19 @@ var data = {
 		
 		hammer: {
 			name: "Hammer",
-			slots: ['left','right'],
+			slots: ['left+right'],
+			colors: {
+				head: 'silver',
+				shaft: 'saddlebrown',
+				bindings: 'ivory',
+			},
 			stats: {
 				balance: 1,
 				reach: 2,
 				weight: 4,
 			},
 			maneuvers: ['batter','swing'],
-			svgNodes: function(item) {return item.pawn.avatar.hammer(item)},
+			svgNodes: function(item) {return item.pawn.avatar.simpleSpear(item)},
 		},
 		
 		initiatesRobes: {
@@ -254,8 +269,6 @@ var data = {
 				edging: 'darkblue',
 				panel: 'gold',
 				sash: 'darkblue',
-			},
-			simpleColoring: {
 				torso: {fill:'beige'},
 				upperArms: {fill:'beige'},
 				lowerArms: {fill:'beige'},
@@ -270,14 +283,49 @@ var data = {
 			svgNodes: function(item) {return item.pawn.avatar.simpleRobe(item)},
 		},
 		
+		initiatesTome: {
+			name: "Initiate's Tome",
+			slots: ['left','right'],
+			colors: {
+				cover: 'blue',
+				pages: 'ivory',
+			},
+			stats: {
+				aegis: 2,
+				arcane: 3,
+				weight: 2,
+			},
+			maneuvers: ['beam','quickTrance'],
+			svgNodes: function(item) {return item.pawn.avatar.book(item)},
+		},
+	
+		mothersSword: {
+			name: "Mother's Sword",
+			description: "This broken sword is the only thing you have left from your Mother.",
+			slots: ['left','right'],
+			colors: {
+				blade: 'silver',
+				grip: 'scarlet',
+				hilt: 'gold',
+				pommel: 'gold',
+			},
+			stats: {
+				balance: 1,
+				reach: 2,
+				sharp: 5,
+				sharpBase: 1,
+				weight: 3,
+			},
+			maneuvers: ['slash','lunge'],
+			svgNodes: function(item) {return item.pawn.avatar.simpleSword(item)},
+		},
+		
 		roughspun: {
 			name: "Roughspun Clothes",
 			slots: ['garb'],
 			colors: {
 				shirt: ["INDIANRED","LIGHTCORAL","SALMON","DARKSALMON","LIGHTSALMON","CRIMSON","RED","FIREBRICK","DARKRED","PINK","LIGHTPINK","HOTPINK","DEEPPINK","MEDIUMVIOLETRED","PALEVIOLETRED","LIGHTSALMON","CORAL","TOMATO","ORANGERED","DARKORANGE","ORANGE","GOLD","YELLOW","LIGHTYELLOW","LEMONCHIFFON","LIGHTGOLDENRODYELLOW","PAPAYAWHIP","MOCCASIN","PEACHPUFF","PALEGOLDENROD","KHAKI","DARKKHAKI","LAVENDER","THISTLE","PLUM","VIOLET","ORCHID","FUCHSIA","MAGENTA","MEDIUMORCHID","MEDIUMPURPLE","REBECCAPURPLE","BLUEVIOLET","DARKVIOLET","DARKORCHID","DARKMAGENTA","PURPLE","INDIGO","SLATEBLUE","DARKSLATEBLUE","MEDIUMSLATEBLUE","GREENYELLOW","CHARTREUSE","LAWNGREEN","LIME","LIMEGREEN","PALEGREEN","LIGHTGREEN","MEDIUMSPRINGGREEN","SPRINGGREEN","MEDIUMSEAGREEN","SEAGREEN","FORESTGREEN","GREEN","DARKGREEN","YELLOWGREEN","OLIVEDRAB","OLIVE","DARKOLIVEGREEN","MEDIUMAQUAMARINE","DARKSEAGREEN","LIGHTSEAGREEN","DARKCYAN","TEAL","AQUA","CYAN","LIGHTCYAN","PALETURQUOISE","AQUAMARINE","TURQUOISE","MEDIUMTURQUOISE","DARKTURQUOISE","CADETBLUE","STEELBLUE","LIGHTSTEELBLUE","POWDERBLUE","LIGHTBLUE","SKYBLUE","LIGHTSKYBLUE","DEEPSKYBLUE","DODGERBLUE","CORNFLOWERBLUE","MEDIUMSLATEBLUE","ROYALBLUE","BLUE","MEDIUMBLUE","DARKBLUE","NAVY","MIDNIGHTBLUE","CORNSILK","BLANCHEDALMOND","BISQUE","NAVAJOWHITE","WHEAT","BURLYWOOD","TAN","ROSYBROWN","SANDYBROWN","GOLDENROD","DARKGOLDENROD","PERU","CHOCOLATE","SADDLEBROWN","SIENNA","BROWN","MAROON","SNOW","HONEYDEW","MINTCREAM","AZURE","ALICEBLUE","GHOSTWHITE","WHITESMOKE","SEASHELL","BEIGE","OLDLACE","FLORALWHITE","IVORY","ANTIQUEWHITE","LINEN","LAVENDERBLUSH","MISTYROSE","GAINSBORO","LIGHTGRAY","SILVER","DARKGRAY","GRAY","DIMGRAY","LIGHTSLATEGRAY","SLATEGRAY","DARKSLATEGRAY"],
 				shorts: 'tan',
-			},
-			simpleColoring: {
 				upperArms: {fill:'match shirt'},
 				feet: {fill:'saddlebrown',stroke:'#000000'},
 			},
@@ -291,14 +339,12 @@ var data = {
 		},
 		
 		scrapArmor: {
-			name: "Armor",
+			name: "Scrap Armor",
 			slots: ['garb'],
 			colors: {
 				bandOne: '#A0522D',
 				bandTwo: '#A05221',
 				bandThree: '#A0452D',
-			},
-			simpleColoring: {
 				upperArms: {fill:'tan'},
 				bust: {fill:'none',stroke:'none'},
 				legs: {fill:'tan'},
@@ -329,8 +375,8 @@ var data = {
 			svgNodes: function(item) {return item.pawn.avatar.simpleShield(item)},
 		},
 	
-		sword: {
-			name: "Sword",
+		shortSword: {
+			name: "Shortsword",
 			slots: ['left','right'],
 			colors: {
 				blade: 'silver',
@@ -341,28 +387,12 @@ var data = {
 			stats: {
 				balance: 1,
 				reach: 2,
-				sharpness: 5,
-				sharpnessBase: 1,
+				sharp: 5,
+				sharpBase: 1,
 				weight: 3,
 			},
 			maneuvers: ['slash','lunge'],
 			svgNodes: function(item) {return item.pawn.avatar.simpleSword(item)},
-		},
-		
-		tome: {
-			name: "Tome",
-			slots: ['left','right'],
-			colors: {
-				cover: 'blue',
-				pages: 'ivory',
-			},
-			stats: {
-				aegis: 2,
-				arcane: 3,
-				weight: 2,
-			},
-			maneuvers: ['quickTrance'],
-			svgNodes: function(item) {return item.pawn.avatar.book(item)},
 		},
 	
 		wand: {
@@ -383,6 +413,7 @@ var data = {
 	
 		batter: {
 			name: "Batter",
+			description: "A basic, close attack",
 			targetType: 'pawn',
 			minRange: 1,
 			maxRange: 1,
@@ -404,6 +435,7 @@ var data = {
 	
 		beam: {
 			name: "Beam",
+			description: "Pew pew pew!",
 			targetType: 'pawn',
 			minRange: 1,
 			maxRange: Infinity,
@@ -425,6 +457,7 @@ var data = {
 	
 		exhort: {
 			name: "Exhort",
+			description: "Replenish the morale of your comrade",
 			targetType: 'pawn',
 			minRange: 1,
 			maxRange: 10,
@@ -442,6 +475,7 @@ var data = {
 		
 		heal: {
 			name: "Heal",
+			description: "Remove wounds on your target",
 			targetType: 'pawn',
 			minRange: 1,
 			maxRange: 1,
@@ -461,6 +495,7 @@ var data = {
 	
 		hook: {
 			name: "Hook",
+			description: "Grab at your target, restricting movement",
 			targetType: 'pawn',
 			minRange: 1,
 			maxRange: 1,
@@ -471,7 +506,7 @@ var data = {
 			rollStats: {
 				action: {pawnStat: 'move',itemStat: 'reach'},
 				reaction: {pawnStat: 'move',itemStat: 'deflection'},
-				power: {pawnStat: 'strength',itemStat: 'sharpness'},
+				power: {pawnStat: 'strength',itemStat: 'sharp'},
 				resist: {pawnStat: 1,itemStat: 'soak'},
 			},
 			effects: [
@@ -481,6 +516,7 @@ var data = {
 	
 		gouge: {
 			name: "Gouge",
+			description: "Ouch!",
 			targetType: 'pawn',
 			minRange: 1,
 			maxRange: 1,
@@ -491,7 +527,7 @@ var data = {
 			rollStats: {
 				action: {pawnStat: 'move',itemStat: 'reach'},
 				reaction: {pawnStat: 'move',itemStat: 'deflection'},
-				power: {pawnStat: 'strength',itemStat: 'sharpness'},
+				power: {pawnStat: 'strength',itemStat: 'sharp'},
 				resist: {pawnStat: 1,itemStat: 'soak'},
 			},
 			effects: [
@@ -501,6 +537,7 @@ var data = {
 	
 		lunge: {
 			name: "Lunge",
+			description: "An energetic and startling attack",
 			targetType: 'pawn',
 			minRange: 1,
 			maxRange: 2,
@@ -512,7 +549,7 @@ var data = {
 			rollStats: {
 				action: {pawnStat: 'strength',itemStat: 'reach'},
 				reaction: {pawnStat: 'move',itemStat: 'deflection'},
-				power: {pawnStat: 'strength',itemStat: 'sharpness'},
+				power: {pawnStat: 'strength',itemStat: 'sharp'},
 				resist: {pawnStat: 1,itemStat: 'soak'},
 			},
 			effects: [
@@ -524,6 +561,7 @@ var data = {
 	
 		quickTrance: {
 			name: "Quick Trance",
+			description: "Take a moment to gather your focus",
 			targetType: 'pawn',
 			costs: {
 				move: function(item) {return 4}
@@ -538,6 +576,7 @@ var data = {
 	
 		shieldBash: {
 			name: "Shield Bash",
+			description: "A basic attack",
 			targetType: 'pawn',
 			minRange: 1,
 			maxRange: 1,
@@ -559,6 +598,7 @@ var data = {
 	
 		slash: {
 			name: "Slash",
+			description: "A basic, close attack",
 			targetType: 'pawn',
 			minRange: 1,
 			maxRange: 1,
@@ -581,6 +621,7 @@ var data = {
 	
 		swing: {
 			name: "Swing",
+			description: "A wide attack",
 			targetType: 'pawn',
 			minRange: 2,
 			maxRange: 2,
@@ -602,6 +643,30 @@ var data = {
 		},
 		
 		// End
+	},
+	
+	landscapes: {
+	
+		house: {
+			sprite: 'house',
+			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
+	
+		bushes: {
+			sprite: 'bushes',
+			blockView: true,
+			exclusive: false,
+			cover: 0.5,
+		},
+	
+		boulder: {
+			sprite: 'boulder',
+			blockView: false,
+			exclusive: true,
+			cover: 0,
+		},
 	},
 	
 	wounds: {

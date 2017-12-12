@@ -31,7 +31,11 @@ var view = {
 	
 		var introDiv = document.createElement('div');
 		introDiv.id = 'introDiv';
-		introDiv.innerHTML = "Placeholder!";
+		introDiv.innerHTML = "<p>In this very under-construction game, you take on the role of citizens of a beautiful, cosmopolitain fantasy city who rise up against the tyranny of the despotic Ogre King. It's a tactical roleplaying game, which means you mostly move little characters around on a map to stage little battles.</p><p>There isn't much here yet -- one and a half levels -- but I'm doing a lot of backend work to make creating levels as easy as possible going forward.</p>";
+		var newGameButton = document.createElement('button');
+		introDiv.appendChild(newGameButton);
+		newGameButton.addEventListener('click',handlers.newGame);
+		newGameButton.innerHTML = "Down with the King!";
 		
 		var creationDiv = document.createElement('div');
 		creationDiv.id = 'creationDiv';
@@ -116,9 +120,12 @@ var view = {
 		creationRightDiv.appendChild(customizeHead);
 		customizeHead.innerHTML = "Customize your Appearance";
 		var randomCharacterBtn = document.createElement('button');
-		customizeHead.appendChild(randomCharacterBtn);
+		creationRightDiv.appendChild(randomCharacterBtn);
 		randomCharacterBtn.setAttribute('onclick','handlers.randomCharacter()');
 		randomCharacterBtn.innerHTML = 'Randomize';
+		var saveSpan = document.createElement('span');
+		creationRightDiv.appendChild(saveSpan);
+		saveSpan.id = 'saveSpan';
 		var characterParameters = {
 			coloring: ["Coloring","blackEumelanin", "brownEumelanin", "pinkPheomelanin", "greenKeratin", "noseShading", "nosePinkness", "lipShading", "lipPinkness", "earShading", "earPinkness",'hairColor','eyeColor'],
 			headShape: ["Head Shape","templePosition", "templeWidth", "templeHeight", "cheekbonePosition", "cheekboneWidth", "cheekboneHeight", "chinHeight", "chinWidth"],
@@ -173,6 +180,12 @@ var view = {
 			};
 		};
 		
+		// Debugging Quick-Start
+		nameInput.value = 'Testy Testtest Testerson';
+		select.value = 'Themself';
+		playButton.disabled = false;
+		// End Debugging
+		
 		var svgDiv = document.createElement('div');
 		svgDiv.id = 'svgDiv';
 		
@@ -190,34 +203,61 @@ var view = {
 	
 	hideCreation: function() {
 		document.getElementById('creationDiv').style.display = 'none';
+		document.getElementById('creationSVG').innerHTML = '';
 	},
 	
 	updateCreation: function() {
 		var tierList;
+		var creationSVG = document.getElementById('creationSVG');
 		game.avatar.svg = game.avatar.draw();
 		game.avatar.updateColoring();
-		document.getElementById('creationSVG').innerHTML = '';
-		document.getElementById('creationSVG').appendChild(game.avatar.svg);
+		creationSVG.innerHTML = '';
+		creationSVG.appendChild(game.avatar.svg);
+		saveSVG(creationSVG,'Citizen Swords Avatar');
+		var pointness = game.avatar.parameters.earDip * -1 - 11;
 		var apparentEthnicities = game.avatar.apparentEthnicities();
-		var apparentString = 'Your features appear';
-		for (var tier of ['very','somewhat','vaguely']) {
-			tierList = [];
-			if (apparentEthnicities[tier].length > 0) {apparentString += ' ' + tier;};
-			for (var ethnicity of apparentEthnicities[tier]) {
-				tierList.push(ethnicity);
+		var apparentString = 'Your features best fit the ';
+		for (var i=0;i<3;i++) {
+			if (i == 2) {apparentString += 'or '};
+			apparentString += apparentEthnicities[i].ethnicity + " (" + Math.round((1-apparentEthnicities[i].num)*100) + "%)";
+			if (i < 2) {apparentString += ', '};
+			if (game.avatar.parameters.hindquarters > 0 ) {
+				pointness -= 3;
 			};
-			apparentString += gamen.prettyList(tierList,'or');
-			if (apparentEthnicities[tier].length > 0 && tier !== 'vaguely') {apparentString += ';';};
+			if (['centaur','dwarven','gigantic','gnomish','minotaur','ogrish'].indexOf(apparentEthnicities[i].ethnicity) !== -1) {
+				pointness -= 3;
+			} else if (['elvish','gnollish','goblin','orcish','trollish'].indexOf(apparentEthnicities[i].ethnicity) !== -1) {
+				pointness += 3;
+			} else if (['kobold'].indexOf(apparentEthnicities[i].ethnicity) !== -1) {
+				pointness += 8;
+			};
 		};
-		apparentString += '.';
-		if (apparentEthnicities.very.length == 0 && apparentEthnicities.somewhat.length == 0 && apparentEthnicities.vaguely.length == 0) {
+		apparentString += ' stereotypes.';
+		if (apparentEthnicities[0].num > 0.3) {
 			apparentString = "Your features are strange and exotic, not easily classified into a common ethnicity.";
 		};
 		var socialCategoryDiv = document.getElementById('socialCategoryDiv');
 		socialCategoryDiv.innerHTML = '';
-		var socialResultsP = document.createElement('p');
-		socialCategoryDiv.appendChild(socialResultsP);
-		socialResultsP.innerHTML  = apparentString;
+		var ethnicityP = document.createElement('p');
+		socialCategoryDiv.appendChild(ethnicityP);
+		ethnicityP.innerHTML  = apparentString;
+		var raceP = document.createElement('p');
+		socialCategoryDiv.appendChild(raceP);
+		var raceString = "You are ";
+		if (Math.abs(pointness) > 5) {
+			raceString += 'reliably';
+		} else if (Math.abs(pointness) > 2) {
+			raceString += 'usually';
+		} else {
+			raceString += 'mostly';
+		};
+		raceString += ' assumed to be a ';
+		if (pointness >= 0) {
+			raceString += 'point.';
+		} else {
+			raceString += 'round.';
+		};
+		raceP.innerHTML = raceString;
 	},	
 	
 	toggleCreationCategory: function(category) {
@@ -268,6 +308,10 @@ var view = {
 		var uiLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
 		uiLayer.id = 'uiLayer';		
 		svg.appendChild(uiLayer);
+	
+		var tipLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+		tipLayer.id = 'tipLayer';		
+		svg.appendChild(tipLayer);
 		
 		var selectGradient = document.createElementNS('http://www.w3.org/2000/svg','radialGradient');
 		selectGradient.id = 'selectGradient';
@@ -329,8 +373,8 @@ var view = {
 		ellipse.setAttribute('fill','inherit');
 		ellipse.setAttribute('cx',0);
 		ellipse.setAttribute('cy',0);
-		ellipse.setAttribute('rx',35);
-		ellipse.setAttribute('ry',8);
+		ellipse.setAttribute('rx',30);
+		ellipse.setAttribute('ry',7);
 		
 		var costSphere = document.createElementNS('http://www.w3.org/2000/svg','g');
 		costSphere.id = 'costSphere';
@@ -380,14 +424,29 @@ var view = {
 		top.setAttribute('fill','saddlebrown');
 		top.setAttribute('stroke','black');
 		
-		var cover = document.createElementNS('http://www.w3.org/2000/svg','rect');
-		cover.id = 'cover';
-		defs.appendChild(cover);
-		cover.setAttribute('x',-50);
-		cover.setAttribute('y',-10);
-		cover.setAttribute('height',10);
-		cover.setAttribute('width',100);
-		cover.setAttribute('fill','yellow');
+		var boulder = document.createElementNS('http://www.w3.org/2000/svg','g');
+		boulder.id = 'boulder';
+		defs.appendChild(boulder);
+		boulder.setAttribute('transform','scale(0.8) translate(0,20)');
+		var facets = [
+			{fill:"#282828", stroke: 'black', points:"32.136,-2.181 44.506,-14.402 39.377,-22.7 39.83,-34.694 22.782,-47.971 -2.112,-57.25 -13.428,-44.728 -31.759,-36.127 -37.644,-9.423 -28.365,-1.878 -1.132,-0.597"},
+			{fill:"#8C8C8C", stroke: 'none', points:"-11.165,-17.267 -13.428,-44.728 -2.112,-57.25 22.782,-47.971 9.278,-26.094"},
+			{fill:"#646464", stroke: 'none', points:"-31.759,-36.127 -37.644,-9.423 -28.365,-1.878 -15.012,-9.197 -11.165,-17.267"},
+			{fill:"#787878", stroke: 'none', points:"15.54,-15.91 25.724,-15.232 32.136,-2.181"},
+			{fill:"#282828", stroke: 'none', points:"-1.132,-0.597 15.54,-15.91 32.136,-2.181"},
+			{fill:"#3C3C3C", stroke: 'none', points:"39.377,-22.7 25.724,-15.232 32.136,-2.181 44.506,-14.402"},
+			{fill:"#A0A0A0", stroke: 'none', points:"-13.428,-44.728 -31.759,-36.127 -11.165,-17.267"},
+			{fill:"#646464", stroke: 'none', points:"22.782,-47.971 9.278,-26.094 15.54,-15.91 25.724,-15.232 39.377,-22.7 39.83,-34.694"},
+			{fill:"#505050", stroke: 'none', points:"-15.012,-9.197 -1.132,-0.597 15.54,-15.91 9.278,-26.094 -11.165,-17.267"},
+			{fill:"#282828", stroke: 'none', points:"-28.365,-1.878 -1.132,-0.597 -15.012,-9.197"},
+		];
+		for (facet of facets) {
+			var polygon = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+			boulder.appendChild(polygon);
+			polygon.setAttribute('fill',facet.fill);
+			polygon.setAttribute('stroke',facet.stroke);
+			polygon.setAttribute('points',facet.points);
+		};
 		
 		var bushes = document.createElementNS('http://www.w3.org/2000/svg','g');
 		bushes.id = 'bushes';
@@ -512,13 +571,15 @@ var view = {
 		firstPawnButton.appendChild(pawn);
 		pawn.setAttribute('x',85);
 		pawn.setAttribute('y',62);
-		pawn.setAttribute('transform',' translate(85 60) scale(0.17) translate(-85 -60)');
+		pawn.setAttribute('transform','translate(0 9.5) translate(85 60) scale(0.09) translate(-85 -60)');
 		pawn.id = 'firstPawnButton';
 		
 		var endTurnButton = document.createElementNS('http://www.w3.org/2000/svg','g');
 		uiLayer.appendChild(endTurnButton);
 		endTurnButton.id = 'endTurnButtonGroup';
 		endTurnButton.addEventListener('click',handlers.endTurn);
+		endTurnButton.addEventListener('mouseenter',view.displayToolTip.bind(this,'endTurn'));
+		endTurnButton.addEventListener('mouseleave',view.clearToolTip);
 		var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
 		endTurnButton.appendChild(rect);
 		rect.setAttribute('x',90.5);
@@ -548,9 +609,7 @@ var view = {
 	
 	buildStandees: function() {
 		for (var pawn of game.map.pawns) {
-			var pawnAvatarNodes = pawn.avatar.svgNodes;
-			pawnAvatarNodes.id = pawn.id;
-			document.getElementById('globalDefs').appendChild(pawnAvatarNodes);
+			document.getElementById('globalDefs').appendChild(pawn.avatar.draw());
 			pawn.sprite = pawn.id;
 		};
 		for (var tile of game.map.tiles) {
@@ -569,14 +628,22 @@ var view = {
 				if (occupant.selectable) {
 					occupantUse.setAttribute('fill',occupant.color);
 					occupantUse.addEventListener('click',handlers.pawnSelect.bind(view,occupant));
-					view.itemDrag.dropTargets.push(occupant);
+// 					view.itemDrag.dropTargets.push(occupant);
 				} else {
 					occupantUse.addEventListener('mousedown',handlers.dragMapStart);
 					occupantUse.addEventListener('touchstart',handlers.dragMapStart);
 				};
 			};
-		};	
-		view.setHref(document.getElementById('firstPawnButton'),game.map.pawns[0].sprite);
+		};
+// 		view.setHref(document.getElementById('firstPawnButton'),game.map.pawns[0].sprite);
+		view.setHref(document.getElementById('firstPawnButton'),game.map.pawns[0].id+"HeadGroup");
+	},
+	
+	redrawPawn: function(pawn) {
+		document.getElementById(pawn.id).remove();
+		var pawnAvatarNodes = pawn.avatar.draw();
+		pawnAvatarNodes.id = pawn.id;
+		document.getElementById('globalDefs').appendChild(pawnAvatarNodes);		
 	},
 	
 	buildCharacterSheets: function() {
@@ -608,6 +675,8 @@ var view = {
 			portrait.setAttribute('fill',pawn.color);
 			var moraleBarGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
 			sheetGroup.appendChild(moraleBarGroup);
+			moraleBarGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,'morale'));
+			moraleBarGroup.addEventListener('mouseleave',view.clearToolTip);
 			var moraleBarBacking = document.createElementNS('http://www.w3.org/2000/svg','rect');
 			moraleBarGroup.appendChild(moraleBarBacking);
 			moraleBarBacking.setAttribute('x',-85);
@@ -641,8 +710,12 @@ var view = {
 			moraleBarGroup.addEventListener('mouseleave',view.hideElement.bind(this,moraleLabel));
 			var statNames = ['move','strength','focus'];
 			for (var i in statNames) {
+				var statGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+				sheetGroup.appendChild(statGroup);
+				statGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,statNames[i]));
+				statGroup.addEventListener('mouseleave',view.clearToolTip);
 				var statSquare = document.createElementNS('http://www.w3.org/2000/svg','rect');
-				sheetGroup.appendChild(statSquare);
+				statGroup.appendChild(statSquare);
 				statSquare.setAttribute('x',-60 + i * 22);
 				statSquare.setAttribute('y',140);
 				statSquare.setAttribute('width',20);
@@ -650,7 +723,7 @@ var view = {
 				statSquare.setAttribute('fill',view.colors[statNames[i]+'Primary']);
 				statSquare.setAttribute('stroke',view.colors[statNames[i]+'Secondary']);
 				var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-				sheetGroup.appendChild(text);
+				statGroup.appendChild(text);
 				text.setAttribute('x',-50 + i * 22);
 				text.setAttribute('y',141.5);
 				text.setAttribute('text-anchor','middle');
@@ -661,7 +734,7 @@ var view = {
 				text.setAttribute('paint-order','stroke');
 				text.innerHTML = statNames[i];
 				var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-				sheetGroup.appendChild(text);
+				statGroup.appendChild(text);
 				text.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'Text';
 				text.setAttribute('x',-48 + i * 22);
 				text.setAttribute('y',148);
@@ -671,7 +744,7 @@ var view = {
 				text.setAttribute('class','bold');
 				text.innerHTML = pawn.stats[statNames[i]];
 				var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-				sheetGroup.appendChild(text);
+				statGroup.appendChild(text);
 				text.setAttribute('x',-48 + i * 22);
 				text.setAttribute('y',148);
 				text.setAttribute('text-anchor','start');
@@ -679,7 +752,7 @@ var view = {
 				text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
 				text.innerHTML = '/';
 				var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-				sheetGroup.appendChild(text);
+				statGroup.appendChild(text);
 				text.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'MaxText';
 				text.setAttribute('x',-48 + 1 + i * 22);
 				text.setAttribute('y',148);
@@ -688,7 +761,7 @@ var view = {
 				text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
 				text.innerHTML = pawn.stats[statNames[i]+'Max'];
 				var woundGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-				sheetGroup.appendChild(woundGroup);
+				statGroup.appendChild(woundGroup);
 				woundGroup.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'WoundGroup';
 			};
 
@@ -876,6 +949,8 @@ var view = {
 		swapItemsButton.id = pawn.id + "SwapButton";
 		swapItemsButton.setAttribute('stroke','grey');
 		swapItemsButton.addEventListener('click',handlers.swapItems.bind(this,pawn));
+		swapItemsButton.addEventListener('mouseenter',view.displayToolTip.bind(this,'swap'));
+		swapItemsButton.addEventListener('mouseleave',view.clearToolTip);
 		var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
 		swapItemsButton.appendChild(rect);
 		rect.setAttribute('x',25);
@@ -932,6 +1007,8 @@ var view = {
 		item.svg = itemGroup;
 		itemGroup.addEventListener('mousedown',handlers.dragItemStart.bind(item));
 		itemGroup.addEventListener('touchstart',handlers.dragItemStart.bind(item));
+		itemGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,item));
+		itemGroup.addEventListener('mouseleave',view.clearToolTip);
 		var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
 		itemGroup.appendChild(rect);
 		rect.setAttribute('x',x);
@@ -957,85 +1034,96 @@ var view = {
 	},
 	
 	refreshManeuvers: function(pawn) {
-		var maneuversPane = document.getElementById(pawn.id + "ManeuversPane");
-		maneuversPane.innerHTML = '';
+		if (pawn.team == 'p1') {
+			var maneuversPane = document.getElementById(pawn.id + "ManeuversPane");
+			maneuversPane.innerHTML = '';
+		
+			var swapButton = document.getElementById(pawn.id + "SwapButton");
+			if (swapButton !== null && pawn.stats.move > 5) { // enable swap button
+				swapButton.setAttribute('opacity',1);
+			} else if (swapButton !== null) { // disable swap button
+				swapButton.setAttribute('opacity',0.5);
+			};
 
-		for (var i in pawn.maneuvers) {
-			var maneuverButton = document.createElementNS('http://www.w3.org/2000/svg','g');
-			maneuversPane.appendChild(maneuverButton);
-			pawn.maneuvers[i].svg = maneuverButton;
-			maneuverButton.setAttribute('stroke','grey');
-			maneuverButton.setAttribute('fill','darkgrey');
-			var canPerform = true;
-			for (var stat in pawn.maneuvers[i].cost) {
-				if (pawn.maneuvers[i].cost[stat] > pawn.stats[stat]) {
-					canPerform = false;
+			for (var i in pawn.maneuvers) {
+				var maneuverButton = document.createElementNS('http://www.w3.org/2000/svg','g');
+				maneuversPane.appendChild(maneuverButton);
+				pawn.maneuvers[i].svg = maneuverButton;
+				maneuverButton.setAttribute('stroke','grey');
+				maneuverButton.setAttribute('fill','darkgrey');
+				maneuverButton.addEventListener('mouseenter',view.displayToolTip.bind(this,pawn.maneuvers[i]));
+				maneuverButton.addEventListener('mouseleave',view.clearToolTip);
+				var canPerform = true;
+				for (var stat in pawn.maneuvers[i].cost) {
+					if (pawn.maneuvers[i].cost[stat] > pawn.stats[stat]) {
+						canPerform = false;
+					};
 				};
-			};
-			if (canPerform) {
-				maneuverButton.addEventListener('click',handlers.maneuverSelect.bind(this,pawn.maneuvers[i]));
-			} else {
-				maneuverButton.setAttribute('opacity',0.5);
-			};
-			var maneuverSquare = document.createElementNS('http://www.w3.org/2000/svg','rect');
-			maneuverButton.appendChild(maneuverSquare);
-			x = 7;
-			y = 140 + i * 7.5;
-			if (parseInt(i)>5) {
-				x += 54;
-				y -= 45;
-			} else if (parseInt(i)>2) {
-				x += 27;
-				y -= 22.5;
-			};
-			maneuverSquare.setAttribute('x',x);
-			maneuverSquare.setAttribute('y',y);
-			maneuverSquare.setAttribute('width',25);
-			maneuverSquare.setAttribute('height',6);
-			maneuverSquare.setAttribute('fill','inherit');
-			maneuverSquare.setAttribute('stroke','inherit');
-			var maneuverText = document.createElementNS('http://www.w3.org/2000/svg','text');
-			maneuverButton.appendChild(maneuverText);
-			maneuverText.setAttribute('x',x+1);
-			maneuverText.setAttribute('y',y+2.5);
-			maneuverText.setAttribute('font-size',2);
-			maneuverText.setAttribute('fill','black');
-			maneuverText.setAttribute('stroke','none');
-			maneuverText.innerHTML = parseInt(i)+1;
-			var maneuverText = document.createElementNS('http://www.w3.org/2000/svg','text');
-			maneuverButton.appendChild(maneuverText);
-			maneuverText.setAttribute('x',x+3);
-			maneuverText.setAttribute('y',y+3.5);
-			maneuverText.setAttribute('font-size',2);
-			maneuverText.setAttribute('fill','black');
-			maneuverText.setAttribute('stroke','none');
-// 			maneuverText.setAttribute('textLength',20);
-// 			maneuverText.setAttribute('lengthAdjust','spacingAndGlyphs');
-			maneuverText.innerHTML = pawn.maneuvers[i].name;
-			var sphereCount = 0;
-			var labelLength = maneuverText.getBBox().width;
-			for (var stat in pawn.maneuvers[i].cost) {
-				if (pawn.maneuvers[i].cost[stat] > 0) {
-					var costSphere = document.createElementNS('http://www.w3.org/2000/svg','use');
-					maneuverButton.appendChild(costSphere);
-// 					costSphere.setAttribute('href','#costSphere');
-					view.setHref(costSphere,'costSphere');
-					costSphere.setAttribute('x',x+3 + 2.5 + labelLength + sphereCount * 2);
-					costSphere.setAttribute('y',y+3);
-					costSphere.setAttribute('fill',view.colors[stat+'Primary']);
-					var costText = document.createElementNS('http://www.w3.org/2000/svg','text');
-					maneuverButton.appendChild(costText);
-					costText.setAttribute('x',x+3 + 2.5 + labelLength + sphereCount * 2);
-					costText.setAttribute('y',y+3 + 0.75);
-					costText.setAttribute('fill',view.colors[stat+'Secondary']);
-					costText.setAttribute('text-anchor','middle');
-					costText.setAttribute('font-size',2);
-					costText.setAttribute('class','bold');
-					costText.setAttribute('stroke','black');
-					costText.setAttribute('stroke-width','0.25');
-					costText.setAttribute('paint-order','stroke');
-					costText.innerHTML = pawn.maneuvers[i].cost[stat];
-					sphereCount++;
+				if (canPerform) {
+					maneuverButton.addEventListener('click',handlers.maneuverSelect.bind(this,pawn.maneuvers[i]));
+				} else {
+					maneuverButton.setAttribute('opacity',0.5);
+				};
+				var maneuverSquare = document.createElementNS('http://www.w3.org/2000/svg','rect');
+				maneuverButton.appendChild(maneuverSquare);
+				x = 7;
+				y = 140 + i * 7.5;
+				if (parseInt(i)>5) {
+					x += 54;
+					y -= 45;
+				} else if (parseInt(i)>2) {
+					x += 27;
+					y -= 22.5;
+				};
+				maneuverSquare.setAttribute('x',x);
+				maneuverSquare.setAttribute('y',y);
+				maneuverSquare.setAttribute('width',25);
+				maneuverSquare.setAttribute('height',6);
+				maneuverSquare.setAttribute('fill','inherit');
+				maneuverSquare.setAttribute('stroke','inherit');
+				var maneuverText = document.createElementNS('http://www.w3.org/2000/svg','text');
+				maneuverButton.appendChild(maneuverText);
+				maneuverText.setAttribute('x',x+1);
+				maneuverText.setAttribute('y',y+2.5);
+				maneuverText.setAttribute('font-size',2);
+				maneuverText.setAttribute('fill','black');
+				maneuverText.setAttribute('stroke','none');
+				maneuverText.innerHTML = parseInt(i)+1;
+				var maneuverText = document.createElementNS('http://www.w3.org/2000/svg','text');
+				maneuverButton.appendChild(maneuverText);
+				maneuverText.setAttribute('x',x+3);
+				maneuverText.setAttribute('y',y+3.5);
+				maneuverText.setAttribute('font-size',2);
+				maneuverText.setAttribute('fill','black');
+				maneuverText.setAttribute('stroke','none');
+	// 			maneuverText.setAttribute('textLength',20);
+	// 			maneuverText.setAttribute('lengthAdjust','spacingAndGlyphs');
+				maneuverText.innerHTML = pawn.maneuvers[i].name;
+				var sphereCount = 0;
+				var labelLength = maneuverText.getBBox().width;
+				for (var stat in pawn.maneuvers[i].cost) {
+					if (pawn.maneuvers[i].cost[stat] > 0) {
+						var costSphere = document.createElementNS('http://www.w3.org/2000/svg','use');
+						maneuverButton.appendChild(costSphere);
+	// 					costSphere.setAttribute('href','#costSphere');
+						view.setHref(costSphere,'costSphere');
+						costSphere.setAttribute('x',x+3 + 2.5 + labelLength + sphereCount * 2);
+						costSphere.setAttribute('y',y+3);
+						costSphere.setAttribute('fill',view.colors[stat+'Primary']);
+						var costText = document.createElementNS('http://www.w3.org/2000/svg','text');
+						maneuverButton.appendChild(costText);
+						costText.setAttribute('x',x+3 + 2.5 + labelLength + sphereCount * 2);
+						costText.setAttribute('y',y+3 + 0.75);
+						costText.setAttribute('fill',view.colors[stat+'Secondary']);
+						costText.setAttribute('text-anchor','middle');
+						costText.setAttribute('font-size',2);
+						costText.setAttribute('class','bold');
+						costText.setAttribute('stroke','black');
+						costText.setAttribute('stroke-width','0.25');
+						costText.setAttribute('paint-order','stroke');
+						costText.innerHTML = pawn.maneuvers[i].cost[stat];
+						sphereCount++;
+					};
 				};
 			};
 		};
@@ -1121,7 +1209,7 @@ var view = {
 				
 		text = "Tile ("+tile.x+","+tile.y+")";
 // 		text = Math.round(scaleY*100)/100;
-		return {x:x,y:y,standeeTransform:standeeTransform,text:text,groundTransform:groundTransform};
+		return {x:x,y:y,standeeScale:scaleX,standeeTransform:standeeTransform,text:text,groundTransform:groundTransform};
 	},
 		
 	dragItemPreselect: function(dropTarget) {
@@ -1300,7 +1388,11 @@ var view = {
 				var displayName = wound.name;
 				if (data.wounds[wound.name] !== undefined) {
 					var descriptorIndex = (-1 * wound.strength / pawn.stats[stat+"Max"]) * data.wounds[wound.name].length << 0;
-					displayName = data.wounds[wound.name][descriptorIndex];
+					if (descriptorIndex < data.wounds[wound.name].length) {
+						displayName = data.wounds[wound.name][descriptorIndex];
+					} else {
+						displayName = data.wounds[wound.name][data.wounds[wound.name].length-1];
+					};
 				};
 				var text = document.createElementNS('http://www.w3.org/2000/svg','text');
 				text.setAttribute('x',x);
@@ -1354,6 +1446,80 @@ var view = {
 		};
 	},
 	
+	displayToolTip: function(button) {
+		var headString; textStrings = [], italicBottom=false, lineLength = 37;
+		
+		if (button == 'swap') {
+			headString = 'Swap Items';
+			textStrings = lineWrap('Take a moment to swap items around.  Changing what items you have equipped will give you different maneuvers to use in your adventure.  Costs 5 move.',lineLength);
+		} else if (button == 'morale') {
+			headString = 'Morale ' + Math.floor(view.focus.pawn.morale*100) + "%";
+			textStrings = lineWrap("This measures a character's will to continue the fight.  Wounds deplete morale; some maneuvers replenish it.  If it runs out, the character is out of the fight.",lineLength);
+		} else if (button == 'endTurn') {
+			headString = 'End the Turn';
+			textStrings = lineWrap("Click here to end the turn, allow other teams to move pawns, and refresh your pawns' stats.",lineLength);
+		} else if (['move','strength','focus'].indexOf(button) !== -1) {
+			headString = button.charAt(0).toUpperCase() + button.slice(1);
+			if (button == 'move') {
+				textStrings = lineWrap("Spend move points on maneuvers and moving around the map. Move replenishes in full each round, less any move wounds.",lineLength);
+			} else if (button == 'strength') {
+				textStrings = lineWrap("Spend strength points on maneuvers. Characters regain one strength point each turn.",lineLength);
+			} else if (button == 'focus') {
+				textStrings = lineWrap("Spend focus points on maneuvers. At the end of each turn, any unused move is converted into focus",lineLength);
+			};
+		} else if (button.textStrings !== undefined) {
+			headString = button.name;
+			textStrings = button.textStrings(lineLength);
+			italicBottom = true;
+		};
+		
+		// Display
+		var tipLayer = document.getElementById('tipLayer');
+		var tipGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+		tipLayer.appendChild(tipGroup);
+// 		tipGroup.setAttribute('opacity',0.9);
+		var tipBack = document.createElementNS('http://www.w3.org/2000/svg','rect');
+		tipGroup.appendChild(tipBack);
+		tipBack.setAttribute('x',-22.5);
+		tipBack.setAttribute('y',11);
+		tipBack.setAttribute('width',45);
+		tipBack.setAttribute('height',25);
+		tipBack.setAttribute('fill','white');
+		tipBack.setAttribute('stroke','black');
+		tipBack.setAttribute('stroke-width',0.25);
+		var tipHead = document.createElementNS('http://www.w3.org/2000/svg','text');
+		tipGroup.appendChild(tipHead);
+		tipHead.setAttribute('x',-21);
+		tipHead.setAttribute('y',15);
+		tipHead.setAttribute('font-size',4);
+		tipHead.setAttribute('class','bold');
+		tipHead.innerHTML = headString;
+		for (var i in textStrings) {
+			var text = document.createElementNS('http://www.w3.org/2000/svg','text');
+			tipGroup.appendChild(text);
+			text.innerHTML = textStrings[i];
+			text.setAttribute('x',-21);
+			text.setAttribute('y',20 + i * 3.5);
+			text.setAttribute('font-size',2.5);
+			if (textStrings[i] !== undefined && textStrings[i].length > lineLength) {
+				text.setAttribute('textLength','42');
+				text.setAttribute('lengthAdjust','spacingAndGlyphs');
+			};
+			if (italicBottom && i > 2) {
+				text.setAttribute('font-style','italic');
+			};
+		};
+		if (textStrings.length == 6) {
+			text.setAttribute('x',21);
+			text.setAttribute('y',34);
+			text.setAttribute('text-anchor','end');
+		};
+	},
+	
+	clearToolTip: function() {
+		document.getElementById('tipLayer').innerHTML = '';
+	},
+	
 	movePawn: function(pawn) {
 		pawn.tile.standeeGroup.prepend(pawn.svg);
 		var displayCoords = view.displayCoords(pawn.tile);
@@ -1375,4 +1541,92 @@ var view = {
 			view.strokeTile(tile);
 		};
 	},
+	
+	animateNerf: function(pawn) {
+		var animation = document.getElementById(pawn.id+'NerfStart');
+		animation.beginElement();
+	},
+	
+	animateBuff: function(pawn) {
+		var animation = document.getElementById(pawn.id+'BuffStart');
+		animation.beginElement();
+	},
+	
+	animateDefeat: function(pawn) {
+		var animation = document.getElementById(pawn.id+'DefeatStart');
+		animation.beginElement();
+	},
+	
+	animateRevive: function(pawn) {
+		var animation = document.getElementById(pawn.id+'ReviveStart');
+		animation.beginElement();
+	},
+	
+	animateInteract: function(actor,target,sprite) {
+		var actorStandeeGroup = document.getElementById('standees_'+actor.tile.x+'_'+actor.tile.y);
+		var targetStandeeGroup = document.getElementById('standees_'+target.tile.x+'_'+target.tile.y);
+		var actorDisplayCoords = view.displayCoords(actor.tile);
+		var targetDisplayCoords = view.displayCoords(target.tile);
+		var lineOne = document.createElementNS('http://www.w3.org/2000/svg','line');
+		actorStandeeGroup.prepend(lineOne);
+		var lineTwo = document.createElementNS('http://www.w3.org/2000/svg','line');
+		targetStandeeGroup.prepend(lineTwo);
+		for (line of [lineOne,lineTwo]) {
+			line.setAttribute('x1',actorDisplayCoords.x);
+			line.setAttribute('y1',actorDisplayCoords.y - 25 * actorDisplayCoords.standeeScale);
+			line.setAttribute('x2',targetDisplayCoords.x);
+			line.setAttribute('y2',targetDisplayCoords.y - 25 * targetDisplayCoords.standeeScale);
+			line.setAttribute('stroke','url(#rainbowGradient)');
+			line.setAttribute('stroke-width','0.5');
+			line.setAttribute('stroke-linecap','round');
+			for (var i of ['x1','y1','x2','y2']) {
+				var anim = document.createElementNS('http://www.w3.org/2000/svg','animate');
+				anim.setAttribute('attributeType','xml');
+				anim.setAttribute('attributeName',i);
+				anim.setAttribute('dur','0.4s');
+				if (i == 'x1' || i == 'x2') {
+					anim.setAttribute('from',actorDisplayCoords.x);
+					anim.setAttribute('to',targetDisplayCoords.x);
+				} else {
+					anim.setAttribute('from',targetDisplayCoords.y - 25 * targetDisplayCoords.standeeScale);
+					anim.setAttribute('to',targetDisplayCoords.y - 25 * targetDisplayCoords.standeeScale);
+				};
+				if (i == 'x1' || i == 'y1') {
+					anim.setAttribute('begin','indefinite');
+					anim.beginElement();
+				} else {
+					anim.setAttribute('begin','indefinite');
+					anim.beginElementAt(1);
+				};
+			};
+		}
+		var removeOne = setTimeout(view.removeElement.bind(this,lineOne),500);
+		var removeTwo = setTimeout(view.removeElement.bind(this,lineTwo),500);
+	},
+	
+	removeElement: function(element) {
+		element.remove();
+	},
+};
+
+function lineWrap(string,limit) {
+	var lines = [], nextLine, lineConversion,lastWord, remainder = string;
+	for (var i=0;i<10;i++) {
+		if (remainder.length > limit) {
+			nextLine = remainder.slice(0,limit);
+			remainder = remainder.slice(limit);
+			lineConversion = nextLine.split(' ');
+			lastWord = lineConversion[lineConversion.length-1];
+			if (lastWord !== nextLine) {
+				lineConversion.pop();
+				nextLine = lineConversion.join(' ');
+				remainder = lastWord+remainder;
+			};
+			lines.push(nextLine);
+		} else if (remainder.length > 0) {
+			lines.push(remainder);
+			remainder = '';
+		};
+	};
+	return lines;
 };
