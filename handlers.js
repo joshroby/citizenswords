@@ -62,8 +62,9 @@ var handlers = {
 	},
 	
 	confirmAndPlay: function() {
-		game.confirmCreation(document.getElementById('nameInput').value);
+		game.confirmCreation(document.getElementById('nameInput').value,document.getElementById('pronounSelect').value);
 		view.hideCreation();
+// 		game.loadMap(hellhoundCave);
 		game.loadMap();
 	},
 	
@@ -98,7 +99,7 @@ var handlers = {
 			var gameSVG = document.getElementById('gameSVG');
 			var diffX = (e.pageX - view.camera.dragStartX) / gameSVG.getBoundingClientRect().width;
 			var diffY = (e.pageY - view.camera.dragStartY) / gameSVG.getBoundingClientRect().height;
-			view.camera.x += diffX;
+			view.camera.x -= diffX;
 			view.camera.y -= diffY;
 			view.updateMap();
 		} else if (view.itemDrag.dragging) {
@@ -175,6 +176,9 @@ var handlers = {
 			view.focus.maneuver = undefined;
 			view.clearRangeOptions();
 		} else {
+			if (pawn !== view.focus.pawn) {
+				view.focus.lastPawn = view.focus.pawn;
+			};
 			view.clearMoveOptions();
 			view.clearRangeOptions();
 			if (view.focus.maneuver !== undefined) {
@@ -189,6 +193,7 @@ var handlers = {
 				view.displaySheet(pawn);
 			};
 		};
+		view.refreshAllManeuvers();
 	},
 	
 	nextPawn: function() {
@@ -293,8 +298,14 @@ document.addEventListener('keydown',function(event) {
 			if (maneuver !== undefined) {
 				handlers.maneuverSelect(maneuver);
 			};
-		}
-	}
+		};
+	} else if (event.keyCode == 13) {
+		handlers.endTurn();
+	} else if (event.keyCode == 39 || event.keyCode == 32) {
+		handlers.nextPawn();
+	} else if (event.keyCode == 37) {
+		handlers.lastPawn();
+	};
 });
 
 function saveSVG(svgElement, name) {

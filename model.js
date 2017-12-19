@@ -12,6 +12,7 @@ var model = {
 		game = undefined;
 		game = new Game();
 		view.displayCreation();
+		view.clearMap();
 	},
 
 };
@@ -20,8 +21,13 @@ var game;
 function Game() {
 	
 	this.players = [new Player()];
+	this.cast = {};
 	
 	this.day = 1;
+	
+	this.levels = {
+		hellhoundCave: hellhoundCave,
+	};
 
 	// Character Creation Prepwork
 	this.costumes = {
@@ -50,22 +56,21 @@ function Game() {
 	this.costumes.pray.stats = {move:9,moveMax:9,strength:9,strengthMax:9,focus:11,focusMax:11};
 	
 	this.avatar.pawn = this.costumes[['work','fight','pray'][Math.random() * 3 << 0]];
-	this.avatar.svgNodes = this.avatar.draw();
 
-	this.confirmCreation = function(name) {
+	this.confirmCreation = function(name,pronoun) {
 		this.name = name;
 		game.avatar.pawn.name = name;
+		game.avatar.pawn.pronoun = pronoun;
 		game.avatar.pawn.team = 'p1';
 		this.players[0].heroes = [game.avatar.pawn];
-		this.avatar.pawn.avatar = game.avatar;
-		this.avatar.pawn.compileManeuvers();
+		this.cast.p1 = game.avatar.pawn.serialize();
 	};
 
-	this.loadMap = function() {
-		this.map = new Map();
+	this.loadMap = function(level) {
+		this.map = new Map(level);
+		this.map.loadLevel(level);
 		var mapSVG = view.buildMapSVG();
 		view.displayMap(mapSVG);
-		this.map.loadStandees();
 		view.buildStandees();
 		view.buildCharacterSheets();
 		for (var pawn of this.map.pawns) {
@@ -73,32 +78,40 @@ function Game() {
 				pawn.look();
 			};
 		};
+		view.panToTile(this.map.tiles[this.map.tiles.length-1]);
+		handlers.firstPawn();
+		for (var event of this.map.loadEvents) {
+			event();
+		};
 	};
 };
 
 function Player() {
+	this.plotkeys = {};
 };
 
 var map;
-function Map(bounds) {
+function Map(level) {
 	this.tiles = [];
 	this.pawns = [];
 	this.heroes = [];
-	this.obstacles = [];
-	if (bounds == undefined) {
+	this.things = [];
+	this.loadEvents = [];
+	this.eventKeys = {};
+	if (level == undefined) {
 		this.bounds = {
-			minX: -10,
+			minX: -5,
 			minY: -5,
-			maxX: 10,
+			maxX: 5,
 			maxY: 5,
 		};
 	} else {
-		this.bounds = bounds;
+		this.bounds = level.bounds;
 	};
 	for (var y=this.bounds.minY;y<this.bounds.maxY;y++) {
 		for (var x=this.bounds.minX;x<this.bounds.maxX;x++) {
 			tile = {x:x,y:y};
-			if (y % 2 == 0) {
+			if (y % 2 !== 0) {
 				tile.x += 0.5;
 			};
 			this.tiles.push(new Tile(tile.x,tile.y));
@@ -115,29 +128,90 @@ function Map(bounds) {
 	
 	// Init Functions
 	
-	this.loadStandees = function(standees) {
-		var tile, bystander;
+	this.loadLevel = function(level) {
+		var standees, events, moveCosts, tile, pawn, bystander, trigger;
+		var titleX,titleY;
 		
-		if (standees == undefined) {standees = this.randomStandees();};
+		if (level == undefined) {
+			level = {};
+			level.title = 'Random Level!';
+			level.standees = this.randomStandees();
+			level.moveCosts = this.randomMoveCosts();
+			level.triggers = [];
+			level.checks = {};
+			level.events = {};
+			level.cameraStart = {x: 100,y: 100,};
+			level.startLoc = {x:0,y:0};
+			level.id = Math.random().toString(36).slice(2);
+			game.levels[level.id] = level;
+		};
+		game.currentLevel = level;
 		
-		for (var standee of standees) {
+		view.camera.x = level.cameraStart.x;
+		view.camera.y = level.cameraStart.y;
+		
+		titleX = (2*level.cameraStart.x + 8*level.startLoc.x) / 10;
+		titleY = (2*(level.cameraStart.y + view.camera.offsetY) + 8*level.startLoc.y) / 10 ;
+		var titleTile = new Tile(titleX,titleY);
+		titleTile.seen = true;
+		this.tiles.push(titleTile);
+		
+		for (var standee of level.standees) {
 			for (var loc of standee.locs) {
 				tile = this.findTile(loc.x,loc.y);
+				if (tile == undefined) {console.log('cannot find ('+loc.x+','+loc.y+')')};
 				if (standee.type == 'landscape') {
 					tile.occupants.push(new Landscape(tile,standee.key));
 					if (data.landscapes[standee.key].exclusive) {
 						tile.color = 'none';
 					};
-				} else if (standee.type == 'hero') {
-					tile.occupants.push(game.players[0].heroes[standee.index]);
-					game.players[0].heroes[standee.index].tile = tile;
-					game.map.pawns.push(game.players[0].heroes[standee.index]);
-					game.map.heroes.push(game.players[0].heroes[standee.index]);
+				} else if (standee.type == 'pawn') {
+					pawn = new Pawn(standee.id,tile);
+					pawn.compileManeuvers();
+					pawn.team = standee.team;
+					tile.occupants.push(pawn);
+					game.map.pawns.push(pawn);
+					if (standee.team == 'p1') {
+						game.map.heroes.push(pawn);
+					};
 				} else if (standee.type == 'bystanders') {
 					bystander = new Pawn(undefined,tile,bystander);
+					bystander.human = true;
+					bystander.dialogue = true;
+					bystander.vendor = true;
 					tile.occupants.push(bystander);
 					bystander.team = 'bystanders';
+				} else if (standee.type == 'thing') {
+					thing = new Thing(standee.template,tile);
+					tile.occupants.push(thing);
+					game.map.things.push(thing);
 				};
+			};
+		};
+		for (var trigger of level.triggers) {
+			if (trigger.check == 'load') {
+				this.loadEvents.push(level.events[trigger.event]);
+			} else {
+				for (var loc of trigger.locs) {
+					tile = this.findTile(loc.x,loc.y);
+					if (trigger.check == undefined) {
+						check = function() {return true};
+					} else {
+						check = level.checks[trigger.check].bind(game.map,pawn,tile);
+					};
+					event = level.events[trigger.event].bind(game.map,pawn,tile)
+					trigger = {
+						check : check,
+						event: event,
+					};
+					tile.triggers.push(trigger);
+				};
+			};
+		};
+		for (var entry of level.moveCosts) {
+			for (var loc of entry.locs) {
+				tile = this.findTile(loc.x,loc.y);
+				tile.moveCost = entry.moveCost
 			};
 		};
 	};
@@ -151,6 +225,34 @@ function Map(bounds) {
 		};
 		return closestTile;
 	};
+	
+	this.randomMoveCosts = function() {
+		var moveCosts = [], tileList = [];
+		for (var cost of ['1','2','4','5']) {
+			moveCosts.push({moveCost:cost,locs:[]});
+			for (var tile of this.tiles) {
+				if (Math.random() < 0.3) {
+					moveCosts[moveCosts.length -1].locs.push({x:tile.x,y:tile.y});
+				};
+			};
+		};
+		return moveCosts;
+	};
+	
+// 	this.randomEvents = function() {
+// 		var events = [], tileList = [], check, event;
+// 		
+// 		for (var tile of this.tiles) {
+// 			if (Math.random() < 0.3) {
+// 				tileList.push({x:tile.x,y:tile.y});
+// 			};
+// 		};
+// 		check = function() {return true};
+// 		event = function() {console.log('event!')};
+// 		events = [{check:check,event:event,locs:tileList}];
+// 		
+// 		return events;
+// 	};
 	
 	this.randomStandees = function() {
 		var standees = [], tileList = {}, adjacentTiles = [], bestOptions = [], frontier = [], clearedTiles = [], currentTile, index, bystanders;
@@ -197,19 +299,34 @@ function Map(bounds) {
 				};
 			};
 		};
+		startLoc = [startLoc].concat(startLoc.adjacent);
+		for (var tile of startLoc) {
+			tileList[tile.x+'x'+tile.y] = undefined;
+			if (clearedTiles.indexOf(startLoc) !== -1) {
+				clearedTiles.splice(clearedTiles.indexOf(startLoc),1);
+			};
+		};
 		for (var entry in tileList) {
 			if (tileList[entry] !== undefined) {
 				index = Math.random() * standees.length << 0;
 				standees[index].locs.push({x:tileList[entry].x,y:tileList[entry].y});
 			};
 		};
+		standees.push({type:'pawn',team:'p1',id:'p1',locs:[startLoc[0]]});
+		standees.push({type:'pawn',team:'p1',id:'mixterStout',locs:[startLoc[1]]});
 		bystanders = {type:'bystanders',locs:[]};
 		for (var i=0;i<5;i++) {
 			tile = clearedTiles[Math.random() * clearedTiles.length << 0];
-			bystanders.locs.push({x:tile.x,y:tile.y});
+			if (startLoc.indexOf(tile) == -1 ) {
+				bystanders.locs.push({x:tile.x,y:tile.y});
+			};
 		};
-		standees.push({type:'hero',index:0,locs:[{x:startLoc.x,y:startLoc.y}]});
 		standees.push(bystanders);
+		var thingTiles = [];
+		for (i=0;i<5;i++) {
+			thingTiles.push(clearedTiles[Math.random() * clearedTiles.length << 0]);
+		};
+		standees.push({type:'thing',locs:thingTiles});
 		return standees;
 	};
 	
@@ -231,6 +348,11 @@ function Tile(x,y) {
 	this.moveCost = 3;
 // 	this.color = ['red','blue','green'][Math.random() * 3 << 0];
 	this.color = 'gainsboro';
+	
+	this.triggers = [{
+		check: function() {return false},
+		event: function() {console.log('no event')},
+	}];
 };
 
 function Landscape(tile,key) {
@@ -244,53 +366,125 @@ function Landscape(tile,key) {
 	this.cover = data.landscapes[key].cover;
 };
 
-function Pawn(id,tile,ai) {
-
-	if (id == undefined) {id = Math.random().toString(36).slice(2)};
-	this.id = id;
+function Pawn(template,tile,ai) {
+	var source;
 	
 	if (game !== undefined && game.map !== undefined && game.map.pawns !== undefined) {
 		game.map.pawns.push(this);
 	};
 	
-	this.sprite = 'pawn';
 	this.tile = tile;
-	
 	this.selectable = true;
 	this.blockView = false;
 	this.exclusive = true;
-	
-	this.color = ['red','blue','green','pink','orange','purple','saddlebrown'][Math.random() * 7 << 0];
-	
-	this.stats = {
-		move: 5,
-		strength: 5,
-		focus: 5,
-// 		luck: 1,
-	};
-	var statList = Object.keys(this.stats);
-	for (var i=0;i<statList.length*5;i++) {
-		var stat = statList[Math.random() * statList.length << 0];
-		this.stats[stat]++;
-	};
-	for (var stat in this.stats) {
-		this.stats[stat+"Max"] = this.stats[stat];
-	};
 	this.wounds = {move:[],strength:[],focus:[]};
-	
 	this.morale = 1;
-	
-	this.inventory = [];
 	this.equipment = {
 		left: undefined,
 		right: undefined,
+		neck: undefined,
 		garb: new Item('roughspun',this),
-		belt: undefined,
 		pouch: undefined,
-		knapsack: undefined,
+	};
+
+	if (template == undefined) {
+		var id = Math.random().toString(36).slice(2);
+		this.id = id;
+		
+		this.name = 'Unnamed';
+		this.pronoun = ['Herself','Himself','Herself','Himself','Herself','Himself','Themself','Emself','Cirself','Ferself'][Math.random() * 10 << 0];
+	
+		this.avatar = new Avatar(this);
+		this.sprite = id;
+		this.stats = {
+			move: 5,
+			strength: 5,
+			focus: 5,
+			// luck: 1,
+		};
+		var statList = Object.keys(this.stats);
+		for (var i=0;i<statList.length*5;i++) {
+			var stat = statList[Math.random() * statList.length << 0];
+			this.stats[stat]++;
+		};
+		for (var stat in this.stats) {
+			this.stats[stat+"Max"] = this.stats[stat];
+		};
+		this.inventory = [];
+	} else {
+		if (game.cast[template] !== undefined) {
+			source = game.cast[template];
+			this.id = template;
+		} else if (data.cast[template] !== undefined) {
+			source = data.cast[template];
+			if (source.unique) {
+				this.id = template;
+			} else {
+				this.id = template + '_' + Math.random().toString(36).slice(2);
+			};
+		};
+		this.name = source.name;
+		this.pronoun = source.pronoun;
+		if (source.avatarHeritage !== undefined) {
+			this.avatar = new Avatar(this,source.avatarHeritage);
+		} else {
+			this.avatar = new Avatar(this);
+		};
+		if (source.avatarParameters !== undefined) {
+			this.avatar.parameters = source.avatarParameters;
+		};
+		this.stats = {};
+		for (var stat in source.stats) {
+			this.stats[stat] = source.stats[stat];
+			this.stats[stat+"Max"] = source.stats[stat];
+		};
+		for (var slot in source.equipment) {
+			if (source.equipment[slot] !== undefined) {
+				this.equipment[slot] = new Item(source.equipment[slot].template,this);
+				if (source.equipment[slot].colors !== undefined) {
+					this.equipment[slot].colors = source.equipment[slot].colors;
+				};
+				if (source.equipment[slot].stats !== undefined) {
+					this.equipment[slot].stats = source.equipment[slot].stats;
+				};
+			};
+		};
+		this.inventory = [];
+		for (var item of source.inventory) {
+			var newItem = new Item(item.template,this);
+			newItem.colors = item.colors;
+			newItem.stats = item.stats;
+			this.inventory.push(newItem);
+		};
+	
 	};
 	
-	this.avatar = new Avatar(this);
+	this.serialize = function() {
+		var flatObject = {}, item;
+		flatObject.name = this.name;
+		flatObject.pronoun = this.pronoun;
+		flatObject.avatarParameters = this.avatar.parameters;
+		flatObject.stats = {};
+		for (var stat in this.stats) {
+			if (stat.indexOf('Max') !== -1) {
+				flatObject.stats[stat.substr(0,stat.length-3)] = this.stats[stat];
+			};
+		};
+		flatObject.equipment = {};
+		for (var slot in this.equipment) {
+			flatObject.equipment[slot] = undefined;
+			if (this.equipment[slot] !== undefined) {
+				item = this.equipment[slot];
+				flatObject.equipment[slot] = {template:item.template,colors:item.colors,stats:item.stats};
+			};
+		};
+		flatObject.inventory = [];
+		for (item of this.inventory) {
+			flatObject.inventory.push({template:item.template,colors:item.colors,stats:item.stats});
+		};
+	
+		return flatObject;
+	};
 	
 	this.equip = function(item,slot) {
 		if (this.equipment[slot] !== undefined) {
@@ -325,6 +519,7 @@ function Pawn(id,tile,ai) {
 		this.compileManeuvers();		
 		view.refreshItems(this);
 		view.refreshManeuvers(this);
+		view.redrawPawn(this);
 	};
 	
 	this.unequip = function(item) {
@@ -338,6 +533,7 @@ function Pawn(id,tile,ai) {
 			this.compileManeuvers();
 			view.refreshItems(this);
 			view.refreshManeuvers(this);
+			view.redrawPawn(this);
 		};
 	};
 	
@@ -369,6 +565,7 @@ function Pawn(id,tile,ai) {
 				if (option.tile !== this.tile) {
 					option.tile.moveOption = true;
 					view.strokeTile(option.tile);
+					view.displayMoveCost(option.tile);
 				};
 			};
 		};
@@ -469,6 +666,13 @@ function Pawn(id,tile,ai) {
 		destination.occupants.unshift(this);
 		view.movePawn(this);
 		this.look();
+		for (var trigger of destination.triggers) {
+			if (trigger.check()) {
+				route = [];
+				trigger.event();
+			};
+
+		};
 		if (route.length > 0) {
 			var timedEvent = setTimeout(this.moveStep.bind(this,route),100);
 		} else {
@@ -642,17 +846,74 @@ function Pawn(id,tile,ai) {
 			view.refreshItems(this);
 			this.compileManeuvers();
 		};
+		view.redrawPawn(this);
 		view.animateNerf(this);
 	};
 	
 	this.defeat = function() {
 		this.exclusive = false;
+		view.refreshManeuvers(this);
 		view.animateDefeat(this);
 	};
 	
 	this.revive = function() {
 		this.exclusive = true;
+		view.refreshManeuvers(this);
 		view.animateRevive(this);
+	};
+	
+	this.contextualManeuvers = {
+		bind: {
+			name: "Bind",
+			cost: {move:2,focus:1},
+			item: {pawn:this},
+			textStrings: function(lineLength) {return lineWrap('Bind this character to prevent them from trying to escape or cause any other trouble.',lineLength)},
+			execute: function() {this.item.pawn.bind()},
+		},
+		murder: {
+			name: "Murder",
+			cost: {move:1},
+			item: {pawn:this},
+			textStrings: function(lineLength) {return lineWrap("This character has been defeated but is still alive.  Tie up the loose end by slitting their throat.  Then they can't cause any trouble.",lineLength)},
+			execute: function() {this.item.pawn.kill()},
+		},
+		slaughter: {
+			name: "Slaughter",
+			cost: {move:1},
+			item: {pawn:this},
+			textStrings: function(lineLength) {return lineWrap("Slaughter this defeated beast.  Most beasts yield valuable carcasses or other valuable commodities.",lineLength)},
+			execute: function() {this.item.pawn.kill()},
+		},
+		talk: {
+			name: "Talk",
+			cost: {move:1},
+			item: {pawn:this},
+			textStrings: function(lineLength) {return lineWrap('Strike up a chat with this charming character.',lineLength)},
+			execute: function() {this.item.pawn.talk()},
+		},
+		trade: {
+			name: "Trade",
+			cost: {move:5},
+			item: {pawn:this},
+			textStrings: function(lineLength) {return lineWrap('Buy stuff!  Sell stuff!  Engage in the capitalist drive that powers most RPGs!',lineLength)},
+			execute: function() {console.log(this);this.item.pawn.trade()},
+		},
+	};
+	
+	this.kill = function() {
+		console.log('killed!');
+	};
+	
+	this.bind = function() {
+		console.log('bind!');
+	};
+	
+	this.talk = function() {
+		console.log('talk!');
+	};
+	
+	this.trade = function() {
+		console.log('trade!');
 	};
 	
 	this.refreshStats = function() {
@@ -682,11 +943,57 @@ function Pawn(id,tile,ai) {
 	};
 };
 
+function Thing(template,tile,argsArray,id) {
+	
+	if (id == undefined) {id = Math.random().toString(36).slice(2)};
+	this.id = id;
+	
+	this.tile = tile;
+	this.selectable = true;
+	
+	if (template == undefined) {
+		this.sprite = 'chest';
+		this.cover = 0.1;
+		this.contents = ['firstAidKit'];
+	} else {
+		this.sprite = data.things[template].sprite;
+		this.cover = data.things[template].cover;
+		this.contents = data.things[template].contents(argsArray);
+		this.triggers = data.things[template].triggers(argsArray);
+	};
+	
+	this.contextualManeuvers = {
+		interact: {
+			name: "Interact",
+			cost: {move:1},
+			item: {pawn:this},
+			textStrings: function(lineLength) {return lineWrap("Interact with this thing in some obvious fashion.",lineLength)},
+			execute: function() {this.item.pawn.loot()},
+		},
+		loot: {
+			name: "Loot",
+			cost: {move:5},
+			item: {pawn:this},
+			textStrings: function(lineLength) {return lineWrap("Loot this container of the no-doubt fabulous treasures hidden within.",lineLength)},
+			execute: function() {this.item.pawn.loot()},
+		},
+	};
+	
+	this.select = function() {};
+	
+	this.interact = function() {};
+	
+	this.loot = function() {
+		view.openTrade(this,view.focus.lastPawn,'loot');
+	};
+};
+
 function Item(template,pawn,id) {
 
 	if (id == undefined) {id = Math.random().toString(36).slice(2)};
 	this.id = id;
 	
+	this.template = template;
 	this.pawn = pawn;
 
 	for (var key of ['name','description','slots']) {
@@ -790,6 +1097,12 @@ function Maneuver(maneuver,item) {
 				reactionRoll += "+"+this.rollStats.reaction.itemStat;
 			};
 			textStrings[3] = 'rolls '+actionRoll+' vs '+reactionRoll;
+		} else if (this.rollStats.power !== undefined) {
+			var powerRoll = this.rollStats.power.pawnStat;
+			if (this.rollStats.power.itemStat !== undefined) {
+				powerRoll += "+"+this.rollStats.power.itemStat;
+			};
+			textStrings[3] = 'rolls '+powerRoll+' for power';
 		} else {
 			textStrings[3] = 'always succeeds'
 		};
@@ -810,8 +1123,8 @@ function Maneuver(maneuver,item) {
 	};
 	
 	this.execute = function(targets) {
+		this.basic(targets);
 		this.chargeCosts();
-		return this.basic(targets);
 	};
 	
 	this.chargeCosts = function() {
@@ -842,7 +1155,7 @@ function Maneuver(maneuver,item) {
 			} else {
 				item = this.item;
 			};
-			if (this.item.stats[this.rollStats[roll].itemStat+"Base"] !== undefined) {
+			if (item !== undefined && item.stats !== undefined && item.stats[this.rollStats[roll].itemStat] !== undefined && item.stats[this.rollStats[roll].itemStat+"Base"] !== undefined) {
 				var currentStat = this.rollStats[roll].itemStat;
 				this.item.stats[currentStat] = (this.item.stats[currentStat] * 9 + this.item.stats[currentStat+"Base"] ) / 10;
 			};
@@ -874,13 +1187,8 @@ function Maneuver(maneuver,item) {
 			if (actionRoll > reactionRoll) {
 				powerRoll = this.roll(this.item.pawn,'power');
 				resistRoll = this.roll(target,'resist');
-// 				console.log('POW',powerRoll,'RES',resistRoll);
-// 				if (resistRoll > 0) {
-// 					strength = Math.max(1, powerRoll / resistRoll );
-// 				} else {
-// 					strength = powerRoll;
-// 				};
-				strength = Math.max(1,powerRoll - resistRoll);
+				if (resistRoll == 0) {resistRoll = 1};
+				strength = Math.max(1,powerRoll / resistRoll);
 				target.applyEffects(this.effects,strength,this.item.pawn);
 				view.animateInteract(this.item.pawn,target,undefined);
 			};

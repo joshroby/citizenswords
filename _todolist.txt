@@ -28,22 +28,37 @@ TO DO LIST CITIZEN SWORDS REDUX
 - defeated pawns do not block movement
 - pawns that aren't yours do not display maneuvers
 - pawns that aren't yours don't move for you / display move options
-
-
-- load level
-	- enemies / other teams
-	- events
-	- move costs
-- GAMEN SVG passages
-- contextual actions (loot, slaughter, bind, interact)
-- multi-hex targets
+- load other teams and pawns
+- load triggers and events
+- load level: move costs
 - display move costs /remainingMove moveOptions
+- new game wipes the map div
+- "always succeeds" tooltip displays power roll if applicable
+- disarm updates avatar
+- level archive save structure and the reading thereof
+- level load positions camera
+- return key for end turn, space and arrows for next/last pawn
+- trigger events on level load
+
+CORE FUNCTIONALITY
+- heroes loaded in startLoc and its adjacent tiles
+- tile coloring/background
+- split power/resist rolls for multiple effects
+- trigger events on pawn defeat
+	- incorporate that into level archives somehow
+- contextual actions (loot, slaughter, bind, interact)
+- envision shop interface
 - trading items between pawns
 	- shops
-- disarm to floor (requires items-on-floor architecture)
 - ai
 
-GAMEN
+OPTIONAL DISPLAY UPGRADES
+- wounds display as little fading pop-ups
+- NPCs have names and descriptions in place of maneuvers
+- level title that you can zoom past on initial pan
 
-- generate main menu buttons
-- view.colors
+OPTIONAL FUNCTIONAL UPGRADES
+- multi-hex targets
+- disarm to floor (requires items-on-floor architecture)
+- ablative-use items
+- standardized/frequently-used map events / macros

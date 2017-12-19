@@ -1,9 +1,7 @@
 function Avatar(pawn,heritages) {
 
-	if (pawn == undefined) {console.log('no pawn specified')};
+	if (pawn == undefined) {pawn = new Pawn()};
 	this.pawn = pawn;
-
-	this.svgNodes = document.createElementNS('http://www.w3.org/2000/svg','g');
 	
 	this.parameters = {};
 	
@@ -177,9 +175,7 @@ function Avatar(pawn,heritages) {
 		};
 		this.parameters.earColor= "#" + ("0" + Math.round(earRed).toString(16)).substr(-2) + ("0" + Math.round(earGreen).toString(16)).substr(-2) + ("0" + Math.round(earBlue).toString(16)).substr(-2);
 	};
-	
-	this.updateColoring();
-	
+		
 	this.apparentEthnicities = function() {
 		var range, diff, diffs = [];
 		var ethnicitiesList = Object.keys(data.ethnicities);
@@ -203,6 +199,16 @@ function Avatar(pawn,heritages) {
 	
 	// The Monster
 	
+	this.svg = function(shot) {
+		var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+		if (shot == undefined || shot == 'fullBody') {
+			svg.setAttribute('viewBox','-25 -50 50 50');
+		} else if (shot == 'bust') {
+			svg.setAttribute('viewBox','-12.5 -50 25 25');
+		};
+		svg.appendChild(this.draw());
+		return svg;
+	};
 	
 	
 	this.draw = function() {
@@ -211,6 +217,10 @@ function Avatar(pawn,heritages) {
 		this.bodyConstants = {eyeline:-172,neck:-115};
 		var muzzle = false;
 		var noseStroke = false;
+		
+		if (this.parameters.skinColor == undefined) {
+			this.updateColoring();
+		};
 
 		var svg = document.createElementNS('http://www.w3.org/2000/svg','g');
 		svg.setAttribute('transform','scale(0.25)');
@@ -298,7 +308,7 @@ function Avatar(pawn,heritages) {
 		leftForearmTopGroup.appendChild(leftHandGroup);
 
 		var interactionGroup = document.createElementNS('http://www.w3.org/2000/svg',"g");
-		interactionGroup.id = pawn.id + 'InteractionGroup';
+		interactionGroup.id = this.pawn.id + 'InteractionGroup';
 		interactionGroup.setAttributeNS('null','z-index',101);
 		svg.appendChild(interactionGroup);
 		
