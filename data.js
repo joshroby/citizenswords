@@ -707,6 +707,13 @@ var data = {
 	},
 	
 	landscapes: {
+		
+		block: {
+			sprite: 'block',
+			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
 	
 		boulder: {
 			sprite: 'boulder',

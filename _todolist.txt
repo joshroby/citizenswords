@@ -39,23 +39,32 @@ TO DO LIST CITIZEN SWORDS REDUX
 - level load positions camera
 - return key for end turn, space and arrows for next/last pawn
 - trigger events on level load
+- selectables (NPCs, lootable chests, switches) have names and descriptions in place of maneuvers
+	- contextual actions (open/loot, slaughter/murder, bind, shop, interact/pull-lever) go here
+	- pawn.select needs to reserve what was selected before this was selected
+- correctly removes moved/equiped/unequiped items from whence they came
+
+
 
 CORE FUNCTIONALITY
+- Loot button should charge move and enable swapping
+- load logs/registers teams
 - heroes loaded in startLoc and its adjacent tiles
 - tile coloring/background
 - split power/resist rolls for multiple effects
 - trigger events on pawn defeat
 	- incorporate that into level archives somehow
-- contextual actions (loot, slaughter, bind, interact)
-- envision shop interface
-- trading items between pawns
-	- shops
+- envision trade/shop/loot interface
+	- trading items between your own pawns
+	- how is shop different from loot?
 - ai
+- switching maps
+- poison can kill folk
 
 OPTIONAL DISPLAY UPGRADES
 - wounds display as little fading pop-ups
-- NPCs have names and descriptions in place of maneuvers
 - level title that you can zoom past on initial pan
+- list totals for deflection, soak and aegis in inventory
 
 OPTIONAL FUNCTIONAL UPGRADES
 - multi-hex targets

@@ -69,6 +69,7 @@ var gamen = {
 		};
 		
 		var gameDiv = document.createElement('div');
+		gameDiv.id = 'gameDiv';
 		body.appendChild(gameDiv);
 		if (model.gameDivContents !== undefined) {
 			var gameDivContents = model.gameDivContents();

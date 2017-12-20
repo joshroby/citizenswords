@@ -312,6 +312,21 @@ var view = {
 		var uiLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
 		uiLayer.id = 'uiLayer';		
 		svg.appendChild(uiLayer);
+			var buttonsLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+			buttonsLayer.id = 'buttonsLayer';		
+			uiLayer.appendChild(buttonsLayer);
+			var inventoryBacksLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+			inventoryBacksLayer.id = 'inventoryBacksLayer';		
+			uiLayer.appendChild(inventoryBacksLayer);
+			var itemsLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+			itemsLayer.id = 'itemsLayer';		
+			uiLayer.appendChild(itemsLayer);
+			var inventoryFrontsLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+			inventoryFrontsLayer.id = 'inventoryFrontsLayer';		
+			uiLayer.appendChild(inventoryFrontsLayer);
+			var sheetsLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+			sheetsLayer.id = 'sheetsLayer';		
+			uiLayer.appendChild(sheetsLayer);
 	
 		var tipLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
 		tipLayer.id = 'tipLayer';		
@@ -637,7 +652,7 @@ var view = {
 		};
 		
 		var firstPawnButton = document.createElementNS('http://www.w3.org/2000/svg','g');
-		uiLayer.appendChild(firstPawnButton);
+		buttonsLayer.appendChild(firstPawnButton);
 		firstPawnButton.id = 'firstPawnButtonGroup';
 		firstPawnButton.addEventListener('click',handlers.firstPawn);
 		var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
@@ -659,7 +674,7 @@ var view = {
 		pawn.id = 'firstPawnButton';
 		
 		var endTurnButton = document.createElementNS('http://www.w3.org/2000/svg','g');
-		uiLayer.appendChild(endTurnButton);
+		buttonsLayer.appendChild(endTurnButton);
 		endTurnButton.id = 'endTurnButtonGroup';
 		endTurnButton.addEventListener('click',handlers.endTurn);
 		endTurnButton.addEventListener('mouseenter',view.displayToolTip.bind(this,'endTurn'));
@@ -753,15 +768,24 @@ var view = {
 		list = list.concat(game.map.pawns);
 		list = list.concat(game.map.things);
 		for (var pawn of list) {
+			var inventoryBack = document.createElementNS('http://www.w3.org/2000/svg','g');
+			inventoryBacksLayer.appendChild(inventoryBack);
+			inventoryBack.id = pawn.id + 'InventoryBack';
+			var inventoryItems = document.createElementNS('http://www.w3.org/2000/svg','g');
+			itemsLayer.appendChild(inventoryItems);
+			inventoryItems.id = pawn.id + 'InventoryItems';
+			var inventoryFront = document.createElementNS('http://www.w3.org/2000/svg','g');
+			inventoryFrontsLayer.appendChild(inventoryFront);
+			inventoryFront.id = pawn.id + 'InventoryFront';
 			var sheetGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-			uiLayer.appendChild(sheetGroup);
+			sheetsLayer.appendChild(sheetGroup);
 			sheetGroup.id = pawn.id + 'Sheet';
 
-			if (pawn.inventory !== undefined || pawn.contents !== undefined) {
-				var inventoryGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-				sheetGroup.appendChild(inventoryGroup);
-				inventoryGroup.id = pawn.id + 'InventoryPane';
-			};
+// 			if (pawn.inventory !== undefined || pawn.contents !== undefined) {
+// 				var InventoryPane = document.createElementNS('http://www.w3.org/2000/svg','g');
+// 				sheetGroup.appendChild(InventoryPane);
+// 				InventoryPane.id = pawn.id + 'InventoryPane';
+// 			};
 			
 			var sheet = document.createElementNS('http://www.w3.org/2000/svg','rect');
 			sheetGroup.appendChild(sheet);
@@ -779,6 +803,7 @@ var view = {
 			view.setHref(portrait,pawn.sprite);
 			portrait.setAttribute('x',-75);
 			portrait.setAttribute('y',160);
+			portrait.addEventListener('click',view.toggleInventoryPane);
 			if (pawn.stats == undefined) {
 				portrait.setAttribute('transform','translate(-27.5 70) scale(0.5)');
 			};
@@ -868,8 +893,8 @@ var view = {
 			
 			view.refreshManeuvers(pawn);
 			
-			if (pawn.inventory !== undefined || pawn.contents !== undefined) {
-				view.refreshItems(pawn);
+			if (pawn.inventory !== undefined) {
+				view.buildInventory(pawn);
 			};
 						
 			// Buttons
@@ -982,60 +1007,69 @@ var view = {
 		};
 	},
 	
-	refreshItems: function(pawn) {
-		var inventoryPane = document.getElementById(pawn.id + "InventoryPane");
-		inventoryPane.innerHTML = '';
-		inventoryPane.setAttribute('stroke','none');
-	
+	buildInventory: function(pawn) {
+		var inventoryBack = document.getElementById(pawn.id + 'InventoryBack');
+		var inventoryItems = document.getElementById(pawn.id + 'InventoryItems');
+		var inventoryFront = document.getElementById(pawn.id + 'InventoryFront');
+
 		var inventoryBacking = document.createElementNS('http://www.w3.org/2000/svg','rect');
-		inventoryPane.appendChild(inventoryBacking);
-		inventoryBacking.setAttribute('x',20);
+		inventoryBack.appendChild(inventoryBacking);
+		inventoryBacking.setAttribute('x',-90);
 		inventoryBacking.setAttribute('y',135);
 		inventoryBacking.setAttribute('rx',2);
 		inventoryBacking.setAttribute('ry',2);
 		inventoryBacking.setAttribute('width',70);
-		inventoryBacking.setAttribute('height',80);
+		inventoryBacking.setAttribute('height',84);
 		inventoryBacking.setAttribute('fill','white');
 		inventoryBacking.setAttribute('stroke','black');
 		inventoryBacking.setAttribute('stroke-width',0.25);
 		
+		for (var i = 0; i < 10; i++) {
+			var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+			inventoryBack.appendChild(rect);
+			rect.setAttribute('x',-53);
+			rect.setAttribute('y',140 + i * 7.5);
+			rect.setAttribute('height',6);
+			rect.setAttribute('width',30);
+			rect.setAttribute('fill','white');
+			rect.setAttribute('stroke','black');
+			rect.setAttribute('stroke-width','0.25');
+			rect.setAttribute('opacity',0.05);
+		};
+		
 		var looseInventoryBacking = document.createElementNS('http://www.w3.org/2000/svg','rect');
-		inventoryPane.appendChild(looseInventoryBacking);
+		inventoryBack.appendChild(looseInventoryBacking);
 		view.itemDrag.dropTargets.push(looseInventoryBacking);
-		looseInventoryBacking.setAttribute('class','looseInventory');
-		looseInventoryBacking.setAttribute('x',57);
+// 		looseInventoryBacking.setAttribute('class','looseInventory');
+		looseInventoryBacking.id = pawn.id + '_' + 'looseInventory_Slot';
+		looseInventoryBacking.setAttribute('x',-53);
 		looseInventoryBacking.setAttribute('y',140);
 		looseInventoryBacking.setAttribute('width',30);
-		looseInventoryBacking.setAttribute('height',90);
+		looseInventoryBacking.setAttribute('height',73);
 		looseInventoryBacking.setAttribute('fill','none');
-		looseInventoryBacking.setAttribute('stroke','inherit');
+// 		looseInventoryBacking.setAttribute('stroke','gainsboro');
+		
+		var inventoryItemsGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+		inventoryItems.appendChild(inventoryItemsGroup);
 
 		var slots = [];
 		if (pawn.equipment !== undefined) {slots = Object.keys(pawn.equipment);};
 		for (var i in slots) {
-			var equipmentGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-			inventoryPane.appendChild(equipmentGroup);
-			view.itemDrag.dropTargets.push(equipmentGroup);
-			equipmentGroup.setAttribute('fill','white');
-			equipmentGroup.setAttribute('stroke','black');
-			equipmentGroup.setAttribute('stroke-width',0.25);
-			equipmentGroup.setAttribute('class',slots[i]);
 			var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
-			equipmentGroup.appendChild(rect);
-			rect.setAttribute('x',25);
+			inventoryBack.appendChild(rect);
+			view.itemDrag.dropTargets.push(rect);
+// 			rect.setAttribute('class',slots[i]);
+			rect.id = pawn.id + '_' + slots[i] + '_Slot';
+			rect.setAttribute('x',-85);
 			rect.setAttribute('y',140 + i * 10);
 			rect.setAttribute('width',30);
 			rect.setAttribute('height',6);
 			rect.setAttribute('fill','none');
-			rect.setAttribute('stroke','inherit');
-			rect.setAttribute('stroke-width','inherit');
-			if (pawn.equipment[slots[i]] !== undefined) {
-				var itemGroup = view.buildItemGroup(pawn.equipment[slots[i]],25,140 + i * 10);
-				equipmentGroup.appendChild(itemGroup);
-			};
+			rect.setAttribute('stroke','black');
+			rect.setAttribute('stroke-width','0.25');
 			var text = 	document.createElementNS('http://www.w3.org/2000/svg','text');
-			equipmentGroup.appendChild(text);
-			text.setAttribute('x',28);
+			inventoryFront.appendChild(text);
+			text.setAttribute('x',-82);
 			text.setAttribute('y',147 + i * 10);
 			text.setAttribute('font-size',3);
 			text.setAttribute('fill','black');
@@ -1047,7 +1081,7 @@ var view = {
 		
 		if (pawn.team == 'p1') {
 			var swapItemsButton = document.createElementNS('http://www.w3.org/2000/svg','g');
-			inventoryPane.appendChild(swapItemsButton);
+			inventoryBack.appendChild(swapItemsButton);
 			swapItemsButton.id = pawn.id + "SwapButton";
 			swapItemsButton.setAttribute('stroke','grey');
 			swapItemsButton.addEventListener('click',handlers.swapItems.bind(this,pawn));
@@ -1055,30 +1089,32 @@ var view = {
 			swapItemsButton.addEventListener('mouseleave',view.clearToolTip);
 			var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
 			swapItemsButton.appendChild(rect);
-			rect.setAttribute('x',25);
-			rect.setAttribute('y',205);
-			rect.setAttribute('width',30);
-			rect.setAttribute('height',6);
+			rect.setAttribute('x',-65);
+			rect.setAttribute('y',200);
+			rect.setAttribute('width',10);
+			rect.setAttribute('height',9);
 			rect.setAttribute('fill','darkgrey');
 			rect.setAttribute('stroke','inherit');
 			var text = document.createElementNS('http://www.w3.org/2000/svg','text');
 			swapItemsButton.appendChild(text);
-			text.setAttribute('x',25+3);
-			text.setAttribute('y',205+3.5);
+			text.setAttribute('x',-65+5);
+			text.setAttribute('y',200+3.5);
 			text.setAttribute('font-size',2);
 			text.setAttribute('fill','black');
 			text.setAttribute('stroke','none');
-			text.innerHTML = 'Swap Items';
+			text.setAttribute('text-anchor','middle');
+			text.innerHTML = 'Swap';
 			var costSphere = document.createElementNS('http://www.w3.org/2000/svg','use');
 			swapItemsButton.appendChild(costSphere);
 			view.setHref(costSphere,'costSphere');
-			costSphere.setAttribute('x',42);
-			costSphere.setAttribute('y',207.75);
+			costSphere.setAttribute('x',-65+5);
+			costSphere.setAttribute('y',200+6);
 			costSphere.setAttribute('fill',view.colors.movePrimary);
 			var costText = document.createElementNS('http://www.w3.org/2000/svg','text');
 			swapItemsButton.appendChild(costText);
 			costText.setAttribute('x',42);
-			costText.setAttribute('y',207.75 + 0.75);
+			costText.setAttribute('x',-65+5);
+			costText.setAttribute('y',200 + 6 + 0.75);
 			costText.setAttribute('text-anchor','middle');
 			costText.setAttribute('font-size',2);
 			costText.setAttribute('class','bold');
@@ -1090,18 +1126,30 @@ var view = {
 			if (view.focus.swapping == pawn) {
 				view.selectManeuver('swap');
 			};
+		};	
+		view.refreshItems(pawn);
+	},
+	
+	refreshItems: function(pawn) {
+		var inventoryItems = document.getElementById(pawn.id + 'InventoryItems');
+		
+		var inventoryItemsGroup = inventoryItems.firstChild;
+		inventoryItemsGroup.innerHTML = '';
+		
+		var slots = [];
+		if (pawn.equipment !== undefined) {slots = Object.keys(pawn.equipment);};
+		for (var i in slots) {
+			if (pawn.equipment[slots[i]] !== undefined) {
+				var itemGroup = view.buildItemGroup(pawn.equipment[slots[i]],-85,140 + i * 10);
+				inventoryItemsGroup.appendChild(itemGroup);
+			};
 		};
-
 		
 		for (var i in pawn.inventory) {
-			var itemGroup = view.buildItemGroup(pawn.inventory[i],57,140 + i * 7.5);
-			inventoryPane.appendChild(itemGroup);
+			var itemGroup = view.buildItemGroup(pawn.inventory[i],-53,140 + i * 7.5);
+			inventoryItemsGroup.appendChild(itemGroup);
 		};
 		
-		if (view.focus.pawn == pawn) {
-			view.focus.inventory = undefined;
-			view.toggleInventoryPane();
-		};
 	},
 	
 	buildItemGroup: function(item,x,y) {
@@ -1134,6 +1182,25 @@ var view = {
 		text.setAttribute('stroke','none');
 		text.innerHTML = item.name;	
 		return itemGroup;
+	},
+	
+	moveInventory: function(pawn,xOffset,yOffset) {
+		var inventoryBack = document.getElementById(pawn.id + 'InventoryBack');
+		var inventoryItems = document.getElementById(pawn.id + 'InventoryItems');
+		var inventoryFront = document.getElementById(pawn.id + 'InventoryFront');
+		for (element of [inventoryBack,inventoryItems,inventoryFront]) {
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			element.appendChild(animateTransform);
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','translate');
+			animateTransform.setAttribute('from','0,0');
+			animateTransform.setAttribute('to',xOffset+','+yOffset);
+			animateTransform.setAttribute('dur','3s');
+			animateTransform.setAttribute('repeatCount','1');
+			animateTransform.setAttribute('fill','freeze');
+			animateTransform.setAttribute('additive','sum');
+		};
 	},
 	
 	refreshManeuvers: function(pawn) {
@@ -1177,7 +1244,7 @@ var view = {
 			nameText.setAttribute('y',143);
 			nameText.setAttribute('font-size',3.5);
 			nameText.setAttribute('class','bold');
-			nameText.innerHTML = "Jojo McGee";
+			nameText.innerHTML = pawn.name;
 			var descText = document.createElementNS('http://www.w3.org/2000/svg','text');
 			maneuversPane.appendChild(descText);
 			descText.setAttribute('x',8);
@@ -1203,7 +1270,7 @@ var view = {
 				if (pawn.dialogue) {
 					maneuverList.push(pawn.contextualManeuvers.talk);
 				};
-				if (pawn.contents !== undefined) {
+				if (pawn.lootable !== undefined) {
 					maneuverList.push(pawn.contextualManeuvers.loot);
 				};
 			};
@@ -1303,7 +1370,7 @@ var view = {
 		var element;
 		if (maneuver == 'swap') {
 			element = document.getElementById(view.focus.swapping.id + 'SwapButton');
-			element.children[1].innerHTML = 'Swapping Items';
+			element.children[1].innerHTML = 'Swapping';
 			element.children[2].setAttribute('visibility','hidden');
 			element.children[3].setAttribute('visibility','hidden');
 		} else {
@@ -1316,7 +1383,7 @@ var view = {
 		var element;
 		if (maneuver == 'swap' && view.focus.swapping !== undefined) {
 			element = document.getElementById(view.focus.swapping.id + 'SwapButton');
-			element.children[1].innerHTML = 'Swap Items';
+			element.children[1].innerHTML = 'Swap';
 			element.children[2].setAttribute('visibility','visible');
 			element.children[3].setAttribute('visibility','visible');
 		} else if (maneuver == 'swap') {
@@ -1397,7 +1464,7 @@ var view = {
 	},
 	
 	dragItemDeselect: function(dropTarget) {
-		if (dropTarget.className.animVal !== 'looseInventory') {
+		if (dropTarget.id.indexOf('looseInventory') == -1) {
 			dropTarget.setAttribute('stroke','black');
 			dropTarget.setAttribute('stroke-width',0.25);
 		} else {
@@ -1516,29 +1583,27 @@ var view = {
 		animateTransform.setAttribute('dur','3s');
 		animateTransform.setAttribute('repeatCount','1');
 		animateTransform.setAttribute('fill','freeze');
+		view.moveInventory(pawn,0,-100);
 	},
 	
 	hideSheets: function() {
-		view.focus.pawn = undefined;
-		var list = [];
-		list = list.concat(game.map.pawns);
-		list = list.concat(game.map.things);
-		for (var pawn of list) {
-			var sheet = document.getElementById(pawn.id+'Sheet');
-			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-			sheet.appendChild(animateTransform);
-			animateTransform.setAttribute('attributeName','transform');
-			animateTransform.setAttribute('attributeType','XML');
-			animateTransform.setAttribute('type','translate');
-			animateTransform.setAttribute('from','0,0');
-			animateTransform.setAttribute('to','0,100');
-			animateTransform.setAttribute('dur','1s');
-			animateTransform.setAttribute('repeatCount','1');
-			animateTransform.setAttribute('fill','freeze');
-		};
-		if (view.focus.inventory !== undefined) {
+		if (view.focus.inventory == view.focus.pawn && view.focus.inventory !== undefined) {
 			view.toggleInventoryPane();
 		};
+		var sheet = document.getElementById(view.focus.pawn.id+'Sheet');
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		sheet.appendChild(animateTransform);
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','translate');
+		animateTransform.setAttribute('from','0,0');
+		animateTransform.setAttribute('to','0,100');
+		animateTransform.setAttribute('dur','1s');
+		animateTransform.setAttribute('repeatCount','1');
+		animateTransform.setAttribute('fill','freeze');
+		view.moveInventory(view.focus.pawn,0,100);
+		view.focus.pawn = undefined;
+		document.getElementById('tipLayer').innerHTML = '';
 	},
 	
 	updateSheet: function(pawn) {
@@ -1588,29 +1653,9 @@ var view = {
 	toggleInventoryPane: function() {
 		if (view.focus.inventory == undefined) { // pop up
 			view.focus.inventory = view.focus.pawn;
-			var pane = document.getElementById(view.focus.inventory.id+'InventoryPane');
-			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-			pane.appendChild(animateTransform);
-			animateTransform.setAttribute('attributeName','transform');
-			animateTransform.setAttribute('attributeType','XML');
-			animateTransform.setAttribute('type','translate');
-			animateTransform.setAttribute('from','0,0');
-			animateTransform.setAttribute('to','0,-80');
-			animateTransform.setAttribute('dur','3s');
-			animateTransform.setAttribute('repeatCount','1');
-			animateTransform.setAttribute('fill','freeze');
+			view.moveInventory(view.focus.pawn,0,-80);
 		} else { // hide
-			var pane = document.getElementById(view.focus.inventory.id+'InventoryPane');
-			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-			pane.appendChild(animateTransform);
-			animateTransform.setAttribute('attributeName','transform');
-			animateTransform.setAttribute('attributeType','XML');
-			animateTransform.setAttribute('type','translate');
-			animateTransform.setAttribute('from','0,0');
-			animateTransform.setAttribute('to','0,80');
-			animateTransform.setAttribute('dur','1s');
-			animateTransform.setAttribute('repeatCount','1');
-			animateTransform.setAttribute('fill','freeze');
+			view.moveInventory(view.focus.inventory,0,80);
 			view.focus.inventory = undefined;
 			view.deselectManeuver('swap');
 			view.focus.swapping = undefined;
@@ -1784,18 +1829,17 @@ var view = {
 		element.remove();
 	},
 	
-	openTrade: function(leftTrader,rightTrader,commerce) {
-		view.focus.leftTrader = leftTrader;
+	openTrade: function(rightTrader,leftTrader,commerce) {
+		handlers.pawnSelect(leftTrader);
 		view.focus.rightTrader = rightTrader;
-		var leftTraderPane = document.getElementById(leftTrader.id + "InventoryPane");
+		view.focus.leftTrader = leftTrader;
 		var rightTraderPane = document.getElementById(rightTrader.id + "InventoryPane");
-		console.log(leftTraderPane,rightTraderPane);
-		handlers.pawnSelect(rightTrader);
+		var leftTraderPane = document.getElementById(leftTrader.id + "InventoryPane");
 		view.toggleInventoryPane();
-		leftTraderPane.setAttribute('transform','translate(-110 -280)');
+		view.moveInventory(rightTrader,110,-188);
 
 		// Trade Close Button
-		var x = -20, y = -44;
+		var x = 89, y = -52;
 		var closeButton = document.createElementNS('http://www.w3.org/2000/svg','g');
 		closeButton.id = 'tradeCloseButton';
 		document.getElementById('uiLayer').appendChild(closeButton);
@@ -1829,11 +1873,14 @@ var view = {
 	},
 	
 	closeTrade: function() {
-		var leftTraderPane = document.getElementById(view.focus.leftTrader.id + "InventoryPane");
-		var rightTraderPane = document.getElementById(view.focus.rightTrader.id + "InventoryPane");
-		leftTraderPane.setAttribute('transform','translate(110 280)');
-		view.focus.leftTrader = undefined;
-		view.focus.rightTrader = undefined;
+		if (view.focus.rightTrader !== undefined) {
+			var rightTraderPane = document.getElementById(view.focus.rightTrader.id + "InventoryPane");
+			var leftTraderPane = document.getElementById(view.focus.leftTrader.id + "InventoryPane");
+			view.moveInventory(view.focus.rightTrader,-110,188);
+			view.focus.rightTrader = undefined;
+			view.focus.leftTrader = undefined;
+			document.getElementById('tradeCloseButton').remove();
+		};
 	},
 };
 

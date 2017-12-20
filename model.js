@@ -100,10 +100,10 @@ function Map(level) {
 	this.eventKeys = {};
 	if (level == undefined) {
 		this.bounds = {
-			minX: -5,
-			minY: -5,
-			maxX: 5,
-			maxY: 5,
+			minX: -10,
+			minY: -7,
+			maxX: 10,
+			maxY: 7,
 		};
 	} else {
 		this.bounds = level.bounds;
@@ -170,7 +170,6 @@ function Map(level) {
 					pawn.compileManeuvers();
 					pawn.team = standee.team;
 					tile.occupants.push(pawn);
-					game.map.pawns.push(pawn);
 					if (standee.team == 'p1') {
 						game.map.heroes.push(pawn);
 					};
@@ -253,71 +252,71 @@ function Map(level) {
 // 		
 // 		return events;
 // 	};
-	
+
 	this.randomStandees = function() {
-		var standees = [], tileList = {}, adjacentTiles = [], bestOptions = [], frontier = [], clearedTiles = [], currentTile, index, bystanders;
-		for (var key in data.landscapes) {
-			standees.push({type:'landscape',key:key,locs:[]});
-		};
-		var startLoc = game.map.tiles[Math.random() * game.map.tiles.length << 0];
+		var tile, neighbor, count, nextTile, clearedTiles = [], frontier = [], frontierTwo = [], frontierOne = [], borders = [];
+		var startLoc = this.findTile(0,0);
 		clearedTiles.push(startLoc);
-		frontier = frontier.concat(startLoc.adjacent);
-		for (var tile of game.map.tiles) {
-			tileList[tile.x+'x'+tile.y] = {x:tile.x,y:tile.y};
+		for (tile of startLoc.adjacent) {
+			clearedTiles.push(tile);
 		};
-		tileList[startLoc.x+'x'+startLoc.y] = undefined;
-		for (var i=0;i<10;i++) {
-			currentTile = clearedTiles[Math.random() * clearedTiles.length << 0];
-			for (var n=0;n<20;n++) {
-				adjacentTiles = [], bestOptions = [];
-				for (var tile of currentTile.adjacent) {
-					if (clearedTiles.indexOf(tile) == -1) {
-						adjacentTiles.push(tile);
-					};
+		for (tile of clearedTiles) {
+			for (neighbor of tile.adjacent) {
+				if (clearedTiles.indexOf(neighbor) == -1) {
+					frontierTwo.push(neighbor);
 				};
-				for (var tile of adjacentTiles) {
-					if (frontier.indexOf(tile) == -1) {
-						bestOptions.push(tile);
-					};
-				};
-				lastTile = currentTile;
-				if (bestOptions.length > 0) {
-					currentTile = bestOptions[bestOptions.length * Math.random() << 0];
-				} else {
-					currentTile = adjacentTiles[adjacentTiles.length * Math.random() << 0];
-				};		
-				if (currentTile == undefined) {
-					break;
-				} else {
-					tileList[currentTile.x+'x'+currentTile.y] = undefined;
-					clearedTiles.push(currentTile);
-					for (var tile of lastTile.adjacent) {
-						if (frontier.indexOf(tile) == -1) {
-							frontier.push(tile);
+			};
+		};
+		for (var i=0;i<1000;i++) {
+			frontier = frontierOne.concat(frontierTwo);
+			frontierOne = [];
+			frontierTwo = [];
+			for (tile of frontier) {
+				if (clearedTiles.indexOf(tile) == -1) {
+					count = 0;
+					for (neighbor of tile.adjacent) {
+						if (clearedTiles.indexOf(neighbor) !== -1) {
+							count++;
 						};
 					};
+					if (count == 1) {
+						frontierOne.push(tile);
+					} else if (count == 2) {
+						frontierTwo.push(tile);
+					} else {
+						borders.push(tile);
+					};
 				};
 			};
-		};
-		startLoc = [startLoc].concat(startLoc.adjacent);
-		for (var tile of startLoc) {
-			tileList[tile.x+'x'+tile.y] = undefined;
-			if (clearedTiles.indexOf(startLoc) !== -1) {
-				clearedTiles.splice(clearedTiles.indexOf(startLoc),1);
+			
+			nextTile = undefined;
+			nextTile = frontierOne[Math.random() * frontierOne.length << 0];
+			if (nextTile !== undefined) {
+				clearedTiles.push(nextTile);
+			} else {
+				nextTile = frontierTwo[Math.random() * frontierTwo.length << 0];
+				if (nextTile == undefined) {
+					i = Infinity;
+				} else {
+					clearedTiles.push(nextTile);
+				};
 			};
-		};
-		for (var entry in tileList) {
-			if (tileList[entry] !== undefined) {
-				index = Math.random() * standees.length << 0;
-				standees[index].locs.push({x:tileList[entry].x,y:tileList[entry].y});
+			if (nextTile == undefined) {
+				i = Infinity;
+			} else {
+				for (neighbor of nextTile.adjacent) {
+					frontierOne.push(neighbor);
+				};
 			};
+			
 		};
-		standees.push({type:'pawn',team:'p1',id:'p1',locs:[startLoc[0]]});
-		standees.push({type:'pawn',team:'p1',id:'mixterStout',locs:[startLoc[1]]});
+		standees = [{type:'landscape',key:'boulder',locs:borders}];
+		standees.push({type:'pawn',team:'p1',id:'p1',locs:[startLoc]});
+		standees.push({type:'pawn',team:'p1',id:'mixterStout',locs:[startLoc.adjacent[0]]});
 		bystanders = {type:'bystanders',locs:[]};
 		for (var i=0;i<5;i++) {
 			tile = clearedTiles[Math.random() * clearedTiles.length << 0];
-			if (startLoc.indexOf(tile) == -1 ) {
+			if (startLoc.adjacent.indexOf(tile) == -1 && startLoc !== tile) {
 				bystanders.locs.push({x:tile.x,y:tile.y});
 			};
 		};
@@ -329,6 +328,82 @@ function Map(level) {
 		standees.push({type:'thing',locs:thingTiles});
 		return standees;
 	};
+	
+// 	this.OLDrandomStandees = function() {
+// 		var standees = [], tileList = {}, adjacentTiles = [], bestOptions = [], frontier = [], clearedTiles = [], currentTile, index, bystanders;
+// 		for (var key in data.landscapes) {
+// 			standees.push({type:'landscape',key:key,locs:[]});
+// 		};
+// 		var startLoc = game.map.tiles[Math.random() * game.map.tiles.length << 0];
+// 		clearedTiles.push(startLoc);
+// 		frontier = frontier.concat(startLoc.adjacent);
+// 		for (var tile of game.map.tiles) {
+// 			tileList[tile.x+'x'+tile.y] = {x:tile.x,y:tile.y};
+// 		};
+// 		tileList[startLoc.x+'x'+startLoc.y] = undefined;
+// 		for (var i=0;i<10;i++) {
+// 			currentTile = clearedTiles[Math.random() * clearedTiles.length << 0];
+// 			for (var n=0;n<20;n++) {
+// 				adjacentTiles = [], bestOptions = [];
+// 				for (var tile of currentTile.adjacent) {
+// 					if (clearedTiles.indexOf(tile) == -1) {
+// 						adjacentTiles.push(tile);
+// 					};
+// 				};
+// 				for (var tile of adjacentTiles) {
+// 					if (frontier.indexOf(tile) == -1) {
+// 						bestOptions.push(tile);
+// 					};
+// 				};
+// 				lastTile = currentTile;
+// 				if (bestOptions.length > 0) {
+// 					currentTile = bestOptions[bestOptions.length * Math.random() << 0];
+// 				} else {
+// 					currentTile = adjacentTiles[adjacentTiles.length * Math.random() << 0];
+// 				};		
+// 				if (currentTile == undefined) {
+// 					break;
+// 				} else {
+// 					tileList[currentTile.x+'x'+currentTile.y] = undefined;
+// 					clearedTiles.push(currentTile);
+// 					for (var tile of lastTile.adjacent) {
+// 						if (frontier.indexOf(tile) == -1) {
+// 							frontier.push(tile);
+// 						};
+// 					};
+// 				};
+// 			};
+// 		};
+// 		startLoc = [startLoc].concat(startLoc.adjacent);
+// 		for (var tile of startLoc) {
+// 			tileList[tile.x+'x'+tile.y] = undefined;
+// 			if (clearedTiles.indexOf(startLoc) !== -1) {
+// 				clearedTiles.splice(clearedTiles.indexOf(startLoc),1);
+// 			};
+// 		};
+// 		for (var entry in tileList) {
+// 			if (tileList[entry] !== undefined) {
+// 				index = Math.random() * standees.length << 0;
+// 				standees[index].locs.push({x:tileList[entry].x,y:tileList[entry].y});
+// 			};
+// 		};
+// 		standees.push({type:'pawn',team:'p1',id:'p1',locs:[startLoc[0]]});
+// 		standees.push({type:'pawn',team:'p1',id:'mixterStout',locs:[startLoc[1]]});
+// 		bystanders = {type:'bystanders',locs:[]};
+// 		for (var i=0;i<5;i++) {
+// 			tile = clearedTiles[Math.random() * clearedTiles.length << 0];
+// 			if (startLoc.indexOf(tile) == -1 ) {
+// 				bystanders.locs.push({x:tile.x,y:tile.y});
+// 			};
+// 		};
+// 		standees.push(bystanders);
+// 		var thingTiles = [];
+// 		for (i=0;i<1;i++) {
+// 			thingTiles.push(clearedTiles[Math.random() * clearedTiles.length << 0]);
+// 		};
+// 		standees.push({type:'thing',locs:thingTiles});
+// 		return standees;
+// 	};
 	
 	// Play Functions
 	
@@ -369,9 +444,15 @@ function Landscape(tile,key) {
 function Pawn(template,tile,ai) {
 	var source;
 	
+	this.id = undefined;
+	
 	if (game !== undefined && game.map !== undefined && game.map.pawns !== undefined) {
 		game.map.pawns.push(this);
 	};
+	
+	this.name = undefined;
+	
+	this.pronoun = ['Herself','Himself','Herself','Himself','Herself','Himself','Themself','Emself','Cirself','Ferself'][Math.random() * 10 << 0];
 	
 	this.tile = tile;
 	this.selectable = true;
@@ -387,14 +468,20 @@ function Pawn(template,tile,ai) {
 		pouch: undefined,
 	};
 
+	this.randomName = function() {
+		var firstNames = ['Jojo','Sam','Avery','Drumlin','Alex'];
+		var lastNames = ['Cooper','Ankole-Watusi','Stout','Duendi','Guffau'];
+		return firstNames[Math.random() * firstNames.length << 0] + ' ' + lastNames[Math.random() * lastNames.length << 0];
+	};
+
 	if (template == undefined) {
 		var id = Math.random().toString(36).slice(2);
 		this.id = id;
 		
-		this.name = 'Unnamed';
-		this.pronoun = ['Herself','Himself','Herself','Himself','Herself','Himself','Themself','Emself','Cirself','Ferself'][Math.random() * 10 << 0];
+		this.name = undefined;
 	
 		this.avatar = new Avatar(this);
+		this.name = this.randomName();
 		this.sprite = id;
 		this.stats = {
 			move: 5,
@@ -423,8 +510,10 @@ function Pawn(template,tile,ai) {
 				this.id = template + '_' + Math.random().toString(36).slice(2);
 			};
 		};
-		this.name = source.name;
-		this.pronoun = source.pronoun;
+		this.name = undefined;
+		if (source.pronoun !== undefined) {
+			this.pronoun = source.pronoun;
+		};
 		if (source.avatarHeritage !== undefined) {
 			this.avatar = new Avatar(this,source.avatarHeritage);
 		} else {
@@ -432,6 +521,11 @@ function Pawn(template,tile,ai) {
 		};
 		if (source.avatarParameters !== undefined) {
 			this.avatar.parameters = source.avatarParameters;
+		};
+		if (source.name !== undefined) {
+			this.name = source.name;
+		} else {
+			this.name = this.randomName();
 		};
 		this.stats = {};
 		for (var stat in source.stats) {
@@ -490,15 +584,15 @@ function Pawn(template,tile,ai) {
 		if (this.equipment[slot] !== undefined) {
 			this.inventory.push(this.equipment[slot]);
 		};
-		if (this.inventory.indexOf(item) !== -1) {
-			this.inventory.splice(this.inventory.indexOf(item),1);
-		} else {
-			for (var potential in this.equipment) {
-				if (this.equipment[potential] == item) {
-					this.equipment[potential] = undefined;
-				};
-			};
-		};
+// 		if (this.inventory.indexOf(item) !== -1) {
+// 			this.inventory.splice(this.inventory.indexOf(item),1);
+// 		} else {
+// 			for (var potential in this.equipment) {
+// 				if (this.equipment[potential] == item) {
+// 					this.equipment[potential] = undefined;
+// 				};
+// 			};
+// 		};
 		if (item.slots[0] == 'left+right') {
 			if (slot == 'right' && this.equipment.left !== undefined) {
 				this.inventory.push(this.equipment.left);
@@ -514,7 +608,11 @@ function Pawn(template,tile,ai) {
 			this.inventory.push(this.equipment.right);
 			this.equipment.right = undefined;
 		};
-		this.equipment[slot] = item;
+		if (slot !== 'looseInventory') {
+			this.equipment[slot] = item;
+		} else {
+			this.inventory.push(item);
+		};
 		
 		this.compileManeuvers();		
 		view.refreshItems(this);
@@ -523,18 +621,18 @@ function Pawn(template,tile,ai) {
 	};
 	
 	this.unequip = function(item) {
-		if (this.inventory.indexOf(item) == -1) {
-			this.inventory.push(item);
-			for (var potential in this.equipment) {
-				if (this.equipment[potential] == item) {
-					this.equipment[potential] = undefined;
-				};
+		for (var potential in this.equipment) {
+			if (this.equipment[potential] == item) {
+				this.equipment[potential] = undefined;
 			};
-			this.compileManeuvers();
-			view.refreshItems(this);
-			view.refreshManeuvers(this);
-			view.redrawPawn(this);
 		};
+		if (this.inventory.indexOf(item) !== -1) {
+			this.inventory.splice(this.inventory.indexOf(item),1);
+		};
+		this.compileManeuvers();
+		view.refreshItems(this);
+		view.refreshManeuvers(this);
+		view.redrawPawn(this);
 	};
 	
 	this.compileManeuvers = function() {
@@ -954,13 +1052,16 @@ function Thing(template,tile,argsArray,id) {
 	if (template == undefined) {
 		this.sprite = 'chest';
 		this.cover = 0.1;
-		this.contents = ['firstAidKit'];
+		this.inventory = [new Item('firstAidKit',this)];
+		this.lootable = true;
 	} else {
 		this.sprite = data.things[template].sprite;
 		this.cover = data.things[template].cover;
-		this.contents = data.things[template].contents(argsArray);
+		this.inventory = data.things[template].inventory(argsArray);
 		this.triggers = data.things[template].triggers(argsArray);
 	};
+	
+	this.equipment = {};
 	
 	this.contextualManeuvers = {
 		interact: {
@@ -986,6 +1087,50 @@ function Thing(template,tile,argsArray,id) {
 	this.loot = function() {
 		view.openTrade(this,view.focus.lastPawn,'loot');
 	};
+
+	this.equip = function(item,slot) {
+		if (this.equipment[slot] !== undefined) {
+			this.inventory.push(this.equipment[slot]);
+		};
+		if (item.slots[0] == 'left+right') {
+			if (slot == 'right' && this.equipment.left !== undefined) {
+				this.inventory.push(this.equipment.left);
+				this.equipment.left = undefined;
+			} else if (this.equipment.right !== undefined) {
+				this.inventory.push(this.equipment.right);
+				this.equipment.right = undefined;
+			};
+		} else if (slot == 'right' && this.equipment.left !== undefined && this.equipment.left.slots[0] == 'left+right') {
+			this.inventory.push(this.equipment.left);
+			this.equipment.left = undefined;
+		} else if (slot == 'left' && this.equipment.right !== undefined && this.equipment.right.slots[0] == 'left+right') {
+			this.inventory.push(this.equipment.right);
+			this.equipment.right = undefined;
+		};
+		if (slot !== 'looseInventory') {
+			this.equipment[slot] = item;
+		} else {
+			this.inventory.push(item);
+		};
+		
+		view.refreshItems(this);
+// 		view.redrawPawn(this);
+	};
+	
+	this.unequip = function(item) {
+		for (var potential in this.equipment) {
+			if (this.equipment[potential] == item) {
+				this.equipment[potential] = undefined;
+			};
+		};
+		if (this.inventory.indexOf(item) !== -1) {
+			this.inventory.splice(this.inventory.indexOf(item),1);
+		};
+		view.refreshItems(this);
+// 		view.redrawPawn(this);
+	};
+
+
 };
 
 function Item(template,pawn,id) {
