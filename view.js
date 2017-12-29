@@ -1,8 +1,8 @@
 var view = {
 
 	camera: {
-		x: 0,
-		y: 5,
+		x: 100,
+		y: 100,
 		z: 10,
 		offsetY: 5,
 		distCameraToScreen: 20,
@@ -17,6 +17,7 @@ var view = {
 	
 	colors: {
 		mainMenu: 'maroon',
+		passagesModal: 'maroon',
 		movePrimary: 'goldenrod',
 		moveSecondary: 'yellow',
 		strengthPrimary: 'purple',
@@ -31,7 +32,7 @@ var view = {
 	
 		var introDiv = document.createElement('div');
 		introDiv.id = 'introDiv';
-		introDiv.innerHTML = "<p>In this very under-construction game, you take on the role of citizens of a beautiful, cosmopolitain fantasy city who rise up against the tyranny of the despotic Ogre King. It's a tactical roleplaying game, which means you mostly move little characters around on a map to stage little battles.</p><p>There isn't much here yet -- one and a half levels -- but I'm doing a lot of backend work to make creating levels as easy as possible going forward.</p>";
+		introDiv.innerHTML = "<p>In this very under-construction game, you take on the role of citizens of a beautiful, cosmopolitain fantasy city who rise up against the tyranny of the despotic Ogre King. It's a tactical roleplaying game, which means you mostly move little characters around on a map to stage little battles.</p><p>There isn't much here yet.  I'm revamping the whole thing with a fun hex-map-perspetive display, and making it as easy as possible for me to make future levels.</p>";
 		var newGameButton = document.createElement('button');
 		introDiv.appendChild(newGameButton);
 		newGameButton.addEventListener('click',handlers.newGame);
@@ -192,13 +193,18 @@ var view = {
 		return [introDiv,creationDiv,svgDiv];
 	},
 	
+	clearMap: function() {
+		document.getElementById('svgDiv').innerHTML = '';
+	},
+	
 	displayCreation: function() {
 		document.getElementById('introDiv').style.display = 'none';
 		document.getElementById('creationDiv').style.display = 'block';
-		view.updateCreation();
 		for (var parameter in data.ethnicities.labelNames) {
 			document.getElementById(parameter+"Input").value = game.avatar.parameters[parameter];
 		};
+		handlers.updateAvatar(); // sets all parameters to slider values (which are rounded from the randomly generated values)
+		view.updateCreation();
 	},
 	
 	hideCreation: function() {
@@ -209,10 +215,8 @@ var view = {
 	updateCreation: function() {
 		var tierList;
 		var creationSVG = document.getElementById('creationSVG');
-		game.avatar.svg = game.avatar.draw();
-		game.avatar.updateColoring();
 		creationSVG.innerHTML = '';
-		creationSVG.appendChild(game.avatar.svg);
+		creationSVG.appendChild(game.avatar.draw());
 		saveSVG(creationSVG,'Citizen Swords Avatar');
 		var pointness = game.avatar.parameters.earDip * -1 - 11;
 		var apparentEthnicities = game.avatar.apparentEthnicities();
@@ -308,6 +312,21 @@ var view = {
 		var uiLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
 		uiLayer.id = 'uiLayer';		
 		svg.appendChild(uiLayer);
+			var buttonsLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+			buttonsLayer.id = 'buttonsLayer';		
+			uiLayer.appendChild(buttonsLayer);
+			var inventoryBacksLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+			inventoryBacksLayer.id = 'inventoryBacksLayer';		
+			uiLayer.appendChild(inventoryBacksLayer);
+			var itemsLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+			itemsLayer.id = 'itemsLayer';		
+			uiLayer.appendChild(itemsLayer);
+			var inventoryFrontsLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+			inventoryFrontsLayer.id = 'inventoryFrontsLayer';		
+			uiLayer.appendChild(inventoryFrontsLayer);
+			var sheetsLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
+			sheetsLayer.id = 'sheetsLayer';		
+			uiLayer.appendChild(sheetsLayer);
 	
 		var tipLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
 		tipLayer.id = 'tipLayer';		
@@ -396,6 +415,32 @@ var view = {
 		circle.setAttribute('stroke','none');
 		circle.setAttribute('opacity',0.5);
 		
+		for (var c=1;c<10;c++) {
+			var moveCostSphere = document.createElementNS('http://www.w3.org/2000/svg','g');
+			defs.appendChild(moveCostSphere);
+			moveCostSphere.id = 'moveCostSphere'+c;
+			var costSphere = document.createElementNS('http://www.w3.org/2000/svg','use');
+			view.setHref(costSphere,'costSphere');
+			costSphere.setAttribute('transform','scale(4)');
+			var costText = document.createElementNS('http://www.w3.org/2000/svg','text');
+			costText.setAttribute('x',0);
+			costText.setAttribute('y',3);
+			costText.setAttribute('text-anchor','middle');
+			costText.setAttribute('font-size',8);
+			costText.setAttribute('fill','white');
+			costText.setAttribute('stroke','black');
+			costText.setAttribute('stroke-width','0.5');
+			costText.setAttribute('paint-order','stroke');
+			costText.innerHTML = c;
+			moveCostSphere.appendChild(costSphere);
+			moveCostSphere.appendChild(costText);
+		};
+				
+		var tileBackground = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+		tileBackground.id = 'tileBackground';
+		defs.appendChild(tileBackground);
+		tileBackground.setAttribute('points','0,13 57,5 47,-6 0,-9 -47,-6 -57,5');
+		
 		var block = document.createElementNS('http://www.w3.org/2000/svg','rect');
 		block.id = 'block';
 		defs.appendChild(block);
@@ -404,6 +449,39 @@ var view = {
 		block.setAttribute('height',60);
 		block.setAttribute('width',100);
 		block.setAttribute('fill','purple');
+		
+		var chest = document.createElementNS('http://www.w3.org/2000/svg','g');
+		chest.id = 'chest';
+		defs.appendChild(chest);
+		chest.setAttribute('stroke-linecap',"round");
+		chest.setAttribute('stroke-linejoin',"round");
+		chest.setAttribute('stroke-miterlimit',"10");
+		var colors = {
+			wood: '#A97C50',
+			woodStroke: '#3F3D42',
+			metal: "#FBB040",
+			metalStroke: "#564700",
+		};
+		var shapes = [
+			{tag:'path', fill:colors.wood, stroke:colors.woodStroke, d:"M-24.398-11.418c0-5.389,3.378-8.778,8.778-8.778l30.239-3c6.551,0,9.779,4.975,9.779,12.778l-29.24,5L-24.398-11.418 z"},
+			{tag:'path', fill:colors.metal, stroke:colors.metalStroke, d:"M16.086-8.908c0-8.18-3.384-13.394-10.249-13.394l3.969-0.551c6.866,0,10.25,5.214,10.25,13.394L16.086-8.908 z"},
+			{tag:'path', fill:colors.metal, stroke:colors.metalStroke, d:"M-9.922-20.645c7.313,0,11.578,5.8,11.578,14.513l4.182-0.754c0-8.714-3.604-14.268-10.918-14.268L-9.922-20.645 z"},
+			{tag:'polygon', fill:colors.wood, stroke:colors.woodStroke, points:"-4.842,14.139 -24.398,8.139 -24.398,-11.418 -4.842,-5.418 "},
+			{tag:'polygon', fill:colors.wood, stroke:colors.woodStroke, points:"24.398,8.139 -4.842,14.139 -4.842,-5.418 24.398,-10.418 "},
+			{tag:'path', fill:colors.wood, stroke:colors.woodStroke, d:"M-24.398-11.418c0-5.4,3.378-8.778,8.778-8.778c6.925,0,10.778,9.378,10.778,14.778L-24.398-11.418 z"},
+			{tag:'polygon', fill:colors.metal, stroke:colors.metalStroke, points:"20.056,9.408 15.72,10.299 15.72,-8.733 20.056,-9.474 "},
+			{tag:'polygon', fill:colors.metal, stroke:colors.metalStroke, points:"5.991,12.01 1.655,12.9 1.655,-6.132 5.991,-6.873 "},
+			{tag:'polygon', fill:colors.metal, stroke:colors.metalStroke, points:"8.549,-5.782 9.165,-7.813 12.521,-8.387 13.751,-6.873 12.355,-3.828 10.476,-3.615"}
+		];
+		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			chest.appendChild(newShape);
+			for (var tag in shape) {
+				if (tag !== 'tag') {
+					newShape.setAttribute(tag,shape[tag]);
+				};
+			};
+		};
 		
 		var house = document.createElementNS('http://www.w3.org/2000/svg','g');
 		house.id = 'house';
@@ -448,6 +526,53 @@ var view = {
 			polygon.setAttribute('points',facet.points);
 		};
 		
+		var riverStones = document.createElementNS('http://www.w3.org/2000/svg','g');
+		riverStones.id = 'riverStones';
+		defs.appendChild(riverStones);
+		for (var stone of [{x:0,y:0,scale:1},{x:10,y:15,scale:0.8},{x:-20,y:20,scale:0.7},{x:15,y:5,scale:0.5},{x:-25,y:-5,scale:0.4}]) {
+			var bottom = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+			riverStones.appendChild(bottom);
+			bottom.setAttribute('cx',stone.x);
+			bottom.setAttribute('cy',stone.y+1);
+			bottom.setAttribute('rx',stone.scale * 10);
+			bottom.setAttribute('ry',stone.scale * 4);
+			bottom.setAttribute('fill','dimgrey');
+			bottom.setAttribute('stroke','none');
+			var top = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+			riverStones.appendChild(top);
+			top.setAttribute('cx',stone.x);
+			top.setAttribute('cy',stone.y-1);
+			top.setAttribute('rx',stone.scale * 10);
+			top.setAttribute('ry',stone.scale * 4);
+			top.setAttribute('fill','silver');
+			top.setAttribute('stroke','none');
+		};
+		
+		var rockface = document.createElementNS('http://www.w3.org/2000/svg','g');
+		rockface.id = 'rockface';
+		defs.appendChild(rockface);
+		rockface.setAttribute('stroke','black');
+		rockface.setAttribute('stroke-width','0.25');
+		rockface.setAttribute('stroke-linecap','round');
+		rockface.setAttribute('stroke-linejoin','round');
+		rockface.setAttribute('transform','scale(1.02)');
+		var facets = [
+			{fill: '#505050', ofill:"#58596F", points:["7.335,7.011 -8.394,7.828 -1.16,-16.692","-25.614,9.426 -17.234,10.578 -16.743,3.444","-53.167,9.018 -35.603,7.011 -39.505,2.032","-16.315,-2.798 -39.505,2.032 -16.743,3.444","-48.102,-3.127 -44.385,-12.605 -35.603,-3.127","34.199,-20.036 23.062,-31.554 21.111,-23.083","8.273,-28.027 3.617,-41.734 -1.25,-16.392","3.617,-41.734 -8.394,-49.536 -7.476,-37.796","-39.505,-34.155 -30.551,-27.764 -44.385,-12.605","-49.609,-39.208 -30.236,-48.57 -20.967,-42.747","34.199,-48.125 48.85,-39.208 34.042,-20.036","53.901,-11.862 21.333,-1.98 34.199,-20.036","45.291,9.018 34.199,16.225 53.901,-11.862","21.111,-23.083 6.071,-12.605 21.571,20.832"]},
+			{fill: '#282828', ofill:"#474053", points:["-17.234,10.578 -8.394,7.828 -16.315,-2.798","-16.315,-2.798 -1.16,-16.692 -24.466,-8.519","-1.25,-16.392 8.483,-28.285 8.286,-22.192 7.335,7.011","3.617,-41.734 -1.25,-16.392 -7.476,-37.796","-18.382,-46.787 -30.551,-27.764 -17.234,-18.179","23.062,-31.554 34.199,-48.125 34.041,-19.814","53.901,-11.862 48.85,-39.208 34.042,-20.036","34.199,16.225 53.901,-11.862 29.606,2.665"]},
+			{fill: '#8C8C8C', ofill:"#F1F2ED", points:["-35.603,7.011 -16.743,3.444 -25.614,9.426","-48.102,-3.127 -53.167,9.018 -39.505,2.032","-44.385,-12.605 -24.466,-8.519 -35.603,-3.127","-1.16,-16.692 -17.234,-18.179 -24.466,-8.519","-18.382,-46.787 -7.476,-37.796 -17.234,-18.179","-17.234,-18.179 -30.551,-27.764 -44.385,-12.605","-49.609,-39.208 -44.385,-12.605 -39.505,-34.155","15.141,-43.666 8.273,-28.285 3.617,-41.734","15.141,-43.666 34.199,-48.125 23.062,-31.554","-2.309,14.738 4.694,17.934 6.071,-12.605","34.199,-20.036 21.111,-23.083 21.333,-1.98","21.333,-1.98 29.606,2.665 21.571,20.832","53.901,-11.862 29.606,2.665 21.333,-1.98"]},
+			{fill: '#646464', ofill:"#A7A9AE", points:["-39.505,2.032 -16.743,3.444 -35.603,7.011","-24.466,-8.519 -35.603,-3.127 -16.315,-2.798","-8.394,7.828 -1.16,-16.692 -16.315,-2.798","21.111,-23.083 7.335,7.828 8.483,-28.285","-7.476,-37.796 -1.25,-16.392 -17.234,-18.179","-30.551,-27.764 -20.967,-42.747 -39.505,-34.155","8.617,-28.229 23.062,-31.554 15.141,-43.666","21.571,20.832 4.694,17.934 6.071,-12.605","34.199,16.225 29.606,2.665 21.571,20.832"]},
+			{fill: '#787878', ofill:"#D9D3D4", points:["-48.102,-3.127 -16.315,-2.798 -39.505,2.032","-17.234,-18.179 -44.385,-12.605 -24.466,-8.519","23.062,-31.554 8.483,-28.285 21.111,-23.083","-8.394,-49.536 -7.476,-37.796 -18.382,-46.787","-49.609,-39.208 -20.967,-42.747 -39.505,-34.155","-20.967,-42.747 -30.236,-48.57 -18.382,-46.787"]}
+		];
+		for (var group of facets) {
+			for (facet of group.points) {
+				var shape = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+				rockface.appendChild(shape);
+				shape.setAttribute('fill',group.fill);
+				shape.setAttribute('points',facet);
+			};
+		};
+
+		
 		var bushes = document.createElementNS('http://www.w3.org/2000/svg','g');
 		bushes.id = 'bushes';
 		defs.appendChild(bushes);
@@ -463,6 +588,26 @@ var view = {
 			ellipse.setAttribute('cy',bush.y);
 			ellipse.setAttribute('rx',16);
 			ellipse.setAttribute('ry',12);
+			ellipse.setAttribute('fill','green');
+			ellipse.setAttribute('stroke','black');
+		}
+
+		
+		var trees = document.createElementNS('http://www.w3.org/2000/svg','g');
+		trees.id = 'trees';
+		defs.appendChild(trees);
+		for (var tree of [{x:-5,y:-20},{x:-20,y:-15},{x:20,y:-17}]) {
+			var polygon = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+			trees.appendChild(polygon);
+			polygon.setAttribute('points',tree.x + ',' + tree.y + ' ' + (tree.x-2) + ',' + (tree.y+37) + ' ' + (tree.x+2) + ',' + (tree.y+37) );
+			polygon.setAttribute('fill','saddlebrown');
+			polygon.setAttribute('stroke','black');
+			var ellipse = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+			trees.appendChild(ellipse);
+			ellipse.setAttribute('cx',tree.x);
+			ellipse.setAttribute('cy',tree.y);
+			ellipse.setAttribute('rx',19);
+			ellipse.setAttribute('ry',15);
 			ellipse.setAttribute('fill','green');
 			ellipse.setAttribute('stroke','black');
 		}
@@ -516,31 +661,30 @@ var view = {
 				groundLayer.appendChild(groundGroup);
 				groundGroup.id = 'ground_'+tile.x+'_'+tile.y;
 				tile.svg = groundGroup;
+// 				groundGroup.setAttribute('fill',tile.fill);
 				groundGroup.setAttribute('fill','white');
 				groundGroup.setAttribute('stroke','none');
 				groundGroup.setAttribute('stroke-width',1);
 				groundGroup.addEventListener('mouseover',view.hoverTile.bind(view,tile));
 				groundGroup.addEventListener('mouseout',view.unhoverTile.bind(view,tile));
 				groundGroup.addEventListener('click',handlers.tileSelect.bind(view,tile));
-				var ground = document.createElementNS('http://www.w3.org/2000/svg','use');
-				groundGroup.appendChild(ground);
-				ground.setAttribute('class','ground');
-				view.setHref(ground,'tileEllipse');
-				ground.setAttribute('x',displayCoords.x);
-				ground.setAttribute('y',displayCoords.y);
-				ground.setAttribute('fill','inherit');
-				ground.setAttribute('stroke','inherit');
-				ground.setAttribute('transform',displayCoords.groundTransform);
-// 				var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-// 				groundGroup.appendChild(text);
-// 				text.setAttribute('x',displayCoords.x);
-// 				text.setAttribute('y',displayCoords.y);
-// 				text.setAttribute('text-anchor','middle');
-// 				text.setAttribute('font-size',2);
-// 				text.setAttribute('fill','black');
-// 				text.setAttribute('stroke','none');
-// 				text.innerHTML = "("+tile.x+","+tile.y+")";
-// 				text.setAttribute('transform',displayCoords.standeeTransform);
+				var tileBackground = document.createElementNS('http://www.w3.org/2000/svg','use');
+				groundGroup.appendChild(tileBackground);
+				view.setHref(tileBackground,'tileBackground');
+				tileBackground.setAttribute('x',displayCoords.x);
+				tileBackground.setAttribute('y',displayCoords.y);
+				tileBackground.setAttribute('transform',displayCoords.groundTransform);
+				tileBackground.setAttribute('fill','inherit');
+				tileBackground.setAttribute('stroke','none');
+				var tileShape = document.createElementNS('http://www.w3.org/2000/svg','use');
+				groundGroup.appendChild(tileShape);
+				tileShape.setAttribute('class','ground');
+				view.setHref(tileShape,'tileEllipse');
+				tileShape.setAttribute('x',displayCoords.x);
+				tileShape.setAttribute('y',displayCoords.y);
+				tileShape.setAttribute('fill','none');
+				tileShape.setAttribute('stroke','inherit');
+				tileShape.setAttribute('transform',displayCoords.groundTransform);
 				var standeeGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
 				standeeLayer.appendChild(standeeGroup);
 				standeeGroup.id = 'standees_'+tile.x+'_'+tile.y;
@@ -553,7 +697,7 @@ var view = {
 		};
 		
 		var firstPawnButton = document.createElementNS('http://www.w3.org/2000/svg','g');
-		uiLayer.appendChild(firstPawnButton);
+		buttonsLayer.appendChild(firstPawnButton);
 		firstPawnButton.id = 'firstPawnButtonGroup';
 		firstPawnButton.addEventListener('click',handlers.firstPawn);
 		var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
@@ -575,7 +719,7 @@ var view = {
 		pawn.id = 'firstPawnButton';
 		
 		var endTurnButton = document.createElementNS('http://www.w3.org/2000/svg','g');
-		uiLayer.appendChild(endTurnButton);
+		buttonsLayer.appendChild(endTurnButton);
 		endTurnButton.id = 'endTurnButtonGroup';
 		endTurnButton.addEventListener('click',handlers.endTurn);
 		endTurnButton.addEventListener('mouseenter',view.displayToolTip.bind(this,'endTurn'));
@@ -613,18 +757,18 @@ var view = {
 			pawn.sprite = pawn.id;
 		};
 		for (var tile of game.map.tiles) {
+			var displayCoords = view.displayCoords(tile);
 			for (var occupant of tile.occupants) {
 				var occupantUse = document.createElementNS('http://www.w3.org/2000/svg','use');
-				var displayCoords = view.displayCoords(tile);
 				tile.standeeGroup.appendChild(occupantUse);
 				occupant.svg = occupantUse;
 				occupantUse.setAttribute('class','standee');
 				view.setHref(occupantUse,occupant.sprite);
 				occupantUse.setAttribute('x',displayCoords.x);
 				occupantUse.setAttribute('y',displayCoords.y);
+				occupantUse.setAttribute('transform',displayCoords.standeeTransform);
 				occupantUse.setAttribute('fill','inherit');
 				occupantUse.setAttribute('stroke','inherit');
-				occupantUse.setAttribute('transform',displayCoords.standeeTransform);
 				if (occupant.selectable) {
 					occupantUse.setAttribute('fill',occupant.color);
 					occupantUse.addEventListener('click',handlers.pawnSelect.bind(view,occupant));
@@ -634,27 +778,59 @@ var view = {
 					occupantUse.addEventListener('touchstart',handlers.dragMapStart);
 				};
 			};
+			var costSphere = document.createElementNS('http://www.w3.org/2000/svg','use');
+			tile.standeeGroup.appendChild(costSphere);
+			view.setHref(costSphere,'moveCostSphere'+tile.moveCost);
+			costSphere.id = 'moveCost_'+tile.x+'x'+tile.y
+			costSphere.setAttribute('class','standee');
+			costSphere.setAttribute('fill',view.colors.movePrimary);
+			costSphere.setAttribute('x',displayCoords.x);
+			costSphere.setAttribute('y',displayCoords.y);
+			costSphere.setAttribute('transform',displayCoords.standeeTransform);
 		};
-// 		view.setHref(document.getElementById('firstPawnButton'),game.map.pawns[0].sprite);
 		view.setHref(document.getElementById('firstPawnButton'),game.map.pawns[0].id+"HeadGroup");
+		var titleText = document.createElementNS('http://www.w3.org/2000/svg','text');
+		tile.standeeGroup.prepend(titleText);
+		titleText.setAttribute('x',displayCoords.x);
+		titleText.setAttribute('y',displayCoords.y);
+		titleText.setAttribute('transform',displayCoords.standeeTransform);
+		titleText.setAttribute('fill','white');
+		titleText.setAttribute('font-size',70);
+		titleText.setAttribute('text-anchor','middle');
+		titleText.setAttribute('visibility','inherit');
+		tile.standeeGroup.setAttribute('visibility','visible');
+		tile.svg.setAttribute('visibility','hidden');
+		titleText.innerHTML = game.currentLevel.title;
 	},
 	
 	redrawPawn: function(pawn) {
 		document.getElementById(pawn.id).remove();
-		var pawnAvatarNodes = pawn.avatar.draw();
-		pawnAvatarNodes.id = pawn.id;
-		document.getElementById('globalDefs').appendChild(pawnAvatarNodes);		
+		document.getElementById('globalDefs').appendChild(pawn.avatar.draw());		
 	},
 	
 	buildCharacterSheets: function() {
-		for (var pawn of game.map.pawns) {
+		var list = [];
+		list = list.concat(game.map.pawns);
+		list = list.concat(game.map.things);
+		for (var pawn of list) {
+			var inventoryBack = document.createElementNS('http://www.w3.org/2000/svg','g');
+			inventoryBacksLayer.appendChild(inventoryBack);
+			inventoryBack.id = pawn.id + 'InventoryBack';
+			var inventoryItems = document.createElementNS('http://www.w3.org/2000/svg','g');
+			itemsLayer.appendChild(inventoryItems);
+			inventoryItems.id = pawn.id + 'InventoryItems';
+			var inventoryFront = document.createElementNS('http://www.w3.org/2000/svg','g');
+			inventoryFrontsLayer.appendChild(inventoryFront);
+			inventoryFront.id = pawn.id + 'InventoryFront';
 			var sheetGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-			uiLayer.appendChild(sheetGroup);
+			sheetsLayer.appendChild(sheetGroup);
 			sheetGroup.id = pawn.id + 'Sheet';
 
-			var inventoryGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-			sheetGroup.appendChild(inventoryGroup);
-			inventoryGroup.id = pawn.id + 'InventoryPane';
+// 			if (pawn.inventory !== undefined || pawn.contents !== undefined) {
+// 				var InventoryPane = document.createElementNS('http://www.w3.org/2000/svg','g');
+// 				sheetGroup.appendChild(InventoryPane);
+// 				InventoryPane.id = pawn.id + 'InventoryPane';
+// 			};
 			
 			var sheet = document.createElementNS('http://www.w3.org/2000/svg','rect');
 			sheetGroup.appendChild(sheet);
@@ -672,97 +848,88 @@ var view = {
 			view.setHref(portrait,pawn.sprite);
 			portrait.setAttribute('x',-75);
 			portrait.setAttribute('y',160);
-			portrait.setAttribute('fill',pawn.color);
-			var moraleBarGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-			sheetGroup.appendChild(moraleBarGroup);
-			moraleBarGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,'morale'));
-			moraleBarGroup.addEventListener('mouseleave',view.clearToolTip);
-			var moraleBarBacking = document.createElementNS('http://www.w3.org/2000/svg','rect');
-			moraleBarGroup.appendChild(moraleBarBacking);
-			moraleBarBacking.setAttribute('x',-85);
-			moraleBarBacking.setAttribute('y',159);
-			moraleBarBacking.setAttribute('width',20);
-			moraleBarBacking.setAttribute('height',2);
-			moraleBarBacking.setAttribute('fill',view.colors.moraleSecondary);
-			var moraleBar = document.createElementNS('http://www.w3.org/2000/svg','rect');
-			moraleBarGroup.appendChild(moraleBar);
-			moraleBar.id = pawn.id + 'MoraleBar';
-			moraleBar.setAttribute('x',-85);
-			moraleBar.setAttribute('y',159);
-			moraleBar.setAttribute('width',20);
-			moraleBar.setAttribute('height',2);
-			moraleBar.setAttribute('fill',view.colors.moralePrimary);
-			var moraleLabel = document.createElementNS('http://www.w3.org/2000/svg','text');
-			moraleBarGroup.appendChild(moraleLabel);
-			moraleLabel.id = pawn.id + 'MoraleLabel';
-			moraleLabel.setAttribute('x',-75);
-			moraleLabel.setAttribute('y',160.5);
-			moraleLabel.setAttribute('font-size',1.5);
-			moraleLabel.setAttribute('class','bold');
-			moraleLabel.setAttribute('text-anchor','middle');
-			moraleLabel.setAttribute('fill','black');
-// 			moraleLabel.setAttribute('stroke',view.colors.moraleSecondary);
-// 			moraleLabel.setAttribute('stroke-width',0.5);
-// 			moraleLabel.setAttribute('paint-order','stroke');
-			moraleLabel.innerHTML = "Morale";
-			moraleLabel.setAttribute('visibility','hidden');
-			moraleBarGroup.addEventListener('mouseenter',view.revealElement.bind(this,moraleLabel));
-			moraleBarGroup.addEventListener('mouseleave',view.hideElement.bind(this,moraleLabel));
-			var statNames = ['move','strength','focus'];
-			for (var i in statNames) {
-				var statGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-				sheetGroup.appendChild(statGroup);
-				statGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,statNames[i]));
-				statGroup.addEventListener('mouseleave',view.clearToolTip);
-				var statSquare = document.createElementNS('http://www.w3.org/2000/svg','rect');
-				statGroup.appendChild(statSquare);
-				statSquare.setAttribute('x',-60 + i * 22);
-				statSquare.setAttribute('y',140);
-				statSquare.setAttribute('width',20);
-				statSquare.setAttribute('height',21);
-				statSquare.setAttribute('fill',view.colors[statNames[i]+'Primary']);
-				statSquare.setAttribute('stroke',view.colors[statNames[i]+'Secondary']);
-				var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-				statGroup.appendChild(text);
-				text.setAttribute('x',-50 + i * 22);
-				text.setAttribute('y',141.5);
-				text.setAttribute('text-anchor','middle');
-				text.setAttribute('font-size',3);
-				text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
-				text.setAttribute('class','bold');
-				text.setAttribute('stroke',view.colors[statNames[i]+'Primary']);
-				text.setAttribute('paint-order','stroke');
-				text.innerHTML = statNames[i];
-				var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-				statGroup.appendChild(text);
-				text.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'Text';
-				text.setAttribute('x',-48 + i * 22);
-				text.setAttribute('y',148);
-				text.setAttribute('text-anchor','end');
-				text.setAttribute('font-size',7);
-				text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
-				text.setAttribute('class','bold');
-				text.innerHTML = pawn.stats[statNames[i]];
-				var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-				statGroup.appendChild(text);
-				text.setAttribute('x',-48 + i * 22);
-				text.setAttribute('y',148);
-				text.setAttribute('text-anchor','start');
-				text.setAttribute('font-size',3);
-				text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
-				text.innerHTML = '/';
-				var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-				statGroup.appendChild(text);
-				text.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'MaxText';
-				text.setAttribute('x',-48 + 1 + i * 22);
-				text.setAttribute('y',148);
-				text.setAttribute('text-anchor','start');
-				text.setAttribute('font-size',3);
-				text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
-				text.innerHTML = pawn.stats[statNames[i]+'Max'];
-				var woundGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-				statGroup.appendChild(woundGroup);
-				woundGroup.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'WoundGroup';
+			portrait.addEventListener('click',view.toggleInventoryPane);
+			if (pawn.stats == undefined) {
+				portrait.setAttribute('transform','translate(-27.5 70) scale(0.5)');
+			};
+			if (pawn.morale !== undefined) {
+				var moraleBarGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+				sheetGroup.appendChild(moraleBarGroup);
+				moraleBarGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,'morale'));
+				moraleBarGroup.addEventListener('mouseleave',view.clearToolTip);
+				var moraleBarBacking = document.createElementNS('http://www.w3.org/2000/svg','rect');
+				moraleBarGroup.appendChild(moraleBarBacking);
+				moraleBarBacking.setAttribute('x',-85);
+				moraleBarBacking.setAttribute('y',159);
+				moraleBarBacking.setAttribute('width',20);
+				moraleBarBacking.setAttribute('height',2);
+				moraleBarBacking.setAttribute('fill',view.colors.moraleSecondary);
+				var moraleBar = document.createElementNS('http://www.w3.org/2000/svg','rect');
+				moraleBarGroup.appendChild(moraleBar);
+				moraleBar.id = pawn.id + 'MoraleBar';
+				moraleBar.setAttribute('x',-85);
+				moraleBar.setAttribute('y',159);
+				moraleBar.setAttribute('width',20);
+				moraleBar.setAttribute('height',2);
+				moraleBar.setAttribute('fill',view.colors.moralePrimary);
+			};
+			if (pawn.stats !== undefined) {
+				var statNames = ['move','strength','focus'];
+				for (var i in statNames) {
+					var statGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+					sheetGroup.appendChild(statGroup);
+					statGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,statNames[i]));
+					statGroup.addEventListener('mouseleave',view.clearToolTip);
+					var statSquare = document.createElementNS('http://www.w3.org/2000/svg','rect');
+					statGroup.appendChild(statSquare);
+					statSquare.setAttribute('x',-60 + i * 22);
+					statSquare.setAttribute('y',140);
+					statSquare.setAttribute('width',20);
+					statSquare.setAttribute('height',21);
+					statSquare.setAttribute('fill',view.colors[statNames[i]+'Primary']);
+					statSquare.setAttribute('stroke',view.colors[statNames[i]+'Secondary']);
+					var text = document.createElementNS('http://www.w3.org/2000/svg','text');
+					statGroup.appendChild(text);
+					text.setAttribute('x',-50 + i * 22);
+					text.setAttribute('y',141.5);
+					text.setAttribute('text-anchor','middle');
+					text.setAttribute('font-size',3);
+					text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
+					text.setAttribute('class','bold');
+					text.setAttribute('stroke',view.colors[statNames[i]+'Primary']);
+					text.setAttribute('paint-order','stroke');
+					text.innerHTML = statNames[i];
+					var text = document.createElementNS('http://www.w3.org/2000/svg','text');
+					statGroup.appendChild(text);
+					text.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'Text';
+					text.setAttribute('x',-48 + i * 22);
+					text.setAttribute('y',148);
+					text.setAttribute('text-anchor','end');
+					text.setAttribute('font-size',7);
+					text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
+					text.setAttribute('class','bold');
+					text.innerHTML = pawn.stats[statNames[i]];
+					var text = document.createElementNS('http://www.w3.org/2000/svg','text');
+					statGroup.appendChild(text);
+					text.setAttribute('x',-48 + i * 22);
+					text.setAttribute('y',148);
+					text.setAttribute('text-anchor','start');
+					text.setAttribute('font-size',3);
+					text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
+					text.innerHTML = '/';
+					var text = document.createElementNS('http://www.w3.org/2000/svg','text');
+					statGroup.appendChild(text);
+					text.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'MaxText';
+					text.setAttribute('x',-48 + 1 + i * 22);
+					text.setAttribute('y',148);
+					text.setAttribute('text-anchor','start');
+					text.setAttribute('font-size',3);
+					text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
+					text.innerHTML = pawn.stats[statNames[i]+'Max'];
+					var woundGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+					statGroup.appendChild(woundGroup);
+					woundGroup.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'WoundGroup';
+				};
 			};
 
 			var maneuversGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -770,7 +937,10 @@ var view = {
 			maneuversGroup.id = pawn.id + 'ManeuversPane';
 			
 			view.refreshManeuvers(pawn);
-			view.refreshItems(pawn);
+			
+			if (pawn.inventory !== undefined) {
+				view.buildInventory(pawn);
+			};
 						
 			// Buttons
 			var closeButton = document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -882,59 +1052,69 @@ var view = {
 		};
 	},
 	
-	refreshItems: function(pawn) {
-		var inventoryPane = document.getElementById(pawn.id + "InventoryPane");
-		inventoryPane.innerHTML = '';
-		inventoryPane.setAttribute('stroke','none');
-	
+	buildInventory: function(pawn) {
+		var inventoryBack = document.getElementById(pawn.id + 'InventoryBack');
+		var inventoryItems = document.getElementById(pawn.id + 'InventoryItems');
+		var inventoryFront = document.getElementById(pawn.id + 'InventoryFront');
+
 		var inventoryBacking = document.createElementNS('http://www.w3.org/2000/svg','rect');
-		inventoryPane.appendChild(inventoryBacking);
-		inventoryBacking.setAttribute('x',20);
+		inventoryBack.appendChild(inventoryBacking);
+		inventoryBacking.setAttribute('x',-90);
 		inventoryBacking.setAttribute('y',135);
 		inventoryBacking.setAttribute('rx',2);
 		inventoryBacking.setAttribute('ry',2);
 		inventoryBacking.setAttribute('width',70);
-		inventoryBacking.setAttribute('height',100);
+		inventoryBacking.setAttribute('height',84);
 		inventoryBacking.setAttribute('fill','white');
 		inventoryBacking.setAttribute('stroke','black');
 		inventoryBacking.setAttribute('stroke-width',0.25);
 		
+		for (var i = 0; i < 10; i++) {
+			var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+			inventoryBack.appendChild(rect);
+			rect.setAttribute('x',-53);
+			rect.setAttribute('y',140 + i * 7.5);
+			rect.setAttribute('height',6);
+			rect.setAttribute('width',30);
+			rect.setAttribute('fill','white');
+			rect.setAttribute('stroke','black');
+			rect.setAttribute('stroke-width','0.25');
+			rect.setAttribute('opacity',0.05);
+		};
+		
 		var looseInventoryBacking = document.createElementNS('http://www.w3.org/2000/svg','rect');
-		inventoryPane.appendChild(looseInventoryBacking);
+		inventoryBack.appendChild(looseInventoryBacking);
 		view.itemDrag.dropTargets.push(looseInventoryBacking);
-		looseInventoryBacking.setAttribute('class','looseInventory');
-		looseInventoryBacking.setAttribute('x',57);
+// 		looseInventoryBacking.setAttribute('class','looseInventory');
+		looseInventoryBacking.id = pawn.id + '_' + 'looseInventory_Slot';
+		looseInventoryBacking.setAttribute('x',-53);
 		looseInventoryBacking.setAttribute('y',140);
 		looseInventoryBacking.setAttribute('width',30);
-		looseInventoryBacking.setAttribute('height',90);
+		looseInventoryBacking.setAttribute('height',73);
 		looseInventoryBacking.setAttribute('fill','none');
-		looseInventoryBacking.setAttribute('stroke','inherit');
+// 		looseInventoryBacking.setAttribute('stroke','gainsboro');
+		
+		var inventoryItemsGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+		inventoryItems.appendChild(inventoryItemsGroup);
 
-		var slots = Object.keys(pawn.equipment);
+		var slots = [];
+		if (pawn.equipment !== undefined) {slots = Object.keys(pawn.equipment);};
 		for (var i in slots) {
-			var equipmentGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-			inventoryPane.appendChild(equipmentGroup);
-			view.itemDrag.dropTargets.push(equipmentGroup);
-			equipmentGroup.setAttribute('fill','white');
-			equipmentGroup.setAttribute('stroke','black');
-			equipmentGroup.setAttribute('stroke-width',0.25);
-			equipmentGroup.setAttribute('class',slots[i]);
 			var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
-			equipmentGroup.appendChild(rect);
-			rect.setAttribute('x',25);
+			inventoryBack.appendChild(rect);
+			view.itemDrag.dropTargets.push(rect);
+// 			rect.setAttribute('class',slots[i]);
+			rect.id = pawn.id + '_' + slots[i] + '_Slot';
+			rect.setAttribute('x',-85);
 			rect.setAttribute('y',140 + i * 10);
 			rect.setAttribute('width',30);
 			rect.setAttribute('height',6);
 			rect.setAttribute('fill','none');
-			rect.setAttribute('stroke','inherit');
-			rect.setAttribute('stroke-width','inherit');
-			if (pawn.equipment[slots[i]] !== undefined) {
-				var itemGroup = view.buildItemGroup(pawn.equipment[slots[i]],25,140 + i * 10);
-				equipmentGroup.appendChild(itemGroup);
-			};
+			rect.setAttribute('stroke','black');
+			rect.setAttribute('stroke-width','0.25');
 			var text = 	document.createElementNS('http://www.w3.org/2000/svg','text');
-			equipmentGroup.appendChild(text);
-			text.setAttribute('x',28);
+			inventoryFront.appendChild(text);
+			text.setAttribute('x',-82);
 			text.setAttribute('y',147 + i * 10);
 			text.setAttribute('font-size',3);
 			text.setAttribute('fill','black');
@@ -944,61 +1124,77 @@ var view = {
 			text.innerHTML = slots[i];
 		};
 		
-		var swapItemsButton = document.createElementNS('http://www.w3.org/2000/svg','g');
-		inventoryPane.appendChild(swapItemsButton);
-		swapItemsButton.id = pawn.id + "SwapButton";
-		swapItemsButton.setAttribute('stroke','grey');
-		swapItemsButton.addEventListener('click',handlers.swapItems.bind(this,pawn));
-		swapItemsButton.addEventListener('mouseenter',view.displayToolTip.bind(this,'swap'));
-		swapItemsButton.addEventListener('mouseleave',view.clearToolTip);
-		var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
-		swapItemsButton.appendChild(rect);
-		rect.setAttribute('x',25);
-		rect.setAttribute('y',205);
-		rect.setAttribute('width',30);
-		rect.setAttribute('height',6);
-		rect.setAttribute('fill','darkgrey');
-		rect.setAttribute('stroke','inherit');
-		var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-		swapItemsButton.appendChild(text);
-		text.setAttribute('x',25+3);
-		text.setAttribute('y',205+3.5);
-		text.setAttribute('font-size',2);
-		text.setAttribute('fill','black');
-		text.setAttribute('stroke','none');
-		text.innerHTML = 'Swap Items';
-		var costSphere = document.createElementNS('http://www.w3.org/2000/svg','use');
-		swapItemsButton.appendChild(costSphere);
-		view.setHref(costSphere,'costSphere');
-		costSphere.setAttribute('x',42);
-		costSphere.setAttribute('y',207.75);
-		costSphere.setAttribute('fill',view.colors.movePrimary);
-		var costText = document.createElementNS('http://www.w3.org/2000/svg','text');
-		swapItemsButton.appendChild(costText);
-		costText.setAttribute('x',42);
-		costText.setAttribute('y',207.75 + 0.75);
-		costText.setAttribute('text-anchor','middle');
-		costText.setAttribute('font-size',2);
-		costText.setAttribute('class','bold');
-		costText.setAttribute('stroke','black');
-		costText.setAttribute('fill',view.colors.moveSecondary);
-		costText.setAttribute('stroke-width','0.25');
-		costText.setAttribute('paint-order','stroke');
-		costText.innerHTML = 5;
-		if (view.focus.swapping == pawn) {
-			view.selectManeuver('swap');
+		if (pawn.team == 'p1') {
+			var swapItemsButton = document.createElementNS('http://www.w3.org/2000/svg','g');
+			inventoryBack.appendChild(swapItemsButton);
+			swapItemsButton.id = pawn.id + "SwapButton";
+			swapItemsButton.setAttribute('stroke','grey');
+			swapItemsButton.addEventListener('click',handlers.swapItems.bind(this,pawn));
+			swapItemsButton.addEventListener('mouseenter',view.displayToolTip.bind(this,'swap'));
+			swapItemsButton.addEventListener('mouseleave',view.clearToolTip);
+			var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+			swapItemsButton.appendChild(rect);
+			rect.setAttribute('x',-65);
+			rect.setAttribute('y',200);
+			rect.setAttribute('width',10);
+			rect.setAttribute('height',9);
+			rect.setAttribute('fill','darkgrey');
+			rect.setAttribute('stroke','inherit');
+			var text = document.createElementNS('http://www.w3.org/2000/svg','text');
+			swapItemsButton.appendChild(text);
+			text.setAttribute('x',-65+5);
+			text.setAttribute('y',200+3.5);
+			text.setAttribute('font-size',2);
+			text.setAttribute('fill','black');
+			text.setAttribute('stroke','none');
+			text.setAttribute('text-anchor','middle');
+			text.innerHTML = 'Swap';
+			var costSphere = document.createElementNS('http://www.w3.org/2000/svg','use');
+			swapItemsButton.appendChild(costSphere);
+			view.setHref(costSphere,'costSphere');
+			costSphere.setAttribute('x',-65+5);
+			costSphere.setAttribute('y',200+6);
+			costSphere.setAttribute('fill',view.colors.movePrimary);
+			var costText = document.createElementNS('http://www.w3.org/2000/svg','text');
+			swapItemsButton.appendChild(costText);
+			costText.setAttribute('x',42);
+			costText.setAttribute('x',-65+5);
+			costText.setAttribute('y',200 + 6 + 0.75);
+			costText.setAttribute('text-anchor','middle');
+			costText.setAttribute('font-size',2);
+			costText.setAttribute('class','bold');
+			costText.setAttribute('stroke','black');
+			costText.setAttribute('fill',view.colors.moveSecondary);
+			costText.setAttribute('stroke-width','0.25');
+			costText.setAttribute('paint-order','stroke');
+			costText.innerHTML = 5;
+			if (view.focus.swapping == pawn) {
+				view.selectManeuver('swap');
+			};
+		};	
+		view.refreshItems(pawn);
+	},
+	
+	refreshItems: function(pawn) {
+		var inventoryItems = document.getElementById(pawn.id + 'InventoryItems');
+		
+		var inventoryItemsGroup = inventoryItems.firstChild;
+		inventoryItemsGroup.innerHTML = '';
+		
+		var slots = [];
+		if (pawn.equipment !== undefined) {slots = Object.keys(pawn.equipment);};
+		for (var i in slots) {
+			if (pawn.equipment[slots[i]] !== undefined) {
+				var itemGroup = view.buildItemGroup(pawn.equipment[slots[i]],-85,140 + i * 10);
+				inventoryItemsGroup.appendChild(itemGroup);
+			};
 		};
-
 		
 		for (var i in pawn.inventory) {
-			var itemGroup = view.buildItemGroup(pawn.inventory[i],57,140 + i * 7.5);
-			inventoryPane.appendChild(itemGroup);
+			var itemGroup = view.buildItemGroup(pawn.inventory[i],-53,140 + i * 7.5);
+			inventoryItemsGroup.appendChild(itemGroup);
 		};
 		
-		if (view.focus.pawn == pawn) {
-			view.focus.inventory = undefined;
-			view.toggleInventoryPane();
-		};
 	},
 	
 	buildItemGroup: function(item,x,y) {
@@ -1033,10 +1229,31 @@ var view = {
 		return itemGroup;
 	},
 	
+	moveInventory: function(pawn,xOffset,yOffset) {
+		var inventoryBack = document.getElementById(pawn.id + 'InventoryBack');
+		var inventoryItems = document.getElementById(pawn.id + 'InventoryItems');
+		var inventoryFront = document.getElementById(pawn.id + 'InventoryFront');
+		for (element of [inventoryBack,inventoryItems,inventoryFront]) {
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			element.appendChild(animateTransform);
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','translate');
+			animateTransform.setAttribute('from','0,0');
+			animateTransform.setAttribute('to',xOffset+','+yOffset);
+			animateTransform.setAttribute('dur','3s');
+			animateTransform.setAttribute('repeatCount','1');
+			animateTransform.setAttribute('fill','freeze');
+			animateTransform.setAttribute('additive','sum');
+		};
+	},
+	
 	refreshManeuvers: function(pawn) {
+		var x, y, maneuverButton;
+		var maneuversPane = document.getElementById(pawn.id + "ManeuversPane");
+		maneuversPane.innerHTML = '';
+		
 		if (pawn.team == 'p1') {
-			var maneuversPane = document.getElementById(pawn.id + "ManeuversPane");
-			maneuversPane.innerHTML = '';
 		
 			var swapButton = document.getElementById(pawn.id + "SwapButton");
 			if (swapButton !== null && pawn.stats.move > 5) { // enable swap button
@@ -1046,26 +1263,12 @@ var view = {
 			};
 
 			for (var i in pawn.maneuvers) {
-				var maneuverButton = document.createElementNS('http://www.w3.org/2000/svg','g');
-				maneuversPane.appendChild(maneuverButton);
-				pawn.maneuvers[i].svg = maneuverButton;
-				maneuverButton.setAttribute('stroke','grey');
-				maneuverButton.setAttribute('fill','darkgrey');
-				maneuverButton.addEventListener('mouseenter',view.displayToolTip.bind(this,pawn.maneuvers[i]));
-				maneuverButton.addEventListener('mouseleave',view.clearToolTip);
 				var canPerform = true;
 				for (var stat in pawn.maneuvers[i].cost) {
 					if (pawn.maneuvers[i].cost[stat] > pawn.stats[stat]) {
 						canPerform = false;
 					};
 				};
-				if (canPerform) {
-					maneuverButton.addEventListener('click',handlers.maneuverSelect.bind(this,pawn.maneuvers[i]));
-				} else {
-					maneuverButton.setAttribute('opacity',0.5);
-				};
-				var maneuverSquare = document.createElementNS('http://www.w3.org/2000/svg','rect');
-				maneuverButton.appendChild(maneuverSquare);
 				x = 7;
 				y = 140 + i * 7.5;
 				if (parseInt(i)>5) {
@@ -1075,65 +1278,142 @@ var view = {
 					x += 27;
 					y -= 22.5;
 				};
-				maneuverSquare.setAttribute('x',x);
-				maneuverSquare.setAttribute('y',y);
-				maneuverSquare.setAttribute('width',25);
-				maneuverSquare.setAttribute('height',6);
-				maneuverSquare.setAttribute('fill','inherit');
-				maneuverSquare.setAttribute('stroke','inherit');
-				var maneuverText = document.createElementNS('http://www.w3.org/2000/svg','text');
-				maneuverButton.appendChild(maneuverText);
-				maneuverText.setAttribute('x',x+1);
-				maneuverText.setAttribute('y',y+2.5);
-				maneuverText.setAttribute('font-size',2);
-				maneuverText.setAttribute('fill','black');
-				maneuverText.setAttribute('stroke','none');
-				maneuverText.innerHTML = parseInt(i)+1;
-				var maneuverText = document.createElementNS('http://www.w3.org/2000/svg','text');
-				maneuverButton.appendChild(maneuverText);
-				maneuverText.setAttribute('x',x+3);
-				maneuverText.setAttribute('y',y+3.5);
-				maneuverText.setAttribute('font-size',2);
-				maneuverText.setAttribute('fill','black');
-				maneuverText.setAttribute('stroke','none');
-	// 			maneuverText.setAttribute('textLength',20);
-	// 			maneuverText.setAttribute('lengthAdjust','spacingAndGlyphs');
-				maneuverText.innerHTML = pawn.maneuvers[i].name;
-				var sphereCount = 0;
-				var labelLength = maneuverText.getBBox().width;
-				for (var stat in pawn.maneuvers[i].cost) {
-					if (pawn.maneuvers[i].cost[stat] > 0) {
-						var costSphere = document.createElementNS('http://www.w3.org/2000/svg','use');
-						maneuverButton.appendChild(costSphere);
-	// 					costSphere.setAttribute('href','#costSphere');
-						view.setHref(costSphere,'costSphere');
-						costSphere.setAttribute('x',x+3 + 2.5 + labelLength + sphereCount * 2);
-						costSphere.setAttribute('y',y+3);
-						costSphere.setAttribute('fill',view.colors[stat+'Primary']);
-						var costText = document.createElementNS('http://www.w3.org/2000/svg','text');
-						maneuverButton.appendChild(costText);
-						costText.setAttribute('x',x+3 + 2.5 + labelLength + sphereCount * 2);
-						costText.setAttribute('y',y+3 + 0.75);
-						costText.setAttribute('fill',view.colors[stat+'Secondary']);
-						costText.setAttribute('text-anchor','middle');
-						costText.setAttribute('font-size',2);
-						costText.setAttribute('class','bold');
-						costText.setAttribute('stroke','black');
-						costText.setAttribute('stroke-width','0.25');
-						costText.setAttribute('paint-order','stroke');
-						costText.innerHTML = pawn.maneuvers[i].cost[stat];
-						sphereCount++;
-					};
+				
+				maneuverButton = view.buildManeuverGroup(pawn.maneuvers[i],x,y,i,canPerform);
+				maneuversPane.appendChild(maneuverButton);
+			};
+		} else {
+			var nameText = document.createElementNS('http://www.w3.org/2000/svg','text');
+			maneuversPane.appendChild(nameText);
+			nameText.setAttribute('x',8);
+			nameText.setAttribute('y',143);
+			nameText.setAttribute('font-size',3.5);
+			nameText.setAttribute('class','bold');
+			nameText.innerHTML = pawn.name;
+			i = 0;
+			for (var string of pawn.textStrings(90)) {
+				var descText = document.createElementNS('http://www.w3.org/2000/svg','text');
+				maneuversPane.appendChild(descText);
+				descText.setAttribute('x',8);
+				descText.setAttribute('y',146 + i * 3);
+				descText.setAttribute('font-size',2);
+				descText.innerHTML = string;
+				i++;
+			};
+			var maneuverList = [];
+			if (pawn.morale <= 0 && pawn.human) {
+				maneuverList.push(pawn.contextualManeuvers.murder);
+				maneuverList.push(pawn.contextualManeuvers.bind);
+			} else if (pawn.morale <= 0) {
+				maneuverList.push(pawn.contextualManeuvers.slaughter);
+			} else {
+				if (pawn.vendor) {
+					maneuverList.push(pawn.contextualManeuvers.trade);
+				};
+				if (pawn.dialogue) {
+					maneuverList.push(pawn.contextualManeuvers.talk);
+				};
+				if (pawn.lootable !== undefined) {
+					maneuverList.push(pawn.contextualManeuvers.loot);
 				};
 			};
+			x = 7, y = 155, i = 0;
+			var enabled = false;
+			for (var neighbor of pawn.tile.adjacent) {
+				if (view.focus.lastPawn !== undefined && view.focus.lastPawn.tile == neighbor) {
+					enabled = true;
+				};
+			};
+			for (var maneuver of maneuverList) {
+				maneuverButton = view.buildManeuverGroup(maneuver,x,y,maneuver.key,enabled);
+				maneuversPane.appendChild(maneuverButton);
+				i++;
+				x = x + 27;
+			};
 		};
+	},
+	
+	refreshAllManeuvers: function() {
+		for (var thing of game.map.pawns) {
+			view.refreshManeuvers(thing);
+		};
+		for (var thing of game.map.things) {
+			view.refreshManeuvers(thing);
+		};
+	},
+	
+	buildManeuverGroup: function(maneuver,x,y,key,enabled) {
+		var maneuverButton = document.createElementNS('http://www.w3.org/2000/svg','g');
+		document.getElementById('gameSVG').appendChild(maneuverButton);
+		maneuver.svg = maneuverButton;
+		maneuverButton.setAttribute('stroke','grey');
+		maneuverButton.setAttribute('fill','darkgrey');
+		maneuverButton.addEventListener('mouseenter',view.displayToolTip.bind(this,maneuver));
+		maneuverButton.addEventListener('mouseleave',view.clearToolTip);
+		if (enabled) {
+			maneuverButton.addEventListener('click',handlers.maneuverSelect.bind(this,maneuver));
+		} else {
+			maneuverButton.setAttribute('opacity',0.5);
+		};
+		var maneuverSquare = document.createElementNS('http://www.w3.org/2000/svg','rect');
+		maneuverButton.appendChild(maneuverSquare);
+		maneuverSquare.setAttribute('x',x);
+		maneuverSquare.setAttribute('y',y);
+		maneuverSquare.setAttribute('width',25);
+		maneuverSquare.setAttribute('height',6);
+		maneuverSquare.setAttribute('fill','inherit');
+		maneuverSquare.setAttribute('stroke','inherit');
+		if (key !== undefined) {
+			var maneuverText = document.createElementNS('http://www.w3.org/2000/svg','text');
+			maneuverButton.appendChild(maneuverText);
+			maneuverText.setAttribute('x',x+1);
+			maneuverText.setAttribute('y',y+2.5);
+			maneuverText.setAttribute('font-size',2);
+			maneuverText.setAttribute('fill','black');
+			maneuverText.setAttribute('stroke','none');
+			maneuverText.innerHTML = parseInt(key)+1;
+		};
+		var maneuverText = document.createElementNS('http://www.w3.org/2000/svg','text');
+		maneuverButton.appendChild(maneuverText);
+		maneuverText.setAttribute('x',x+3);
+		maneuverText.setAttribute('y',y+3.75);
+		maneuverText.setAttribute('font-size',2);
+		maneuverText.setAttribute('fill','black');
+		maneuverText.setAttribute('stroke','none');
+		maneuverText.innerHTML = maneuver.name;
+		var sphereCount = 0;
+		var labelLength = maneuverText.getBBox().width;
+		for (var stat in maneuver.cost) {
+			if (maneuver.cost[stat] > 0) {
+				var costSphere = document.createElementNS('http://www.w3.org/2000/svg','use');
+				maneuverButton.appendChild(costSphere);
+				view.setHref(costSphere,'costSphere');
+				costSphere.setAttribute('x',x+3 + 2.5 + labelLength + sphereCount * 2);
+				costSphere.setAttribute('y',y+3);
+				costSphere.setAttribute('fill',view.colors[stat+'Primary']);
+				var costText = document.createElementNS('http://www.w3.org/2000/svg','text');
+				maneuverButton.appendChild(costText);
+				costText.setAttribute('x',x+3 + 2.5 + labelLength + sphereCount * 2);
+				costText.setAttribute('y',y+3 + 0.75);
+				costText.setAttribute('fill',view.colors[stat+'Secondary']);
+				costText.setAttribute('text-anchor','middle');
+				costText.setAttribute('font-size',2);
+				costText.setAttribute('class','bold');
+				costText.setAttribute('stroke','black');
+				costText.setAttribute('stroke-width','0.25');
+				costText.setAttribute('paint-order','stroke');
+				costText.innerHTML = maneuver.cost[stat];
+				sphereCount++;
+			};
+		};
+		return maneuverButton;
 	},
 	
 	selectManeuver: function(maneuver) {
 		var element;
 		if (maneuver == 'swap') {
 			element = document.getElementById(view.focus.swapping.id + 'SwapButton');
-			element.children[1].innerHTML = 'Swapping Items';
+			element.children[1].innerHTML = 'Swapping';
 			element.children[2].setAttribute('visibility','hidden');
 			element.children[3].setAttribute('visibility','hidden');
 		} else {
@@ -1146,7 +1426,7 @@ var view = {
 		var element;
 		if (maneuver == 'swap' && view.focus.swapping !== undefined) {
 			element = document.getElementById(view.focus.swapping.id + 'SwapButton');
-			element.children[1].innerHTML = 'Swap Items';
+			element.children[1].innerHTML = 'Swap';
 			element.children[2].setAttribute('visibility','visible');
 			element.children[3].setAttribute('visibility','visible');
 		} else if (maneuver == 'swap') {
@@ -1172,7 +1452,7 @@ var view = {
 	},
 	
 	displayX: function(x,y) {
-		return 5 * view.camera.distCameraToScreen * (view.camera.x - x) / (view.camera.y - y);
+		return -5 * view.camera.distCameraToScreen * (view.camera.x - x) / (view.camera.y - y);
 	},
 	
 	displayY:function(x,y) {
@@ -1208,7 +1488,6 @@ var view = {
 		};
 				
 		text = "Tile ("+tile.x+","+tile.y+")";
-// 		text = Math.round(scaleY*100)/100;
 		return {x:x,y:y,standeeScale:scaleX,standeeTransform:standeeTransform,text:text,groundTransform:groundTransform};
 	},
 		
@@ -1228,7 +1507,7 @@ var view = {
 	},
 	
 	dragItemDeselect: function(dropTarget) {
-		if (dropTarget.className.animVal !== 'looseInventory') {
+		if (dropTarget.id.indexOf('looseInventory') == -1) {
 			dropTarget.setAttribute('stroke','black');
 			dropTarget.setAttribute('stroke-width',0.25);
 		} else {
@@ -1281,6 +1560,7 @@ var view = {
 			tile.hover = true;
 			view.strokeTile(tile);
 		};
+// 		console.log('tile',tile.x,tile.y);
 	},
 	
 	unhoverTile: function(tile) {
@@ -1303,7 +1583,8 @@ var view = {
 				tile.svg.setAttribute('stroke','cyan');
 				tile.svg.setAttribute('stroke-width',1);
 			} else if (tile.seen) {
-				tile.svg.setAttribute('stroke',tile.color);
+				tile.svg.setAttribute('stroke',tile.fill);
+				tile.svg.setAttribute('fill',tile.fill);
 				tile.svg.setAttribute('stroke-width',1);
 			} else {
 				tile.svg.setAttribute('stroke','none');
@@ -1347,31 +1628,31 @@ var view = {
 		animateTransform.setAttribute('dur','3s');
 		animateTransform.setAttribute('repeatCount','1');
 		animateTransform.setAttribute('fill','freeze');
+		view.moveInventory(pawn,0,-100);
 	},
 	
 	hideSheets: function() {
-		view.focus.pawn = undefined;
-		for (var pawn of game.map.pawns) {
-			var sheet = document.getElementById(pawn.id+'Sheet');
-			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-			sheet.appendChild(animateTransform);
-			animateTransform.setAttribute('attributeName','transform');
-			animateTransform.setAttribute('attributeType','XML');
-			animateTransform.setAttribute('type','translate');
-			animateTransform.setAttribute('from','0,0');
-			animateTransform.setAttribute('to','0,100');
-			animateTransform.setAttribute('dur','1s');
-			animateTransform.setAttribute('repeatCount','1');
-			animateTransform.setAttribute('fill','freeze');
-		};
-		if (view.focus.inventory !== undefined) {
+		if (view.focus.inventory == view.focus.pawn && view.focus.inventory !== undefined) {
 			view.toggleInventoryPane();
 		};
+		var sheet = document.getElementById(view.focus.pawn.id+'Sheet');
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		sheet.appendChild(animateTransform);
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','translate');
+		animateTransform.setAttribute('from','0,0');
+		animateTransform.setAttribute('to','0,100');
+		animateTransform.setAttribute('dur','1s');
+		animateTransform.setAttribute('repeatCount','1');
+		animateTransform.setAttribute('fill','freeze');
+		view.moveInventory(view.focus.pawn,0,100);
+		view.focus.pawn = undefined;
+		document.getElementById('tipLayer').innerHTML = '';
 	},
 	
 	updateSheet: function(pawn) {
 		document.getElementById(pawn.id + "MoraleBar").setAttribute('width',Math.max(0,pawn.morale * 20));
-		document.getElementById(pawn.id + "MoraleLabel").innerHTML = "Morale: " + Math.ceil(pawn.morale*100) + "%";
 		for (var stat in pawn.stats) {
 			var text = document.getElementById(pawn.id + stat.charAt(0).toUpperCase() + stat.slice(1) + 'Text');
 			text.innerHTML = pawn.stats[stat];
@@ -1417,29 +1698,9 @@ var view = {
 	toggleInventoryPane: function() {
 		if (view.focus.inventory == undefined) { // pop up
 			view.focus.inventory = view.focus.pawn;
-			var pane = document.getElementById(view.focus.inventory.id+'InventoryPane');
-			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-			pane.appendChild(animateTransform);
-			animateTransform.setAttribute('attributeName','transform');
-			animateTransform.setAttribute('attributeType','XML');
-			animateTransform.setAttribute('type','translate');
-			animateTransform.setAttribute('from','0,0');
-			animateTransform.setAttribute('to','0,-80');
-			animateTransform.setAttribute('dur','3s');
-			animateTransform.setAttribute('repeatCount','1');
-			animateTransform.setAttribute('fill','freeze');
+			view.moveInventory(view.focus.pawn,0,-80);
 		} else { // hide
-			var pane = document.getElementById(view.focus.inventory.id+'InventoryPane');
-			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-			pane.appendChild(animateTransform);
-			animateTransform.setAttribute('attributeName','transform');
-			animateTransform.setAttribute('attributeType','XML');
-			animateTransform.setAttribute('type','translate');
-			animateTransform.setAttribute('from','0,0');
-			animateTransform.setAttribute('to','0,80');
-			animateTransform.setAttribute('dur','1s');
-			animateTransform.setAttribute('repeatCount','1');
-			animateTransform.setAttribute('fill','freeze');
+			view.moveInventory(view.focus.inventory,0,80);
 			view.focus.inventory = undefined;
 			view.deselectManeuver('swap');
 			view.focus.swapping = undefined;
@@ -1532,7 +1793,12 @@ var view = {
 		for (var tile of game.map.tiles) {
 			tile.moveOption = false;
 			view.strokeTile(tile);
+			tile.standeeGroup.lastChild.setAttribute('visibility','hidden');
 		};
+	},
+	
+	displayMoveCost: function(tile) {
+		tile.standeeGroup.lastChild.setAttribute('visibility','visible');
 	},
 	
 	clearRangeOptions: function() {
@@ -1606,6 +1872,71 @@ var view = {
 	
 	removeElement: function(element) {
 		element.remove();
+	},
+	
+	openTrade: function(rightTrader,leftTrader,commerce) {
+		handlers.pawnSelect(leftTrader);
+		handlers.swapItems(leftTrader);
+		view.focus.rightTrader = rightTrader;
+		view.focus.leftTrader = leftTrader;
+		var rightTraderPane = document.getElementById(rightTrader.id + "InventoryPane");
+		var leftTraderPane = document.getElementById(leftTrader.id + "InventoryPane");
+		view.toggleInventoryPane();
+		view.moveInventory(rightTrader,110,-188);
+
+		// Trade Close Button
+		var x = 89, y = -52;
+		var closeButton = document.createElementNS('http://www.w3.org/2000/svg','g');
+		closeButton.id = 'tradeCloseButton';
+		document.getElementById('uiLayer').appendChild(closeButton);
+		closeButton.addEventListener('click',view.closeTrade);
+		var closeButtonBack = document.createElementNS('http://www.w3.org/2000/svg','circle');
+		closeButton.appendChild(closeButtonBack);
+		closeButtonBack.setAttribute('cx',x);
+		closeButtonBack.setAttribute('cy',y);
+		closeButtonBack.setAttribute('r',2);
+		closeButtonBack.setAttribute('fill','white');
+		closeButtonBack.setAttribute('stroke','black');
+		closeButtonBack.setAttribute('stroke-width',0.25);
+		var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+		closeButton.appendChild(line);
+		line.setAttribute('x1',x+0.5);
+		line.setAttribute('y1',y-0.5);
+		line.setAttribute('x2',x-0.5);
+		line.setAttribute('y2',y+0.5);
+		line.setAttribute('stroke','black');
+		line.setAttribute('stroke-width',0.5);
+		line.setAttribute('stroke-linecap','round');
+		var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+		closeButton.appendChild(line);
+		line.setAttribute('x1',x+0.5);
+		line.setAttribute('y1',y+0.5);
+		line.setAttribute('x2',x-0.5);
+		line.setAttribute('y2',y-0.5);
+		line.setAttribute('stroke','black');
+		line.setAttribute('stroke-width',0.5);
+		line.setAttribute('stroke-linecap','round');	
+	},
+	
+	closeTrade: function() {
+		if (view.focus.rightTrader !== undefined) {
+			var rightTraderPane = document.getElementById(view.focus.rightTrader.id + "InventoryPane");
+			var leftTraderPane = document.getElementById(view.focus.leftTrader.id + "InventoryPane");
+			view.moveInventory(view.focus.rightTrader,-110,188);
+			view.focus.rightTrader = undefined;
+			view.focus.leftTrader = undefined;
+			document.getElementById('tradeCloseButton').remove();
+		};
+	},
+	
+	passageDisplaying: function() {
+		document.getElementById('uiLayer').setAttribute('visibility','hidden');
+		document.getElementById('tipLayer').setAttribute('visibility','hidden');
+	},
+	
+	passageDismissed: function() {
+		document.getElementById('uiLayer').setAttribute('visibility','visibile');
+		document.getElementById('tipLayer').setAttribute('visibility','visibile');
 	},
 };
 

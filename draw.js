@@ -1,9 +1,7 @@
 function Avatar(pawn,heritages) {
 
-	if (pawn == undefined) {console.log('no pawn specified')};
+	if (pawn == undefined) {pawn = new Pawn()};
 	this.pawn = pawn;
-
-	this.svgNodes = document.createElementNS('http://www.w3.org/2000/svg','g');
 	
 	this.parameters = {};
 	
@@ -177,9 +175,7 @@ function Avatar(pawn,heritages) {
 		};
 		this.parameters.earColor= "#" + ("0" + Math.round(earRed).toString(16)).substr(-2) + ("0" + Math.round(earGreen).toString(16)).substr(-2) + ("0" + Math.round(earBlue).toString(16)).substr(-2);
 	};
-	
-	this.updateColoring();
-	
+		
 	this.apparentEthnicities = function() {
 		var range, diff, diffs = [];
 		var ethnicitiesList = Object.keys(data.ethnicities);
@@ -203,6 +199,16 @@ function Avatar(pawn,heritages) {
 	
 	// The Monster
 	
+	this.svg = function(shot) {
+		var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+		if (shot == undefined || shot == 'fullBody') {
+			svg.setAttribute('viewBox','-25 -50 50 50');
+		} else if (shot == 'bust') {
+			svg.setAttribute('viewBox','-12.5 -50 25 25');
+		};
+		svg.appendChild(this.draw());
+		return svg;
+	};
 	
 	
 	this.draw = function() {
@@ -211,6 +217,10 @@ function Avatar(pawn,heritages) {
 		this.bodyConstants = {eyeline:-172,neck:-115};
 		var muzzle = false;
 		var noseStroke = false;
+		
+		if (this.parameters.skinColor == undefined) {
+			this.updateColoring();
+		};
 
 		var svg = document.createElementNS('http://www.w3.org/2000/svg','g');
 		svg.setAttribute('transform','scale(0.25)');
@@ -219,27 +229,35 @@ function Avatar(pawn,heritages) {
 		var defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
 		defs.id = 'defs';
 		svg.appendChild(defs);
+		
+		var parameterText = document.createElementNS('http://www.w3.org/2000/svg','text');
+		defs.appendChild(parameterText);
+		parameterText.innerHTML = "Parameters: " + JSON.stringify(this.parameters);
 			
 		// Shadow
-// 		var shadow = document.createElementNS('http://www.w3.org/2000/svg',"ellipse");
-// 			shadow.setAttribute("fill",'#000000');
-// 			shadow.setAttribute("opacity",0.2);
-// 			shadow.setAttribute("cx",0);
-// 			shadow.setAttribute("cy",95 + this.bodyConstants.neck);
-// 			shadow.setAttribute("rx",this.parameters.shoulders * 1.3);
-// 			shadow.setAttribute("ry",13);
-// 		svg.appendChild(shadow);
+		var shadow = document.createElementNS('http://www.w3.org/2000/svg',"ellipse");
+		shadow.setAttribute("fill",'#000000');
+		shadow.setAttribute("opacity",0.2);
+		shadow.setAttribute("cx",0);
+		shadow.setAttribute("cy",95 + this.bodyConstants.neck);
+		shadow.setAttribute("rx",this.parameters.shoulders * 1.3);
+		shadow.setAttribute("ry",13);
+		svg.appendChild(shadow);
 		
 		// Groups
+		var characterGroup = document.createElementNS('http://www.w3.org/2000/svg',"g");
+		characterGroup.id = pawn.id + 'CharacterGroup';
+		svg.appendChild(characterGroup);
+		
 		var backHairGroup = document.createElementNS('http://www.w3.org/2000/svg',"g");
 		backHairGroup.id = 'backHairGroup';
 		backHairGroup.setAttribute("fill",this.parameters.hairColor);
-		svg.appendChild(backHairGroup);
+		characterGroup.appendChild(backHairGroup);
 		
 		var bodyAndClothingGroup = document.createElementNS('http://www.w3.org/2000/svg',"g");
 		bodyAndClothingGroup.id = 'bodyAndClothingGroup';
 		bodyAndClothingGroup.setAttribute("fill",this.parameters.skinColor);
-		svg.appendChild(bodyAndClothingGroup);
+		characterGroup.appendChild(bodyAndClothingGroup);
 
 		var hindquartersGroup = document.createElementNS('http://www.w3.org/2000/svg',"g");
 		hindquartersGroup.id = 'hindquartersGroup';
@@ -270,7 +288,7 @@ function Avatar(pawn,heritages) {
 		var headGroup = document.createElementNS('http://www.w3.org/2000/svg',"g");
 		headGroup.id = this.pawn.id+'HeadGroup';
 		headGroup.setAttribute("fill",this.parameters.skinColor);
-		svg.appendChild(headGroup);
+		characterGroup.appendChild(headGroup);
 		
 		var rightArmTopGroup = document.createElementNS('http://www.w3.org/2000/svg',"g");
 		rightArmTopGroup.id = 'rightArmTopGroup';
@@ -298,9 +316,9 @@ function Avatar(pawn,heritages) {
 		leftForearmTopGroup.appendChild(leftHandGroup);
 
 		var interactionGroup = document.createElementNS('http://www.w3.org/2000/svg',"g");
-		interactionGroup.id = pawn.id + 'InteractionGroup';
+		interactionGroup.id = this.pawn.id + 'InteractionGroup';
 		interactionGroup.setAttributeNS('null','z-index',101);
-		svg.appendChild(interactionGroup);
+		characterGroup.appendChild(interactionGroup);
 		
 		// Hair in Back
 		
@@ -2440,7 +2458,7 @@ function Avatar(pawn,heritages) {
 		// Nerf Animation
 		
 		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		svg.appendChild(animateTransform);
+		characterGroup.appendChild(animateTransform);
 		animateTransform.setAttribute('id',this.pawn.id+'NerfStart');
 		animateTransform.setAttribute('attributeName','transform');
 		animateTransform.setAttribute('attributeType','XML');
@@ -2452,7 +2470,7 @@ function Avatar(pawn,heritages) {
 		animateTransform.setAttribute('additive','sum');
 		animateTransform.setAttribute('repeatCount',1);
 		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		svg.appendChild(animateTransform);
+		characterGroup.appendChild(animateTransform);
 		animateTransform.setAttribute('id',this.pawn.id+'Nerf2');
 		animateTransform.setAttribute('attributeName','transform');
 		animateTransform.setAttribute('attributeType','XML');
@@ -2464,7 +2482,7 @@ function Avatar(pawn,heritages) {
 		animateTransform.setAttribute('additive','sum');
 		animateTransform.setAttribute('repeatCount','1');
 		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		svg.appendChild(animateTransform);
+		characterGroup.appendChild(animateTransform);
 		animateTransform.setAttribute('attributeName','transform');
 		animateTransform.setAttribute('attributeType','XML');
 		animateTransform.setAttribute('type','rotate');
@@ -2478,7 +2496,7 @@ function Avatar(pawn,heritages) {
 		// Buff Animation
 		
 		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		svg.appendChild(animateTransform);
+		characterGroup.appendChild(animateTransform);
 		animateTransform.setAttribute('id',this.pawn.id+'BuffStart');
 		animateTransform.setAttribute('attributeName','transform');
 		animateTransform.setAttribute('attributeType','XML');
@@ -2490,7 +2508,7 @@ function Avatar(pawn,heritages) {
 		animateTransform.setAttribute('additive','sum');
 		animateTransform.setAttribute('repeatCount',1);
 		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		svg.appendChild(animateTransform);
+		characterGroup.appendChild(animateTransform);
 		animateTransform.setAttribute('attributeName','transform');
 		animateTransform.setAttribute('attributeType','XML');
 		animateTransform.setAttribute('type','rotate');
@@ -2501,7 +2519,7 @@ function Avatar(pawn,heritages) {
 		animateTransform.setAttribute('additive','sum');
 		animateTransform.setAttribute('repeatCount','1');
 		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		svg.appendChild(animateTransform);
+		characterGroup.appendChild(animateTransform);
 		animateTransform.setAttribute('id',this.pawn.id+'BuffStartJump');
 		animateTransform.setAttribute('attributeName','transform');
 		animateTransform.setAttribute('attributeType','XML');
@@ -2513,7 +2531,7 @@ function Avatar(pawn,heritages) {
 		animateTransform.setAttribute('additive','sum');
 		animateTransform.setAttribute('repeatCount','1');
 		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		svg.appendChild(animateTransform);
+		characterGroup.appendChild(animateTransform);
 		animateTransform.setAttribute('attributeName','transform');
 		animateTransform.setAttribute('attributeType','XML');
 		animateTransform.setAttribute('type','translate');
@@ -2527,7 +2545,7 @@ function Avatar(pawn,heritages) {
 		// Defeat Animation
 		
 		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		svg.appendChild(animateTransform);
+		characterGroup.appendChild(animateTransform);
 		animateTransform.setAttribute('id',this.pawn.id+'DefeatStart');
 		animateTransform.setAttribute('attributeName','transform');
 		animateTransform.setAttribute('attributeType','XML');
@@ -2539,7 +2557,7 @@ function Avatar(pawn,heritages) {
 		animateTransform.setAttribute('additive','sum');
 		animateTransform.setAttribute('repeatCount','1');
 		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		svg.appendChild(animateTransform);
+		characterGroup.appendChild(animateTransform);
 		animateTransform.setAttribute('id',this.pawn.id+'Defeat2');
 		animateTransform.setAttribute('attributeName','transform');
 		animateTransform.setAttribute('attributeType','XML');
@@ -2552,7 +2570,7 @@ function Avatar(pawn,heritages) {
 		animateTransform.setAttribute('repeatCount','1');
 		animateTransform.setAttribute('fill','freeze');
 		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		svg.appendChild(animateTransform);
+		characterGroup.appendChild(animateTransform);
 		animateTransform.setAttribute('id',this.pawn.id+'DefeatFall');
 		animateTransform.setAttribute('attributeName','transform');
 		animateTransform.setAttribute('attributeType','XML');
@@ -2567,7 +2585,7 @@ function Avatar(pawn,heritages) {
 		// Revive Animation
 		
 		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		svg.appendChild(animateTransform);
+		characterGroup.appendChild(animateTransform);
 		animateTransform.setAttribute('id',this.pawn.id+'Revive1');
 		animateTransform.setAttribute('attributeName','transform');
 		animateTransform.setAttribute('attributeType','XML');
@@ -2579,7 +2597,7 @@ function Avatar(pawn,heritages) {
 		animateTransform.setAttribute('additive','sum');
 		animateTransform.setAttribute('repeatCount','1');
 		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		svg.appendChild(animateTransform);
+		characterGroup.appendChild(animateTransform);
 		animateTransform.setAttribute('id',this.pawn.id+'Revive2');
 		animateTransform.setAttribute('attributeName','transform');
 		animateTransform.setAttribute('attributeType','XML');
@@ -2592,7 +2610,7 @@ function Avatar(pawn,heritages) {
 		animateTransform.setAttribute('repeatCount','1');
 		animateTransform.setAttribute('fill','freeze');
 		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		svg.appendChild(animateTransform);
+		characterGroup.appendChild(animateTransform);
 		animateTransform.setAttribute('id',this.pawn.id+'ReviveStart');
 		animateTransform.setAttribute('attributeName','transform');
 		animateTransform.setAttribute('attributeType','XML');
@@ -2684,7 +2702,9 @@ function Avatar(pawn,heritages) {
 		
 				
 		// End Draw Mob
+		
 		return svg;
+		
 	};
 	
 	this.torso = function(color) {
@@ -4241,4 +4261,352 @@ function Avatar(pawn,heritages) {
 		return svgNodes;
 	};
 
+};
+
+function AvatarBeast(pawn,type) {
+
+	this.pawn = pawn;
+	
+	if (type == undefined) {type = 'rat'};
+	this.type = type;
+	
+	this.svg = function() {
+		
+		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg','g');
+		svgNodes.id = pawn.id;
+
+		// Shadow
+		var shadow = document.createElementNS('http://www.w3.org/2000/svg',"ellipse");
+		shadow.setAttribute("fill",'#000000');
+		shadow.setAttribute("opacity",0.2);
+		shadow.setAttribute("cx",0);
+		shadow.setAttribute("cy",0);
+		shadow.setAttribute("rx",20);
+		shadow.setAttribute("ry",8);
+		svgNodes.appendChild(shadow);
+		
+		var characterGroup = this[this.type]();
+		characterGroup.id = pawn.id + "CharacterGroup";
+		svgNodes.appendChild(characterGroup);
+
+		// Nerf Animation
+		
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		characterGroup.appendChild(animateTransform);
+		animateTransform.setAttribute('id',this.pawn.id+'NerfStart');
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','rotate');
+		animateTransform.setAttribute('from','0 0 0' );
+		animateTransform.setAttribute('to',' 10 0 0');
+		animateTransform.setAttribute('dur','0.1s');
+		animateTransform.setAttribute('begin','indefinite');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount',1);
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		characterGroup.appendChild(animateTransform);
+		animateTransform.setAttribute('id',this.pawn.id+'Nerf2');
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','rotate');
+		animateTransform.setAttribute('from','10 0 0' );
+		animateTransform.setAttribute('to',' -10 0 0');
+		animateTransform.setAttribute('dur','0.2s');
+		animateTransform.setAttribute('begin',this.pawn.id+'NerfStart.end');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount','1');
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		characterGroup.appendChild(animateTransform);
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','rotate');
+		animateTransform.setAttribute('from','-10 0 0' );
+		animateTransform.setAttribute('to',' 0 0 0');
+		animateTransform.setAttribute('dur','0.1s');
+		animateTransform.setAttribute('begin',this.pawn.id+'Nerf2.end');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount','1');
+
+		// Buff Animation
+		
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		characterGroup.appendChild(animateTransform);
+		animateTransform.setAttribute('id',this.pawn.id+'BuffStart');
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','rotate');
+		animateTransform.setAttribute('from','0 0 0' );
+		animateTransform.setAttribute('to',' -10 0 0');
+		animateTransform.setAttribute('dur','0.2s');
+		animateTransform.setAttribute('begin','indefinite');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount',1);
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		characterGroup.appendChild(animateTransform);
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','rotate');
+		animateTransform.setAttribute('from','-10 0 0' );
+		animateTransform.setAttribute('to',' 0 0 0');
+		animateTransform.setAttribute('dur','0.2s');
+		animateTransform.setAttribute('begin',this.pawn.id+'BuffStart.end');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount','1');
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		characterGroup.appendChild(animateTransform);
+		animateTransform.setAttribute('id',this.pawn.id+'BuffStartJump');
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','translate');
+		animateTransform.setAttribute('from','0 0' );
+		animateTransform.setAttribute('to',' 20 -20');
+		animateTransform.setAttribute('dur','0.2s');
+		animateTransform.setAttribute('begin',this.pawn.id+'BuffStart.begin');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount','1');
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		characterGroup.appendChild(animateTransform);
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','translate');
+		animateTransform.setAttribute('from','20 -20' );
+		animateTransform.setAttribute('to',' 0 0');
+		animateTransform.setAttribute('dur','0.2s');
+		animateTransform.setAttribute('begin',this.pawn.id+'BuffStartJump.end');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount','1');
+
+		// Defeat Animation
+		
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		characterGroup.appendChild(animateTransform);
+		animateTransform.setAttribute('id',this.pawn.id+'DefeatStart');
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','translate');
+		animateTransform.setAttribute('from','0 0' );
+		animateTransform.setAttribute('to','-15 -10');
+		animateTransform.setAttribute('dur','0.2s');
+		animateTransform.setAttribute('begin','indefinite');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount','1');
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		characterGroup.appendChild(animateTransform);
+		animateTransform.setAttribute('id',this.pawn.id+'Defeat2');
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','translate');
+		animateTransform.setAttribute('from','-15 -10' );
+		animateTransform.setAttribute('to',' -30 0');
+		animateTransform.setAttribute('dur','0.2s');
+		animateTransform.setAttribute('begin',this.pawn.id+'DefeatStart.end');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount','1');
+		animateTransform.setAttribute('fill','freeze');
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		characterGroup.appendChild(animateTransform);
+		animateTransform.setAttribute('id',this.pawn.id+'DefeatFall');
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','rotate');
+		animateTransform.setAttribute('by','90');
+		animateTransform.setAttribute('dur','1s');
+		animateTransform.setAttribute('begin',this.pawn.id+'Defeat2.end');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount',1);
+		animateTransform.setAttribute('fill','freeze');
+
+		// Revive Animation
+		
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		characterGroup.appendChild(animateTransform);
+		animateTransform.setAttribute('id',this.pawn.id+'Revive1');
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','translate');
+		animateTransform.setAttribute('from','0 0' );
+		animateTransform.setAttribute('to','15 -10');
+		animateTransform.setAttribute('dur','0.2s');
+		animateTransform.setAttribute('begin',this.pawn.id+'ReviveStart.end');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount','1');
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		characterGroup.appendChild(animateTransform);
+		animateTransform.setAttribute('id',this.pawn.id+'Revive2');
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','translate');
+		animateTransform.setAttribute('from','15 -10' );
+		animateTransform.setAttribute('to',' 30 0');
+		animateTransform.setAttribute('dur','0.2s');
+		animateTransform.setAttribute('begin',this.pawn.id+'ReviveStart.end');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount','1');
+		animateTransform.setAttribute('fill','freeze');
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		characterGroup.appendChild(animateTransform);
+		animateTransform.setAttribute('id',this.pawn.id+'ReviveStart');
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','rotate');
+		animateTransform.setAttribute('by','-90');
+		animateTransform.setAttribute('dur','1s');
+		animateTransform.setAttribute('begin','indefinite');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount',1);
+		animateTransform.setAttribute('fill','freeze');
+	
+		return svgNodes;
+	};
+	
+	this.draw = function() {return this.svg()};
+	
+	this.rat = function() {
+		var bodyNodes = document.createElementNS('http://www.w3.org/2000/svg','g');
+		bodyNodes.setAttribute('stroke','#000000');
+		bodyNodes.setAttribute('stroke-width','0.5');
+		bodyNodes.setAttribute('transform','scale(0.5)');
+
+		var shapes = [
+			{tag:'path', fill:"#B8747B", d:"M20.543-21.568 c-0.122-2.553,3.298-3.789,4.89-5.151c1.073-0.919,1.644-2.331,1.388-3.745c-0.108-0.591-2.025-2.286-1.337-2.847 c3.012,0.445,3.884,4.423,2.207,6.624c-1.979,2.594-5.366,4.298-7.228,6.867"},
+			{tag:'path', fill:"#77484E", d:"M30.631-16.724 c-2.117-2.271-9.781-2.249-9.863-5.519c-3.67,5.78,8.351,4.471,8.909,8.299"},
+			{tag:'path', fill:"#B8747B", d:"M11.25-8.622 c1.397-3.376,6.91-4.689,10.076-4.571c2.905,0.108,9.266,0.928,9.226-3.61c4.178,4.202-2.197,6.77-5.603,6.702 c-4.55-0.092-10.877,0.581-13.699,4.814"},
+			{tag:'path', fill:"#3C2415", d:" M8.867-44.284c1.008,1.435,2.103,2.692,3.198,4.033c0.772,0.946,1.11,2.139,1.466,3.274c0.877,2.794,1.666,5.75,1.929,8.741 c0.139,1.581,0.267,3.066,0.658,4.607c0.328,1.289,0.136,2.846,0.136,4.204c0,3.611,0.158,7.111,0.158,10.701 c0,3.364,0.353,6.978-1.354,9.972c-0.882,1.547-1.601,2.97-3.255,3.791c-2.438,1.209-4.819,1.65-7.466,1.907 C0.81,7.288-3.288,6.921-6.78,6.052c-1.896-0.473-3.042-1.969-4.576-3.007c0.281-1.499,0.039-3.175,0.129-4.698 c0.054-0.911,0.082-1.848,0.161-2.742c0.174-1.981,0.597-3.899,0.789-5.879c0.359-3.732,0.322-7.521,0.322-11.296 c0-2.686-0.323-5.44-0.812-8.021c-0.561-2.959-0.644-6.104,0.097-8.975c0.278-1.077,0.622-2.611,0.874-3.653 c0.312-1.289,1.513-1.34,2.476-2.067c2.188-1.653,5.577-1.386,8.252-1.287c1.83,0.068,3.503,1.187,5.316,1.05"},
+			{tag:'path', fill:"#3C2415", d:" M13.395,0.829c0.392,0.741,0.927,1.212,1.093,2.061c0.131,0.678,0.266,1.328,0.354,1.99c0.204,1.504-0.037,2.601-1.686,2.863 C11.482,8.01,9.531,8.289,7.907,7.682C6.361,7.103,6.405,4.906,6.405,3.449"},
+			{tag:'path', fill:"#3C2415", d:" M-10.989,0.193c-1.606,0.87-3.39,1.488-4.845,2.617c-0.941,0.73-1.438,2.543-0.653,3.518c0.784,0.973,3.212,0.832,4.447,0.775 c1.482-0.067,3.101-0.864,4.142-1.924c0.511-0.52,0.822-1.23,1.277-1.73"},
+			{tag:'path', fill:"#E3C568", d:" M12.206,4.856c2.027-0.365,1.93,4.492,1.097,5.453c-0.356-0.357-0.269-0.847-0.382-1.322c-0.11-0.463-0.358-0.781-0.575-1.169 c-0.389-0.692-0.683-1.848-0.14-2.564"},
+			{tag:'path', fill:"#E3C568", d:" M10.97,5.291c-1.945,0.195-1.255,4.084-0.014,4.564c0.036-0.717-0.104-1.571,0.104-2.23c0.162-0.519,0.971-1.504,0.089-1.885"},
+			{tag:'path', fill:"#E3C568", d:" M9.026,5.118c-0.993,1.056-1.68,3.526-0.533,4.737c0.416-0.474,0.337-1.581,0.531-2.2c0.205-0.653,0.592-1.323,0.319-2.061"},
+			{tag:'path', fill:"#E3C568", d:" M-11.068,5.277c-0.973,1.005-0.857,2.865,0.08,3.821c0.356-0.371,0.386-1.457,0.576-1.973c0.163-0.442,0.747-1.713-0.179-1.77"},
+			{tag:'path', fill:"#E3C568", d:" M-16.628,4.721c-0.745,0.575-1.138,1.719-0.781,2.608c0.079,0.028,0.216,0.072,0.288,0.085c-0.036-0.622,1.822-2.934,0.572-2.772 "},
+			{tag:'path', fill:"#E3C568", d:" M14.269,4.959c1.459,0.28,1.847,3.396,0.892,4.341c-0.193-0.588-0.535-1.024-0.872-1.581c-0.421-0.695-0.345-1.32-0.179-2.124"},
+			{tag:'path', fill:"#E3C568", d:" M-15.397,3.608c-0.864,0.249-1.29,1.635-1.208,2.383c0.045,0.418,0.431,2.487,1.127,2.468c0.407-0.011,0.48-2.039,0.695-2.468 c0.432-0.864,0.865-1.728-0.296-2.224"},
+			{tag:'path', fill:"#E3C568", d:" M-13.213,3.888c-2.035,0.771-1.601,4.467-0.02,5.546c0.164-0.329,0.102-0.838,0.161-1.196c0.083-0.509,0.281-0.926,0.476-1.413 c0.362-0.905,0.482-1.669-0.221-2.46"},
+			{tag:'path', fill:"#E3C568", d:" M-10.671-47.461c1.042-0.168,1.241-1.723,1.974-1.814c-0.056,0.788,0.002,1.396-0.403,2.113 c-0.376,0.667-1.168,1.267-1.889,1.449"},
+			{tag:'path', fill:"#3C2415", d:" M11.092-38.089c0.672,0.274,1.398-0.012,2.068,0.377c0.565,0.329,0.75,0.85,1.008,1.388c0.548,1.145,1.04,2.2,1.609,3.318 c1.613,3.165,3.257,6.165,2.855,9.844c-0.307,2.813-3.742,4.986-6.43,3.736"},
+			{tag:'path', fill:"#3C2415", d:" M11.647-21.25c-0.449-1.072-1.521-1.924-1.729-3.098c-0.231-1.303,0.195-2.661-0.357-3.874c-0.54-1.185-1.462-1.874-1.17-3.274 c0.157-0.748,0.558-1.178,1.41-0.779c0.397,0.186,0.964,0.788,1.193,1.176c0.25,0.423,0.265,1.022,0.512,1.43 c0.385,0.634,0.737,0.545,1.338,0.79c1.018,0.416,1.531,1.381,1.98,2.387c0.448,1.009,0.028,2.327-0.079,3.415 c-0.18,1.821-0.884,1.902-2.7,1.907"},
+			{tag:'path', fill:"#3C2415", d:" M12.918-29.749c1.667,0.022,2.523,0.484,2.524,2.224c0.001,0.718,0.11,1.036,0.318,1.683c0.294,0.918-0.079,1.158-0.285,1.976 c-0.169,0.667,0.302,1.075,0.165,1.746c-0.091,0.444-0.529,1.131-0.9,1.411c-0.781,0.59-3.858,0.887-3.588-0.639 c0.206-1.166,2.362-0.456,2.65-1.416c-0.816-0.333-1.226-1.284-0.887-2.139c0.296-0.746,1.368-0.841,1.097-1.747 c-0.217-0.725-1.121-0.853-1.554-1.373c-0.38-0.459-0.697-1.827,0.379-1.567"},
+			{tag:'path', fill:"#E3C568", d:" M12.68-29.432c-0.854,0.317-2.768-0.046-3.085,1.176c0.768,0.423,1.812,0.058,2.604,0.012c0.482-0.027,1.999-0.332,1.116-1.108"},
+			{tag:'path', fill:"#E3C568", d:" M10.377-25.777c1.034,0.212,4.643-0.406,3.477,1.647c-0.713,1.258-3.309-0.423-3.556-1.489"},
+			{tag:'path', fill:"#E3C568", d:" M10.059-22.998c0.635,0.277,1.003,0.608,1.741,0.791c0.634,0.155,1.481,0.851,0.824,1.594c-0.606,0.684-1.758-0.016-2.168-0.558 c-0.396-0.524-0.448-1.143-0.636-1.748"},
+			{tag:'path', fill:"#3C2415", d:" M-6.144-43.093c-1.078-1.762-2.711-0.281-4.13-0.018c-0.664,0.123-1.454,0.159-2.164,0.097c-0.995-0.087-1.321-0.308-1.411-1.271 c-0.07-0.748-0.013-1.71-0.473-2.339c-0.796-1.086-2.294-1.215-3.491-0.937c-1.556,0.361-2.091,1.552-2.688,2.898 c-0.649,1.465-0.179,2.331-0.179,3.873c0,1.345-0.216,2.618,0.539,3.832c1.151,1.851,3.558,1.173,5.345,1.865 c1.467,0.568,2.578,2.13,3.268,3.417c0.297,0.554,0.3,1.262,0.629,1.765c0.421,0.642,1.633,1.542,2.133,1.908"},
+			{tag:'path', fill:"#3C2415", d:" M-17.74-51.591c0.58,1.915,4.032,4.755,5.628,4.634c0.816-0.062,2.083-1.292,2.287-0.256c0.178,0.899-0.832,1.582-1.83,1.838 c-0.749,0.192-1.186,0.665-2.052,1.153c-0.535,0.301-0.993,0.754-1.571,0.99c-0.691,0.283-1.417,0.349-2.151,0.377 c-1.145,0.045-1.717-0.512-2.696-0.856c-1.224-0.43-3.288-0.011-3.493-1.765c-0.155-1.335,1.172-1.944,1.429-3.177 c0.23-1.099,0.249-1.547,1.496-1.759c0.217-0.683,0.078-1.583,0.727-1.993c0.87-0.552,2.208,0.133,2.305,1.052"},
+			{tag:'path', fill:"#E3C568", d:" M-20.44-50.082c-0.624,0.366-0.989,1.122-0.618,1.822c0.479,0.904,1.84,0.831,2.678,0.878c0.234,0.014,1.462,0.105,1.599-0.135 c0.274-0.485-1.026-0.981-1.431-1.233c-0.658-0.409-1.188-1.065-1.99-1.094"},
+			{tag:'path', fill:"#E3C568", d:" M-21.87-45.793c-0.776,0.35-1.051,1.162-0.496,1.763c0.602,0.651,2.315,0.685,3.119,0.463c1.357-0.375-0.172-0.788-0.858-1.136 c-0.59-0.299-1.096-0.825-1.686-1.09"},
+			{tag:'path', fill:"#E3C568", d:" M-19.011-51.115c-0.339-0.335-0.37-1.106-0.002-1.369c0.435-0.31,1.274,0.08,1.671,0.259c0.845,0.382,1.793,1.009,1.972,1.961 c-0.32,0.384-0.968-0.198-1.362-0.355c-0.607-0.242-1.374-0.22-1.882-0.417"},
+			{tag:'path', fill:"#3C2415", d:" M7.756-57.667c2.953,0.189,4.523-3.677,7.052-4.572c2.821-0.999,4.281,3.612,4.388,5.519c0.045,0.794,0.005,1.669-0.129,2.554 c-0.038,0.247-2.081,0.406-2.133,0.653c-0.054,0.247,1.886,0.581,1.818,0.824c-0.389,1.4-1.031,2.723-1.967,3.67 c-0.975,0.987-5.818,1.711-5.813,3.464"},
+			{tag:'path', fill:"none", d:" M15.579-61.281c-0.553,0.625-1.138,1.062-1.598,1.787c-0.636,1.004-0.864,2.195-0.864,3.377c0,0.953-0.035,1.887,0.15,2.819 c0.242,1.229,0.821,2.112,1.637,3.136"},
+			{tag:'path', fill:"#3C2415", d:" M3.149-58.621c-1.585-1.966-2.517-4.003-3.93-6.074c-2.094-3.069-4.751-1.938-5.73,1.311c-1.24,4.117-4.7,11.969,2.75,11.832"},
+			{tag:'path', fill:"none", d:" M-3.403-64.18c0.888,0.916,1.502,1.777,1.738,3.075c0.206,1.134,0.282,2.263,0.088,3.398"},
+			{tag:'path', fill:"#3C2415", d:" M6.564-58.501c-1.475-0.442-2.291-0.56-3.811-0.636c-1.459-0.072-2.785,0.185-4.216,0.4c-1.809,0.272-1.907,1.136-2.597,2.557 c-0.607,1.253-1.262,2.431-1.547,3.794c-0.29,1.395-0.466,2.901-0.538,4.369c-0.061,1.261-0.585,2.686,0.177,3.796 c2.292,3.345,7.768,3.284,11.343,3.588c1.72,0.146,2.793-0.574,4.131-1.567c1.019-0.756,2.288-1.429,2.701-2.721 c0.472-1.476,0.79-3.079,0.869-4.664c0.092-1.835-0.368-3.331-1.249-4.95c-0.51-0.938-1.527-1.842-2.306-2.559 C8.666-57.883,7.537-57.946,6.564-58.501z"},
+			{tag:'circle', fill:"#BE1E2D", cx:"9.221", cy:"-52.882", r:"1.316"},
+			{tag:'circle', fill:"#BE1E2D", cx:"-2.461", cy:"-55.594", r:"1.135"},
+			{tag:'path', fill:"#3C2415", d:" M-5.667-44.602c0,2.245,0.229,5.494,1.926,7.148c1.187,1.157,3.209,1.11,4.745,1.112c1.531,0.002,2.137-0.414,3.038-1.573 c1.184-1.521,4.074-2.637,4.111-4.86"},
+			{tag:'path', fill:"#410000", d:" M-3.523-48.335c1.275-0.379,2.987-0.016,4.206,0.163c1.357,0.2,2.706,0.269,3.958,0.894c1.408,0.703,2.1,1.301,1.941,2.915 c-0.136,1.377-0.595,2.367-1.586,3.357c-0.712,0.711-1.535,1.631-2.401,2.143c-1.062,0.628-2.234,0.081-3.403-0.121 c-0.828-0.143-1.709-0.32-2.336-0.911c-0.954-0.901-0.935-2.2-0.934-3.356c0.001-1.241-0.728-2.181-0.397-3.335 C-4.306-47.182-4.187-48.173-3.523-48.335z"},
+			{tag:'path', fill:"#3C2415", d:" M10.218-55.324c0.958,0.28,1.455,2.194,0.334,2.608c-0.422-1.523-2.288-0.93-3.431-0.702"},
+			{tag:'path', fill:"#3C2415", d:" M-2.411-58.104c-0.322,0.126-1.306,0.421-1.333,0.891c-0.013,0.216,0.382,0.436,0.526,0.536c0.297,0.205,0.611,0.38,0.915,0.575 c0.577,0.371,1.446,0.573,2.021,0.034"},
+			{tag:'path', fill:"#3C2415", d:" M-3.443-53.736c0.649-2.537,4.254-3.102,6.358-2.279c2.093,0.818,3.077,2.467,3.014,4.583"},
+			{tag:'path', fill:'#000000', d:" M-0.893-54.189c-1.647-0.284-0.276-2.124,0.563-2.547c0.892-0.45,2.239-0.339,3,0.241c0.469,0.357,1.49,2.937,0.338,2.988 c-0.613,0.027-0.213-1.133-0.731-1.344c-0.819-0.333-0.868,0.853-1.127,1.261c-1.048,0.299-0.361-0.945-0.717-1.321 C-0.133-55.509-0.303-54.129-0.893-54.189z"},
+			{tag:'path', fill:"#E3C568", d:" M1.472-50.962c-0.112,0.735-0.41,1.474-0.623,2.189c-0.147,0.495-0.312,0.991-0.492,1.475c-0.098,0.264-0.406,1.006-0.113,1.229 c0.363,0.276,0.806-0.345,0.941-0.605c0.203-0.391,0.47-0.777,0.717-1.145c0.287-0.425,0.615-0.872,0.857-1.33 c0.211-0.399,0.48-0.86,0.239-1.307C2.828-50.77,2.33-51.014,1.979-51c-0.083,0.003-0.157,0.024-0.234,0.058"},
+			{tag:'path', fill:"#E3C568", d:" M3.85-49.149c0.497-0.266,0.69,0.731,0.465,1.014c-0.222,0.278-0.575,0.083-0.6-0.209c-0.017-0.201-0.024-0.637,0.213-0.726"},
+			{tag:'path', fill:"#E3C568", d:" M4.825-48.662c0.247-0.221,0.469,0.137,0.482,0.351c0.017,0.252,0.003,0.688-0.218,0.859c-0.366,0.283-0.37-0.183-0.382-0.434 C4.7-48.069,4.605-48.65,4.922-48.643"},
+			{tag:'path', fill:"#E3C568", d:" M-0.087-50.864c-0.489-0.12-0.79,0.32-0.911,0.74c-0.125,0.434,0.063,0.992,0.17,1.418c0.032,0.128,0.092,0.527,0.233,0.591 c0.22,0.099,0.189-0.205,0.195-0.332c0.021-0.442,0.089-0.883,0.229-1.311c0.065-0.199,0.13-0.401,0.16-0.6 c0.042-0.284-0.086-0.303-0.252-0.487"},
+			{tag:'path', fill:"#E3C568", d:" M-3.849-49.617c-0.309,0.094-0.581,0.438-0.542,0.765c0.04,0.329,0.343,0.515,0.639,0.38c0.254-0.115,0.459-0.382,0.468-0.657 c0.007-0.269-0.111-0.635-0.449-0.586"},
+			{tag:'path', fill:"#E3C568", d:" M0.225-50.436c-0.152,0.145-0.119,0.503-0.137,0.696c-0.023,0.249-0.024,0.494-0.039,0.746c-0.021,0.371-0.016,0.75-0.076,1.109 c0.204,0.037,0.367-0.369,0.447-0.504c0.184-0.313,0.293-0.638,0.375-0.993c0.105-0.456,0.428-1.349-0.356-1.307"},
+			{tag:'path', fill:"#E3C568", d:" M1.18-38.175c-0.045-0.591,0.244-0.91,0.541-1.385c0.141-0.226,0.232-0.55,0.434-0.703c0.441,0.243,0.296,1.279,0.273,1.702 c-0.017,0.306-0.109,0.625-0.454,0.674c-0.1,0.014-0.286,0.032-0.384,0.005c-0.168-0.046-0.218-0.218-0.39-0.254"},
+			{tag:'path', fill:"#E3C568", d:" M-1.51-39.033c-0.025-0.191-0.119-0.37-0.132-0.565c-0.013-0.182-0.022-0.36-0.024-0.545c-0.001-0.13,0.019-0.333-0.039-0.448 c-0.113-0.229-0.256-0.016-0.366,0.117c-0.292,0.354-0.44,0.773-0.394,1.229c0.02,0.191,0.035,0.346,0.233,0.434 c0.206,0.091,0.487,0.055,0.644-0.103"},
+			{tag:'path', fill:"#E3C568", d:" M-3.264-39.228c-0.275-0.056-0.372-0.097-0.455-0.365c-0.07-0.23-0.042-0.523-0.033-0.762c0.011-0.29,0.107-0.551,0.239-0.799 c0.243,0.062,0.242,0.219,0.287,0.426c0.053,0.244,0.207,0.441,0.318,0.663c0.204,0.407,0.243,1.028-0.396,0.955"},
+			{tag:'path', fill:"#E3C568", d:" M-0.126-38.487c0.129-0.346,0.529-0.564,0.722-0.897c0.088-0.151,0.111-0.312,0.312-0.175c0.095,0.064,0.167,0.224,0.195,0.331 c0.054,0.201,0.085,0.626-0.039,0.801c-0.176,0.247-0.753,0.285-0.995,0.135"},
+			{tag:'path', fill:"#E3C568", d:" M2.817-39.033c0.138-0.155,0.412-0.408,0.623-0.448c0.406-0.078,0.326,0.353,0.2,0.566c-0.095,0.161-0.229,0.44-0.395,0.546 c-0.26,0.167-0.539,0.058-0.76-0.099"},
+			{tag:'path', fill:"#E3C568", d:" M3.85-39.891c0.057-0.213,0.164-0.419,0.234-0.629c0.037-0.108,0.085-0.324,0.194-0.39c0.284-0.172,0.313,0.264,0.332,0.434 c0.055,0.493-0.017,1.21-0.683,1.15"},
+			{tag:'path', fill:"#E3C568", d:" M-3.869-40.768c-0.438-0.043-0.383-0.428-0.391-0.755c-0.004-0.177-0.059-0.657,0.142-0.76c0.211-0.108,0.476,0.821,0.521,0.989"},
+			{tag:'path', fill:"#E3C568", d:" M-3.05-50.202c-0.185,0.203-0.477,0.341-0.565,0.624c-0.087,0.28,0.014,0.559,0.307,0.604c0.357,0.056,0.574-0.171,0.732-0.468 c0.107-0.201,0.215-0.592-0.024-0.74"},
+			{tag:'path', fill:"#E3C568", d:" M-1.958-51.683c-0.977,0.176-0.882,1.271-0.741,2.045c0.081,0.44,0.227,0.835,0.347,1.266c0.123,0.441,0.248,0.833,0.549,1.191 c0.152,0.181,0.67,0.764,0.878,0.352c0.133-0.262-0.194-0.793-0.253-1.073c-0.191-0.896,0.064-1.759,0.097-2.651 c0.015-0.394-0.101-0.576-0.39-0.839c-0.157-0.143-0.273-0.285-0.504-0.272c-0.206,0.011-0.295,0.138-0.451,0.234"},
+		];
+		
+		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			bodyNodes.appendChild(newShape);
+			for (var attribute in shape) {
+				if (attribute !== 'tag') {
+					newShape.setAttribute(attribute,shape[attribute]);
+				};
+			};
+		};
+		
+		return bodyNodes;
+
+	};
+	
+	this.hellpuppy = function() {
+		var bodyNodes = document.createElementNS('http://www.w3.org/2000/svg','g');
+		bodyNodes.setAttribute('stroke','#000000');
+		bodyNodes.setAttribute('stroke-width','0.5');
+		bodyNodes.setAttribute('transform','scale(0.4)');
+
+		var shapes = [
+			{tag:"path", fill:"#414042", stroke:"#000000", d:"M9.777-10.65 c2.15,0.059,1.66,2.527,1.028,3.728c-0.69,1.311-1.684,2.375-3.171,2.516c-3.845,0.362-4.383-2.929-4.08-5.943 c0.167-1.674,0.104-3.576-0.839-5.056c-1.229-1.928-4.799-1.708-5.612,0.566c-1.038,2.902,0.602,6.867,1.932,9.336 C0.194-3.35,0.334-1.047,0.738,1.351C0.805,1.749,0.74,3.661,1.012,3.958c0.393,0.429,1.106,3.481,1.403,4.587 c0.549,2.036-3.075,1.521-4.286,1.306c-3.198-0.572-2.216-6.08-2.351-8.547C-4.325-0.577-4.897-2.684-6.063-4.2 c-0.696-0.905-1.761-1.468-2.353-2.42c-0.473-0.761-0.684-1.661-0.818-2.539c-0.336-2.197-0.181-4.402-0.091-6.601 c0.025-0.608,0.164-1.42,0.092-2.001c-0.129-1.033-1.137-1.881-1.56-2.885c-0.547-1.299-0.923-2.635-1.308-4.008 c-0.8-2.86-2.595-6.601-2.183-9.576c0.404-2.921,2.108-3.848,4.604-5.493c1.649-1.087,3.247-1.715,5.239-1.777 c1.997-0.062,3.293,0.555,4.892,1.625c0.847,0.568,1.508,1.117,2.097,1.935c0.491,0.682,0.747,1.404,1.269,2.034 c0.795,0.961,1.477,1.537,1.788,2.796c0.211,0.853,0.577,2.532,0.26,3.354"},
+			{tag:"path", fill:"#58595B", d:"M7.076-18.386c-1.298,0.736-2.414,1.052-2.799,2.609c-0.284,1.154,0.146,2.521,0.381,3.63 c0.22,1.045,0.36,2.768,0.949,3.637c0.792,1.165,3.361,1.242,3.983,0.003"},
+			{tag:"path", fill:"#58595B", stroke:"#000000", d:"M1.204-31.62 c1.516-0.866,3.928-1.188,5.592-0.584c1.438,0.522,2.06,1.79,2.519,3.096c0.513,1.456,1.633,2.493,2.209,3.92 c0.645,1.597,0.155,2.821-0.23,4.38c-0.255,1.022-0.358,1.993-0.396,3.097c-0.037,1.065,0.283,2.186,0.098,3.24 c-0.372,2.115-1.881,3.562-1.31,5.778"},
+			{tag:"path", fill:"#58595B", stroke:"#000000", d:"M0.086-26.68 c0.007,0.832,0.108,1.541,0.56,2.242c0.375,0.583,1.102,0.969,1.379,1.576c0.786,1.724-0.85,2.561-1.777,3.619 c-0.915,1.042-2.004,1.805-2.934,2.837c-0.962,1.069-1.271,2.688-1.426,4.077c-0.204,1.817,0.37,3.382,2.052,4.354 c1.517,0.877,3.472,1.136,4.645-0.347c1.097-1.385,0.965-3.188,1.624-4.638c0.676-1.49,2.372-2.769,3.398-4.026 c1.482-1.816,2.18-3.245,0.846-5.409c-0.669-1.084-0.861-1.8-0.983-3.08c-0.087-0.913-0.194-1.862-0.579-2.696"},
+			{tag:"path", fill:"#58595B", stroke:"#000000", d:"M-13.707-35.533 c-0.798,1.782-2.481,3.196-3.168,5.038c-0.497,1.33-0.448,3.098-0.375,4.561c0.081,1.644,0.055,3.062-0.272,4.661 c-0.317,1.547-1.125,3.373-1.219,4.938c-0.092,1.53,0.946,3.684,2.024,4.75c1.349,1.335,4.747,2.369,6.552,1.401 c2.779-1.489,1.727-6.21,0.023-8.037c-1.411-1.514-1.546-3.549-0.023-5.104"},
+			{tag:"path", fill:"#58595B", stroke:"#000000", d:"M-12.465-17.506 c-2.688,0.341-3.876,3.994-2.692,6.201c0.915,1.707,2.862,3.248,4.774,1.991c0.974-0.642,2.19-1.79,2.893-4.166 c0.458-1.549-0.562-2.946-2.13-3.629"},
+			{tag:"path", fill:"#000000", stroke:"#000000", d:"M-9.865-14.099 c0.004-0.603-0.805-1.938,0-1.938c1.137,0,0.818,1.735,0.078,2.125"},
+			{tag:"path", fill:"#000000", stroke:"#000000" , d:"M-11.377-12.798 c-0.596-0.28-1.768-1.498-2.209-0.938c-1.013,1.293,1.646,1.276,2.209,1.096"},
+			{tag:"path", fill:"#000000", stroke:"#000000" , d:"M-12.216-11.635 c-0.671-0.15-1.342-0.565-2.036-0.293c-0.292,1.067,1.57,1.174,2.129,0.524"},
+			{tag:"path", fill:"#000000", stroke:"#000000", d:"M-9.42-13.167 c-0.546,0.466-3.207,2.29-2.332,2.984c0.462,0.367,1.801-0.237,2.168-0.56c0.588-0.515,0.833-1.266,0.708-2.036 c-0.143-0.055-0.3-0.106-0.452-0.109"},
+			{tag:"path", fill:"#000000", stroke:"#000000", d:"M-12.394-14.978 c0.707-0.513,1.653-0.378,1.821,1.039c0.155,1.297-1.382,0.157-1.65-0.768"},
+			{tag:"path", fill:"#58595B", stroke:"#000000", d:"M-2.854,6.44 c-0.817,0.334-1.645,0.912-2.114,1.357c-0.342,0.325-1.047,1.177-0.918,1.678c0.284,1.099,3.032,0.731,3.895,0.774 c1.162,0.058,3.882,0.308,4.131-1.238C2.312,7.951,1.62,7.236,0.776,6.779"},
+			{tag:"path", fill:"#58595B", stroke:"#000000", d:"M-14.283-34.229 c0.404-2.921,2.108-3.848,4.604-5.493c1.648-1.087,3.246-1.715,5.239-1.777c1.997-0.063,3.293,0.554,4.893,1.625 c0.846,0.567,1.508,1.117,2.096,1.935c0.491,0.681,0.747,1.403,1.269,2.034c0.795,0.961,1.477,1.536,1.789,2.796 c0.21,0.853,0.578,2.531,0.259,3.354"},
+			{tag:"path", fill:"#58595B", stroke:"#000000", d:"M2.08-8.09 c0.044,0.767-0.194,1.505-0.876,1.938c-1.356,0.863-2.938,0.958-4.24,0.107c-0.652-0.427-2.108-1.325-2.47-1.81 c-0.493-1.753,0.592-2.894,2.068-3.355"},
+			{tag:"path", fill:"#000000", stroke:"#000000", d:"M-2.373-8.371 C-3.274-8.49-3.93-7.494-3.133-7.006c1.091,0.67,0.775-0.853,0.76-1.234"},
+			{tag:"path", fill:"#000000", stroke:"#000000", d:"M-0.899-7.809 c-0.545,0.487-1.412,2.174-0.056,1.672c0.92-0.341,0.909-1.983-0.086-1.592"},
+			{tag:"path", fill:"none", stroke:"#000000", d:"M0.039-6.271 C0.262-6.624,0.53-7.228,1.012-7.194C0.949-6.847,0.354-6.44,0.039-6.271"},
+			{tag:"path", fill:"none", stroke:"#000000", d:"M-4.434-7.809 C-4.505-8.117-4.68-8.748-4.116-8.64C-3.996-8.3-4.065-7.98-4.294-7.716"},
+			{tag:"path", fill:"#ED1C24", d:"M0.436,1.628c-0.435-0.112-0.98,0.007-1.072,0.536c-0.03,0.177,0.057,0.371,0.173,0.495 c0.192,0.206,0.28,0.191,0.223,0.508c-0.064,0.354-0.362,0.75-0.162,1.118c0.094,0.174,0.269,0.246,0.327,0.441 c0.052,0.18,0.006,0.392,0.022,0.584C0.009,6.046,0.69,6.023,1.251,6.265"},
+			{tag:"path", fill:"#ED1C24", stroke:"#000000", d:"M0.342,1.651 c0.31,0.873,1.36,1.151,2.074,1.555C1.924,3.532,1.021,3.307,0.49,3.127c0.102,0.891,1.457,1.628,2.226,1.892 C2.293,5.54,1.393,5.287,0.854,5.155C1.256,5.61,1.982,5.631,2.411,6.069c-0.276,0.34-0.979,0.13-1.16,0.195"},
+			{tag:"path", fill:"#ED1C24", d:"M-8.395-26.027c0.331-0.378,0.327-0.879,0.795-1.16c0.411-0.248,0.915-0.316,1.406-0.273 c0.816,0.073,1.862,0.534,1.573,1.503"},
+			{tag:"path", fill:"#ED1C24", stroke:"#000000", d:"M-8.395-26.027 c-0.303,0.915,0,2.069-0.678,2.854c0.469-0.004,0.997-0.463,1.293-0.806c0.167,0.833,0.418,2.308-0.177,3.031 c0.779-0.359,1.312-1.04,1.712-1.72c0.136,0.598,0.403,1.27,0.234,1.877c0.498-0.2,0.718-0.987,0.774-1.457 c0.321,0.507,0.906,0.709,1.513,0.683c-0.039-0.627-0.854-1.3-1.027-1.936c0.642,0.161,1.332,0.17,2.016-0.028 c-0.701-0.437-2.405-1.355-1.887-2.43"},
+			{tag:"path", fill:"#ED1C24", d:"M-14.371-32.248c0.928-0.214,2.8-0.906,3.068-1.958c0.077-0.303-0.174-1.066-0.375-1.294 c-0.298-0.336-0.891-0.243-1.295-0.243"},
+			{tag:"path", fill:"#ED1C24", d:"M1.601-34.24c-1.169,0.065-1.947-0.852-2.098-1.889c-0.079-0.549,0.121-0.841,0.446-1.324 c0.138-0.204,0.215-0.427,0.428-0.57c0.26-0.174,0.542-0.1,0.839-0.166"},
+			{tag:"path", fill:"#ED1C24", stroke:"#000000", d:"M0.342-40.496 c0.999,0.742,2.607,0.542,3.772,0.781c-0.524,0.705-1.468,0.851-2.091,1.368c0.749,0.198,1.287,0.402,2.068,0.447 c-0.238,0.688-0.753,1.379-1.508,1.472c0.614,0.604,2.199,0.64,2.994,0.56c-0.462,0.467-1.161,1.042-1.742,1.383 c-0.725,0.427-1.472,0.28-2.306,0.28"},
+			{tag:"path", fill:"#ED1C24", stroke:"#000000", d:"M-12.327-36.435 c-0.065-0.003-0.118-0.09-0.16-0.133c-0.137-0.137-0.289-0.268-0.448-0.377c-0.156-0.108-0.561-0.432-0.733-0.223 c-0.189,0.229-0.394,0.424-0.643,0.588c-0.305,0.202-0.638,0.354-0.966,0.516c-0.16,0.078-0.318,0.158-0.472,0.247 c-0.036,0.021-0.417,0.279-0.413,0.283c0.499,0.46,1.436,0.588,2.102,0.573c-0.601,0.754-1.693,0.164-2.352,0.575 c0.417,0.508,1.038,0.776,1.636,1.001c-0.452,0.416-1.218,0.266-1.777,0.505c0.595,0.404,1.433,0.908,2.147,0.701"},
+			{tag:"path", fill:"#58595B", d:"M0.179-26.772c0-2.415-0.062-4.092-2.782-4.862c-0.098-0.921,2.128-0.833,2.752-0.823 c1.354,0.023,2.706,0.618,3.224,1.957c0.561,1.454,0.385,3.957-1.424,4.474"},
+			{tag:"path", fill:"#58595B", d:"M-10.166-23.604c0.543-1.255-0.309-2.642,0.28-3.822c0.599-1.2,1.662-1.766,1.493-3.373 c-0.125-1.189-1.104-3.094-2.332-3.43c-1.836-0.502-3.176,0.716-3.075,2.516"},
+			{tag:"path", fill:"#F7941E", stroke:"#000000", d:"M-13.171-63.877 c-0.592,0.355-1.147,1.424-1.526,1.968c-0.504,0.726-0.82,1.422-1.106,2.238c-0.166,0.475-0.45,0.856-0.502,1.362 c-0.049,0.457-0.048,0.895-0.114,1.341c-0.117,0.779-0.154,1.604-0.27,2.376c-0.25,1.68-1.469,3.443-0.466,5.174 c0.567,0.979,1.397,1.435,2.52,1.443c1.608,0.011,3.289-0.303,4.469-1.41c1.862-1.744,1.195-4.881,0.944-7.116 c-0.211-1.885-0.834-3.86-1.838-5.511C-11.396-62.562-12.553-63.606-13.171-63.877z"},
+			{tag:"path", fill:"#ED1C24", stroke:"#000000", d:"M-10.911-52.401 c-0.201-1.972-3.013-1.757-4.395-1.511c0.852-0.897,2.165-0.704,3.238-0.994c-1.017-0.519-2.504-0.479-3.677-0.239 c0.465-1.119,2.615-1.153,3.626-0.934c-0.386-0.588-0.48-0.776-0.994-1.263c-0.34-0.322-1.394-0.956-1.445-1.39 c0.759,0.046,1.377,0.284,2.016,0.739c0.483,0.346,0.872,0.69,1.185,1.189c0.307,0.49,0.887,0.608,1.331,0.93"},
+			{tag:"path", fill:"#F7941E", stroke:"#000000", d:"M3.347-58.226 c-0.139,0.894-0.213,1.834-0.289,2.74c-0.065,0.768-0.03,1.709,0.243,2.432c0.501,1.327,0.855,2.99-0.129,4.242 c-0.489,0.622-1.017,1.185-1.781,1.385c-1.365,0.358-2.027-0.395-3.079-1.19c-0.988-0.747-1.568-1.761-2.222-2.763 c-0.279-0.428-0.484-0.591-0.535-1.115c-0.039-0.406-0.026-0.754,0.059-1.151c0.296-1.398,0.853-2.988,2.05-3.87 c1.454-1.069,3.844-1.327,5.544-0.804"},
+			{tag:"path", fill:"#58595B", stroke:"#000000", d:"M-4.341-53.193 c-0.136-0.562,0.416-1.648,0.689-2.19c0.301-0.599,0.686-1.208,1.173-1.678c1.41-1.362,3.722-0.923,5.498-0.831 c1.11,0.057,2.265-0.031,3.368-0.055c0.322-0.006,1.09,0.065,1.33-0.183c0.395-0.407-0.465-0.527-0.781-0.609 c-0.806-0.209-1.611-0.401-2.424-0.642c-0.417-0.124-0.815-0.296-1.245-0.396c-1.01-0.236-2.034-0.065-3.041,0.117 c-2.882,0.521-4.862,3.842-4.707,6.559"},
+			{tag:"path", fill:"#58595B", stroke:"#000000", d:"M-11.238-53.45 c0.094-1.581,0.247-3.232,0.093-4.813c-0.072-0.745-0.24-1.435-0.421-2.154c-0.176-0.704-0.394-1.243-0.826-1.865 c-0.365-0.525-0.992-0.949-0.757-1.676c0.688,0.198,1.659,1.149,2.039,1.727c0.409,0.622,0.807,1.324,1.13,2 c0.869,1.822,1.478,3.838,1.874,5.825c0.115,0.578,0.43,1.311,0.362,1.912"},
+			{tag:"path", fill:"#ED1C24", stroke:"#000000", d:"M-3.929-51.725 c0.326-2.008,1.368-4.382,2.791-4.926c0.644-0.246,1.159,0.121,1.751,0.338C1.34-56.045,2.045-56,2.781-55.904 c-1.151,0.899-5.382-0.035-5.163,3.54c0.649-1.691,2.537-2.53,3.749-2.343c-0.603,0.664-2.074,1.305-2.701,2.44 c0.76-1.509,2.608-0.833,3.633-1.555c-0.171,1.236-1.828,1.188-2.343,1.796c0.579-0.014,2.29-0.295,2.623,0.557 c-0.509,0.145-1.422,0.13-1.931,0.431c0.589,0.485,1.823,0.497,2.35,0.478c-0.687,0.625-1.724,0.862-2.586,1.84"},
+			{tag:"path", fill:"#58595B", stroke:"#000000", d:"M-7.696-53.986 c1.508,0.036,3.049-0.455,4.543-0.126c1.422,0.314,2.851,1.351,3.701,2.52c2.028,2.791,0.941,6.764,1.078,9.943 c0.074,1.717,0.008,3.177-0.903,4.685c-0.957,1.583-2.893,2.913-3.485,4.667c-0.432,1.278,0.018,2.538-1.33,3.354 c-1.094,0.663-2.501,0.823-3.753,0.702c-1.042-0.101-2.245-0.425-2.925-1.282c-1.085-1.365-0.469-3.283-1.664-4.687 c-1.03-1.21-2.017-2.127-2.627-3.642c-0.703-1.744-1.367-3.329-1.552-5.219c-0.3-3.055-0.827-7.31,1.597-9.718 C-13.229-54.566-9.965-54.04-7.696-53.986C-5.827-53.941-9.565-54.03-7.696-53.986z"},
+			{tag:"path", fill:"#000000", stroke:"#000000", d:"M-11.68-36.792 c0.26,1.081,0.862,2.012,1.049,3.076c0.226,1.286,1.496,2.291,2.795,2.307c0.863,0.011,2.252-0.147,2.708-0.996 c0.243-0.452,0.115-1.121,0.211-1.605c0.106-0.53,0.312-0.887,0.662-1.296c3.804-4.446-7.871-5.284-7.356-1.345"},
+			{tag:"path", fill:"#BE1E2D", stroke:"#000000", d:"M-9.304-36.932 c0.19,1.626-1.237,6.16,1.451,6.151c1.65-0.005,1.833-0.831,2.029-2.237c0.157-1.131,0.155-2.344,0.155-3.494 c0-0.187,0-0.373,0-0.56"},
+			{tag:"circle", fill:"#BE1E2D", stroke:"#000000", cx:"-11.82", cy:"-45.039", r:"1.398"},
+			{tag:"circle", fill:"#BE1E2D", stroke:"#000000", cx:"-2.814", cy:"-45.039", r:"1.398"},
+			{tag:"circle", fill:"#FFFFFF", stroke:"#FFFFFF", cx:"-2.668", cy:"-45.523", r:"0.145"},
+			{tag:"polygon", fill:"#FFFFFF", stroke:"#FFFFFF", points:" -2.244,-45.23 -2.244,-45.23 -2.244,-45.23 "},
+			{tag:"circle", fill:"#FFFFFF", stroke:"#FFFFFF", cx:"-11.553", cy:"-45.397", r:"0.145"},
+			{tag:"polygon", fill:"#FFFFFF", stroke:"#FFFFFF", points:" -11.128,-45.104 -11.128,-45.104 -11.128,-45.104 "},
+			{tag:"path", fill:"#ED1C24", stroke:"#000000", d:"M-10.212-43.921 c-0.486-0.484-0.172-1.115-0.916-2.012c0.468,0.211,0.569,0.072,1.031,0.316c-0.023-0.186,0.05-0.417,0.02-0.6 c0.308,0.347,0.172,0.253,0.679,0.188c0.099-0.486-0.284-1.052-0.388-1.517c0.331,0.096,0.805,0.654,1.101,0.342 c0.194-0.204-0.083-1.12-0.104-1.308c0.46,0.241,0.502,0.978,0.954,1.025c0.371,0.039,1.005-0.75,1.193-1.025 c-0.045,0.472-0.213,0.953-0.134,1.435c0.66,0.104,0.98-0.294,1.519-0.396c-0.256,0.414-0.507,0.824-0.611,1.305 c0.368,0.018,0.713-0.11,1.086-0.047c-0.222,0.359-0.428,0.725-0.603,1.093c0.76-0.088,1.23-0.686,1.87-1.028 c0.153,0.792-0.604,1.405-0.887,2.077c0.637,0.223,1.675-0.122,2.156,0.417c-0.409-0.038-0.89,0.112-1.123,0.436 c0.247,0.291,0.722,0.518,1.121,0.569c-0.199,0.329-0.537,0.527-0.829,0.755c0.185,0.275,0.553,0.448,0.896,0.431 c-0.076,0.472-0.521,0.706-0.68,1.094c0.443,0.095,1.205,0.085,1.645-0.05c-0.164,0.341-0.294,0.705-0.542,0.988 c0.253,0.141,1.28,0.082,1.18,0.528c-0.056,0.247-0.437,0.144-0.545,0.295c-0.328,0.464,0.071,0.822,0.396,1.315 c-0.128-0.028-0.322,0.044-0.455,0.023c-0.039,0.39,0.162,0.706,0.193,1.087c-0.814-0.372-1.434-0.743-1.345,0.346 c-0.404-0.05-0.925-0.434-1.185-0.739c-0.302,0.151-0.324,0.525-0.465,0.812c-0.772-0.873-1.118-1.159-1.612,0.069 c-0.172-0.354-0.919-1.62-1.13-0.543c-0.259-0.352-1.134-0.904-1.175-0.086c-0.054-0.306-0.316-0.458-0.617-0.442 c-0.191,0.194-0.41,0.38-0.583,0.599c-0.678-0.626-1.293-0.256-1.937,0.207c0.011-0.247,0.055-0.525,0.111-0.735 c-0.612,0.145-1.352,0.284-1.928,0.458c0.03-0.362,0.274-0.712,0.318-1.034c-0.41,0.095-1.325,0.373-1.295-0.288 c0.011-0.238,0.882-0.966,1.071-1.122c-1.432,0.241-0.152-1.068,0.451-1.269c-0.08-0.047-0.219-0.23-0.286-0.268 c0.391-0.298,1.051-0.191,1.542-0.219c-0.12-0.429-0.624-0.608-1.021-0.702c0.561-0.503,1.167-0.248,1.791-0.472 c-0.169-0.377-0.614-0.415-0.959-0.619c0.372,0.025,0.722-0.094,1.014-0.309c-0.431-0.474-1.25-0.128-1.806-0.205 c0.549-0.585,1.238-0.862,1.967-1.038"},
+			{tag:"ellipse", fill:"#000000", stroke:"#000000", cx:"-7.493", cy:"-39.773", rx:"1.998", ry:"1.293"},
+			{tag:"path", fill:"#3C2415", stroke:"#000000", d:"M-6.985-41.317 c-0.736-0.028-1.742-0.107-2.384,0.192c-0.629,0.294-0.88,1.075-0.284,1.545c0.439-0.33,0.758-0.988,1.386-0.411 c0.231,0.213,0.33,0.655,0.138,0.893c-0.303,0.377-0.698-0.081-0.892,0.063c-0.712,0.53,1.202,1.051,1.675,1.04 c0.524-0.013,1.817-0.183,1.744-0.952c-0.487-0.11-1.438,0.318-1.186-0.642c0.191-0.73,0.659-0.341,1.067-0.292 c0.335,0.041,0.22,0.353,0.47,0.012c0.046-0.063,0.094-0.674,0.041-0.779C-5.469-41.151-6.25-41.29-6.985-41.317z"},
+			{tag:"path", fill:"#ED1C24", d:"M-15.804-47.031c0.807-0.563,0.435,0.533,0.505,0.819c0.071,0.287,0.184,0.495,0.184,0.803 c0,0.336-0.152,0.449-0.253,0.726c-0.125,0.34,0.111,0.384,0.246,0.715c0.104,0.254,0.111,0.6,0.043,0.866 c-0.064,0.252-0.23,0.458-0.081,0.733c0.159,0.293,0.45,0.384,0.464,0.769c0.008,0.196-0.135,0.373-0.133,0.534 c0.001,0.162,0.167,0.313,0.23,0.452c0.162,0.354,0.152,0.686,0.112,1.075c-0.064,0.629,0.569,1.581,0.046,2.188"},
+			{tag:"path", fill:"#ED1C24", d:"M0.762-47.416c-0.28-0.045-0.486-0.314-0.628,0.037c-0.095,0.236,0.108,0.447,0.2,0.662 c0.125,0.293,0.094,0.436,0.019,0.741c-0.034,0.129-0.136,0.261-0.082,0.412c0.07,0.204,0.229,0.164,0.326,0.349 C0.75-44.919,0.5-44.753,0.42-44.48c-0.072,0.243-0.083,0.619-0.035,0.874c0.054,0.286,0.235,0.489,0.071,0.771 c-0.119,0.203-0.42,0.331-0.542,0.548c-0.27,0.478,0.25,0.613,0.184,1.025c-0.073,0.445-0.323,0.487-0.113,0.979 c0.188,0.441-0.051,0.493-0.134,0.941c-0.079,0.437,0.219,0.827,0.562,1.084"},
+			{tag:"path", fill:"#ED1C24", stroke:"#000000", d:"M0.762-47.416 c0.43,0.254,0.992,0.498,1.467,0.673c0.266,0.098,0.681,0.128,0.879,0.305c-0.383,0.346-1.506,0.21-2.028,0.285 c-0.007,0.385,1.071,0.851,1.386,1.079c0.207,0.15,0.506,0.346,0.552,0.621c-0.517,0.215-1.26,0.108-1.698-0.224 c0.034,0.721,1.341,1.114,1.673,1.628c-0.462,0.286-1.27,0.152-1.805,0.182c-0.035,0.627,1.333,0.992,1.81,1.295 c-0.274,0.459-1.537,0.466-2.026,0.396c0.263,0.234,0.573,0.383,0.809,0.646c0.197,0.219,0.337,0.392,0.59,0.557 c0.199,0.131,0.65,0.227,0.415,0.465c-0.235,0.237-1.732,0.132-2.054-0.033c0.067,0.261,0.378,0.455,0.55,0.661 c0.305,0.368,0.559,0.816,0.937,1.114c-0.349,0.341-1.393-0.414-1.804-0.493"},
+			{tag:"path", fill:"#ED1C24", stroke:"#000000", d:"M-15.804-47.031 c-0.534,0.49-1.367,0.582-2.022,0.775c0.211,0.435,1.263,0.448,1.707,0.355c-0.125,0.415-0.553,0.928-0.84,1.249 c-0.276,0.309-0.671,0.681-1.107,0.73c0.648,0.162,1.332,0.041,1.938-0.13c-0.202,0.429-0.309,0.727-0.619,1.073 c-0.187,0.208-0.434,0.42-0.55,0.661c0.319,0.019,0.601-0.016,0.911-0.056c0.41-0.052,0.619-0.129,0.487,0.313 c-0.159,0.536-0.721,1.146-1.183,1.456c0.579,0.024,1.165-0.123,1.729-0.2c0.023,0.445-0.323,0.938-0.553,1.29 c-0.088,0.135-0.645,0.47-0.658,0.565c-0.069,0.478,1.377-0.023,1.628-0.004c0.274,0.63-0.496,1.313-0.905,1.639 c0.381,0.191,1.007,0.072,1.401-0.034"}
+		];
+		
+		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			bodyNodes.appendChild(newShape);
+			for (var attribute in shape) {
+				if (attribute !== 'tag') {
+					newShape.setAttribute(attribute,shape[attribute]);
+				};
+			};
+		};
+		
+		return bodyNodes;
+	};
 }

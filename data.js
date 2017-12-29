@@ -1,5 +1,71 @@
 var data = {
 
+	cast: {
+		
+		daisy: {
+			name: "Daisy Moucau",
+			unique: true,
+			pronoun: "Herself",
+			avatarParameters: {skinColor:'#824c38', templePosition:15, templeWidth:1, templeHeight:6, cheekbonePosition:14, cheekboneWidth:5, cheekboneHeight:6, chinHeight:47, chinWidth:30, eyeColor:'#1b0ec0', eyeDistance:19, eyeSize:9, browSize:2, leftBrowTilt:3, rightBrowTilt:1, insideEyelidCurve:0, outsideEyelidCurve:7, lowerEyelidCurve:7, noseColor:'#f37776', noseHeight:73, noseSize:2, noseWidth:9, nostrilHeight:7, noseBump:-3, lipColor:'#551f17', mouthWidth:15, lipSize:2, smile:-2, mouthOpen:1, teeth:0, leftTusk:0, rightTusk:0, earColor:'#9c493f', earSize:21, earDip:-8, earTilt:3, earWidth:-7, earLobe:7, hairColor:'#55284f', hairLength:50, hairCurl:1, hairPart:-4, hairBangs:2, hairBangsLength:2, hairSweep:3, topHairHeight:7, topHairBase:13, topHairWidth:18, horns:7, shoulders:38, bust:22, belly:22, hips:22, feet:0},
+			stats: {move:9,strength:12,focus:7},
+			equipment: {},
+			inventory: [],
+		},
+		
+		doti: {
+			name: "Doti",
+			unique: true,
+			pronoun: "Emself",
+			avatarHeritage: ['goblin'],
+			stats: {move:12,strength:12,focus:12},
+			equipment: {
+				left: {template:'simpleSpear'},
+				garb: {template: 'scrapArmor'},
+			},
+			inventory: [],
+		},
+		
+		hellpuppy: {
+			name: "Hellpuppy",
+			unique: false,
+			pronoun: "Herself",
+			description: "Summoned from an abyssal plane of darkness and fire, this pupper is eager to give you sloppy kisses.",
+			beastType: 'hellpuppy',
+			stats: {move:14,strength:8,focus:1},
+			equipment: {
+			},
+			inventory: [],
+		},
+		
+		mixterStout: {
+			name: 'Mx. Stout',
+			unique: true,
+			pronoun: 'Themself',
+			avatarParameters: { hairColor:'aqua', skinColor:'#d9895a', templePosition:12, templeWidth:2, templeHeight:5, cheekbonePosition:11, cheekboneWidth:2, cheekboneHeight:6, chinHeight:43, chinWidth:22, eyeColor:'#0e9bb4', eyeDistance:13, eyeSize:8, browSize:4, leftBrowTilt:2, rightBrowTilt:0, insideEyelidCurve:1, outsideEyelidCurve:7, lowerEyelidCurve:5, noseColor:'#de6c50', noseHeight:46, noseSize:3, noseWidth:6, nostrilHeight:8, noseBump:10, lipColor:'#e96557', mouthWidth:13, lipSize:5, smile:3, mouthOpen:3, teeth:2, leftTusk:0, rightTusk:0, earColor:'#e08465', earSize:14, earDip:-8, earTilt:-3, earWidth:-5, earLobe:14, hairLength:14, hairCurl:4, hairPart:-7, hairBangs:6, hairBangsLength:14, hairSweep:5, topHairHeight:2, topHairBase:12, topHairWidth:6, horns:0, shoulders:32, bust:10, belly:20, hips:15, feet:20},
+			stats: {move:8,strength:9,focus:12},
+			equipment: {
+				left: {template:'initiatesTome'},
+				garb: {template:'initiatesRobes'},
+			},
+			inventory: [{template:'firstAidKit'}],
+		},
+		
+		rat: {
+			name: "Giant Rat",
+			unique: false,
+			pronoun: "Itself",
+			description: "Rodents of Unusual Size?  I don't believe in them.",
+			beastType: 'rat',
+			stats: {move:6,strength:8,focus:4},
+			equipment: {
+				teeth: {template: 'ratTeeth'},
+				hide: {template: 'ratHide'},
+			},
+			inventory: [],
+		},
+	
+	},
+
 	ethnicities: {
 
 		min: {
@@ -236,7 +302,7 @@ var data = {
 		
 		firstAidKit: {
 			name: "First Aid Kit",
-			slots: ['belt','knapsack'],
+			slots: ['pouch'],
 			stats: {
 				healing: 3,
 				weight: 2,
@@ -316,8 +382,33 @@ var data = {
 				sharpBase: 1,
 				weight: 3,
 			},
-			maneuvers: ['slash','lunge'],
+			maneuvers: ['slash','lunge','feint'],
 			svgNodes: function(item) {return item.pawn.avatar.simpleSword(item)},
+		},
+		
+		ratHide: {
+			name: "Rat Hide",
+			slots: ['hide'],
+			stats: {
+				deflection: 1,
+				soak: 1,
+				weight: 4,
+			},
+			maneuvers: [],
+// 			svgNodes: function(item) {return item.pawn.avatar.roughspun(item);},
+		},
+		
+		ratTeeth: {
+			name: "Rat Teeth",
+			slots: ['teeth'],
+			colors: {
+			},
+			stats: {
+				sharp: 4,
+				weight: 1,
+			},
+			maneuvers: ['bite'],
+// 			svgNodes: function(item) {return item.pawn.avatar.simpleShield(item)},
 		},
 		
 		roughspun: {
@@ -425,11 +516,32 @@ var data = {
 				action: {pawnStat: 'strength',itemStat:'balance'},
 				reaction: {pawnStat: 'move',itemStat:'deflection'},
 				power: {pawnStat:'strength',itemStat:'weight'},
-				resist: {pawnStat: 1,itemStat:'soak'},
+				resist: {pawnStat: 'strength',itemStat:'soak'},
 			},
 			effects: [
 				{type:'wound',stat:'focus',name:'blunt',woundType:'physical'},
 				{type:'wound',stat:'move',name:'blunt',woundType:'physical'},
+			],
+		},
+	
+		bite: {
+			name: "Bite",
+			description: "A basic, close attack",
+			targetType: 'pawn',
+			minRange: 1,
+			maxRange: 1,
+			costs: {
+				move: function() {return 1},
+				strength: function(item) {return 2},
+			},
+			rollStats: {
+				action: {pawnStat: 'strength',itemStat: 'sharp'},
+				reaction: {pawnStat: 'move',itemStat:'deflection'},
+				power: {pawnStat:'strength',itemStat:'sharp'},
+				resist: {pawnStat: 'strength',itemStat:'soak'},
+			},
+			effects: [
+				{type:'wound',stat:'strength',name:'bite',woundType:'physical'},
 			],
 		},
 	
@@ -447,7 +559,7 @@ var data = {
 				action: {pawnStat: 'focus',itemStat:'arcane'},
 				reaction: {pawnStat: 'move',itemStat:'aegis'},
 				power: {pawnStat:'focus',itemStat:'arcane'},
-				resist: {pawnStat: 1,itemStat:'soak'},
+				resist: {pawnStat: 'move',itemStat:'soak'},
 			},
 			effects: [
 				{type:'wound',stat:'strength',name:'fire',woundType:'physical'},
@@ -473,6 +585,27 @@ var data = {
 			],
 		},
 		
+		feint: {
+			name: "Feint",
+			description: undefined,
+			targetType: 'pawn',
+			minRange: 1,
+			maxRange: 1,
+			costs: {
+				move: function() {return 1},
+				focus: function(item) {return 10 - item.stats.balance;},
+			},
+			rollStats: {
+				action: {pawnStat: 'focus'},
+				reaction: {pawnStat: 'focus'},
+				power: {pawnStat: 'focus'},
+				resist: {pawnStat: 'focus'},
+			},
+			effects: [
+				{type:'wound',stat:'focus',name:'confuse',woundType:'mental'}
+			],
+		},
+		
 		heal: {
 			name: "Heal",
 			description: "Remove wounds on your target",
@@ -488,7 +621,7 @@ var data = {
 				power: {pawnStat: 'focus',itemStat: 'healing'},
 			},
 			effects: [
-				{type: 'heal',woundTypes:['physical']},
+				{type: 'heal', woundTypes:['physical']},
 				{type: 'rally'},
 			],
 		},
@@ -507,7 +640,7 @@ var data = {
 				action: {pawnStat: 'move',itemStat: 'reach'},
 				reaction: {pawnStat: 'move',itemStat: 'deflection'},
 				power: {pawnStat: 'strength',itemStat: 'sharp'},
-				resist: {pawnStat: 1,itemStat: 'soak'},
+				resist: {pawnStat: 'strength',itemStat: 'soak'},
 			},
 			effects: [
 				{type:'wound',stat:'move',name:'hook',woundType:'entangled'},
@@ -528,7 +661,7 @@ var data = {
 				action: {pawnStat: 'move',itemStat: 'reach'},
 				reaction: {pawnStat: 'move',itemStat: 'deflection'},
 				power: {pawnStat: 'strength',itemStat: 'sharp'},
-				resist: {pawnStat: 1,itemStat: 'soak'},
+				resist: {pawnStat: 'strength',itemStat: 'soak'},
 			},
 			effects: [
 				{type:'wound',stat:'strength',name:'sharp',woundType:'physical'},
@@ -550,7 +683,7 @@ var data = {
 				action: {pawnStat: 'strength',itemStat: 'reach'},
 				reaction: {pawnStat: 'move',itemStat: 'deflection'},
 				power: {pawnStat: 'strength',itemStat: 'sharp'},
-				resist: {pawnStat: 1,itemStat: 'soak'},
+				resist: {pawnStat: 'strength',itemStat: 'soak'},
 			},
 			effects: [
 				{type:'wound',stat:'strength',name:'sharp',woundType:'physical'},
@@ -570,7 +703,7 @@ var data = {
 				action: {pawnStat:1},
 			},
 			effects: [
-				{type:'refresh', stat:'focus', num:8},
+				{type:'refresh', stat:'focus', num:3},
 			],
 		},
 	
@@ -588,7 +721,7 @@ var data = {
 				action: {pawnStat: 'strength',itemStat: 'weight'},
 				reaction: {pawnStat: 'move',itemStat: 'deflection'},
 				power: {pawnStat: 'strength',itemStat: 'weight'},
-				resist: {pawnStat: 1,itemStat: 'soak'},
+				resist: {pawnStat: 'strength',itemStat: 'soak'},
 			},
 			effects: [
 				{type:'wound',stat:'focus',name:'blunt',woundType:'physical'},
@@ -610,7 +743,7 @@ var data = {
 				action: {pawnStat: 'strength',itemStat: 'balance'},
 				reaction: {pawnStat: 'move',itemStat: 'deflection'},
 				power: {pawnStat: 'strength',itemStat: 'weight'},
-				resist: {pawnStat: 1,itemStat: 'soak'},
+				resist: {pawnStat: 'strength',itemStat: 'soak'},
 			},
 			effects: [
 				{type:'wound',stat:'strength',name:'sharp',woundType:'physical'},
@@ -633,7 +766,7 @@ var data = {
 				action: {pawnStat: 'strength',itemStat: 'balance'},
 				reaction: {pawnStat: 'move',itemStat: 'deflection'},
 				power: {pawnStat: 'strength',itemStat: 'weight'},
-				resist: {pawnStat: 1,itemStat: 'soak'},
+				resist: {pawnStat: 'strength',itemStat: 'soak'},
 			},
 			effects: [
 				{type:'wound',stat:'move',name:'blunt',woundType:'physical'},
@@ -646,19 +779,12 @@ var data = {
 	},
 	
 	landscapes: {
-	
-		house: {
-			sprite: 'house',
+		
+		block: {
+			sprite: 'block',
 			blockView: true,
 			exclusive: true,
 			cover: 0,
-		},
-	
-		bushes: {
-			sprite: 'bushes',
-			blockView: true,
-			exclusive: false,
-			cover: 0.5,
 		},
 	
 		boulder: {
@@ -667,11 +793,47 @@ var data = {
 			exclusive: true,
 			cover: 0,
 		},
+	
+		bushes: {
+			sprite: 'bushes',
+			blockView: false,
+			exclusive: false,
+			cover: 0.5,
+		},
+	
+		house: {
+			sprite: 'house',
+			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
+	
+		riverStones: {
+			sprite: 'riverStones',
+			blockView: false,
+			exclusive: false,
+			cover: 0,
+		},
+		
+		rockface: {
+			sprite: 'rockface',
+			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
+	
+		trees: {
+			sprite: 'trees',
+			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
 	},
 	
 	wounds: {
 		bite: ["Nibbled","Bitten","Savaged","Mauled",'Chewed Up'],
 		blunt: ["Dazed","Battered","Bruised","Concussion"],
+		confuse: ["Misled","Distracted","Confused","Frazzled","Baffled","Bewildered","Disoriented"],
 		fire: ["Singed","Toasty","Burnt","Charred"],
 		cold: ["Frostbitten","Chilled","Frozen"],
 		sharp: ["Scratched","Cut Up","Lacerated","Blood Everywhere"],

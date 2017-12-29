@@ -62,9 +62,10 @@ var handlers = {
 	},
 	
 	confirmAndPlay: function() {
-		game.confirmCreation(document.getElementById('nameInput').value);
+		game.confirmCreation(document.getElementById('nameInput').value,document.getElementById('pronounSelect').value);
 		view.hideCreation();
-		game.loadMap();
+		game.loadMap(hellhoundCave);
+// 		game.loadMap();
 	},
 	
 	// Map Handlers
@@ -98,7 +99,7 @@ var handlers = {
 			var gameSVG = document.getElementById('gameSVG');
 			var diffX = (e.pageX - view.camera.dragStartX) / gameSVG.getBoundingClientRect().width;
 			var diffY = (e.pageY - view.camera.dragStartY) / gameSVG.getBoundingClientRect().height;
-			view.camera.x += diffX;
+			view.camera.x -= diffX;
 			view.camera.y -= diffY;
 			view.updateMap();
 		} else if (view.itemDrag.dragging) {
@@ -111,13 +112,14 @@ var handlers = {
 			item.svg.setAttribute('transform','translate('+diffX+','+diffY+')');
 			var slotHover = false;
 			for (var dropTarget of view.itemDrag.dropTargets) {
-				var targetRect, slotType, appropriateSlot;
+				var targetRect, slotPawnID, slotType, appropriateSlot;
 				if (dropTarget.children[0] == undefined) {
 					targetRect = dropTarget.getBoundingClientRect();
 				} else {
 					targetRect = dropTarget.children[0].getBoundingClientRect();
 				};
-				slotType = dropTarget.className.baseVal;
+				slotPawnID = dropTarget.id.split('_')[0];
+				slotType = dropTarget.id.split('_')[1];
 				appropriateSlot = false;
 				if (view.itemDrag.item.slots.indexOf(slotType) !== -1) {
 					appropriateSlot = true;
@@ -129,12 +131,14 @@ var handlers = {
 				if (slotType == 'looseInventory' && e.pageY > targetRect.y && e.pageY < targetRect.y + targetRect.height && e.pageX > targetRect.x && e.pageX < targetRect.x + targetRect.width) {
 // 					view.dragItemSelect(dropTarget);
 					view.itemDrag.selectedSlot = slotType;
+					view.itemDrag.selectedPawn = slotPawnID;
 					slotHover = true;
 				} else if (slotType == 'looseInventory') {
 					view.dragItemClear(dropTarget);
 				} else if (appropriateSlot && e.pageY > targetRect.y && e.pageY < targetRect.y + targetRect.height && e.pageX > targetRect.x && e.pageX < targetRect.x + targetRect.width) {
 					view.dragItemSelect(dropTarget);
 					view.itemDrag.selectedSlot = slotType;
+					view.itemDrag.selectedPawn = slotPawnID;
 					slotHover = true;
 				} else if (!appropriateSlot && e.pageY > targetRect.y && e.pageY < targetRect.y + targetRect.height && e.pageX > targetRect.x && e.pageX < targetRect.x + targetRect.width) {
 					view.dragItemWrongSlot(dropTarget);
@@ -159,10 +163,24 @@ var handlers = {
 			for (var dropTarget of view.itemDrag.dropTargets) {
 				view.dragItemDeselect(dropTarget);
 			};
-			if (view.itemDrag.selectedSlot == 'looseInventory') {
-				view.focus.pawn.unequip(view.itemDrag.item);
-			} else if (view.itemDrag.selectedSlot !== undefined) {
-				view.focus.pawn.equip(view.itemDrag.item,view.itemDrag.selectedSlot);
+			if (view.itemDrag.selectedSlot !== undefined) {
+				var targetPawn;
+				if (view.focus.pawn !== undefined) {
+					view.focus.pawn.unequip(view.itemDrag.item);
+				};
+				if (view.focus.leftTrader !== undefined) {
+					view.focus.leftTrader.unequip(view.itemDrag.item);
+				};
+				if (view.focus.rightTrader !== undefined) {
+					view.focus.rightTrader.unequip(view.itemDrag.item);
+				};
+				var list = game.map.pawns.concat(game.map.things);
+				for (var pawn of list) {
+					if (pawn.id == view.itemDrag.selectedPawn) {
+						targetPawn = pawn;
+					};
+				};
+				targetPawn.equip(view.itemDrag.item,view.itemDrag.selectedSlot);
 			};
 			view.redrawPawn(view.focus.pawn);
 		};
@@ -175,13 +193,18 @@ var handlers = {
 			view.focus.maneuver = undefined;
 			view.clearRangeOptions();
 		} else {
+			if (pawn !== view.focus.pawn) {
+				view.focus.lastPawn = view.focus.pawn;
+			};
 			view.clearMoveOptions();
 			view.clearRangeOptions();
 			if (view.focus.maneuver !== undefined) {
 				view.deselectManeuver(view.focus.maneuver);
 			};
 			view.focus.maneuver = undefined;
-			view.hideSheets();
+			if (view.focus.pawn !== undefined) {
+				view.hideSheets();
+			};
 			view.panToTile(pawn.tile);
 			pawn.select();
 			view.focus.pawn = pawn;
@@ -189,6 +212,8 @@ var handlers = {
 				view.displaySheet(pawn);
 			};
 		};
+		view.closeTrade();
+		view.refreshAllManeuvers();
 	},
 	
 	nextPawn: function() {
@@ -293,8 +318,16 @@ document.addEventListener('keydown',function(event) {
 			if (maneuver !== undefined) {
 				handlers.maneuverSelect(maneuver);
 			};
-		}
-	}
+		};
+	} else if (event.keyCode == 13) {
+		handlers.endTurn();
+	} else if (event.keyCode == 39 || event.keyCode == 32) {
+		handlers.nextPawn();
+	} else if (event.keyCode == 37) {
+		handlers.lastPawn();
+	} else if (event.keyCode == 73 && view.focus.pawn !== undefined) {
+		view.toggleInventoryPane();
+	};
 });
 
 function saveSVG(svgElement, name) {
