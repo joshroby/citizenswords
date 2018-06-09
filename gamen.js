@@ -325,6 +325,7 @@ var gamen = {
 			if (passage.bust == undefined) {
 				document.getElementById('gamenModalBustDiv').style.display = 'none';
 			} else {
+				document.getElementById('gamenModalBustDiv').style.display = 'block';
 				var gamenModalBustDiv = document.getElementById('gamenModalBustDiv');
 				gamenModalBustDiv.appendChild(passage.bust);
 				if (passage.bustPosition == 'right') {

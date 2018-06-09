@@ -218,10 +218,8 @@ function Avatar(pawn,heritages) {
 		var muzzle = false;
 		var noseStroke = false;
 		
-		if (this.parameters.skinColor == undefined) {
-			this.updateColoring();
-		};
-
+		this.updateColoring();
+		
 		var svg = document.createElementNS('http://www.w3.org/2000/svg','g');
 		svg.setAttribute('transform','scale(0.25)');
 		svg.setAttribute('id',this.pawn.id);
@@ -3403,7 +3401,7 @@ function Avatar(pawn,heritages) {
 	this.book = function(item) {
 		if (this.bodyConstants.wrist.id === 'rightWristPivot') {var reflect = 1} else {var reflect = -1};
 
-		var size = item.stats.weight/2;
+		var size = 1+ item.stats.weight/10;
 
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
 		

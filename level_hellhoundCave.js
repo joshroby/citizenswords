@@ -38,6 +38,7 @@ var hellhoundCave = {
 	],
 	
 	standees: [
+		{type:'heroes',locs:[{x:0,y:0},{x:1,y:0},{x:1.5,y:1}]},
 		{type:'landscape',key:'bushes',locs:[
 			{x:5,y:-2},{x:7,y:-2},
 			{x:-0.5,y:-1},{x:0.5,y:-1},{x:1.5,y:-1},
@@ -47,6 +48,7 @@ var hellhoundCave = {
 			{x:-0.5,y:3},
 			{x:4,y:6},
 			]},
+		{type:'landscape',key:'signpost',locs:[{x:-1,y:0}]},
 		{type:'landscape',key:'trees',locs:[{x:-1,y:-2},{x:0,y:-2},{x:1,y:-2},{x:2,y:-2},{x:3,y:-2},{x:6,y:-2},{x:-1,y:2},{x:-1,y:4}]},
 		{type:'landscape',key:'boulder',locs:[{x:5.5,y:-1},{x:16,y:0},{x:11.5,y:1},{x:2,y:2},{x:4,y:2},{x:3,y:4},{x:9.5,y:5}]},
 		{type:'landscape',key:'rockface',locs:[
@@ -62,10 +64,8 @@ var hellhoundCave = {
 			]},
 		{type:'landscape',key:'riverStones',locs:[{x:3,y:2}]},
 		{type:'thing',locs:[{x:13,y:2}]},
-		{type:'pawn',team:'p1',id:'p1',locs:[{x:0,y:0}]},
-		{type:'pawn',team:'p1',id:'mixterStout',locs:[{x:1,y:0}]},
-		{type:'pawn',team:'rats',id:'rat',locs:[{x:10,y:4},{x:10,y:6},{x:12,y:4},{x:11.5,y:5},{x:7.5,y:3},{x:10.5,y:-1}]},
-		{type:'pawn',team:'rats',id:'hellpuppy',locs:[{x:10,y:2}]},
+		{type:'pawn',id:'rat',team:'rats',priorities:{freeze:true},locs:[{x:10,y:4},{x:10,y:6},{x:12,y:4},{x:11.5,y:5},{x:7.5,y:3},{x:10.5,y:-1}]},
+		{type:'pawn',id:'hellpuppy',team:'hell',priorities:{freeze:true},locs:[{x:10,y:2}]},
 	],
 	
 	moveCosts: [
@@ -79,10 +79,12 @@ var hellhoundCave = {
 	
 	triggers: [
 		{check:'load',event:'event1'},
+		{check:'always',event:'signpost',locs:[{x:-1,y:0}]},
 		{check:'caveEntrance',event:'caveEntrance',locs:[{x:6.5,y:5}]},
 		{check:'undergroundRiver',event:'undergroundRiver',locs:[{x:9,y:0}]},
 		{check:'chestSpotted',event:'chestSpotted',locs:[{x:9.5,y:-1},{x:10.5,y:-1},{x:11,y:0}]},
 		{check:'whatElse',event:'whatElse',locs:[{x:12,y:0}]},
+		{check:'hellpuppy',event:'hellpuppy',locs:[{x:12.5,y:1}]},
 	],
 	
 	checks: {
@@ -99,6 +101,9 @@ var hellhoundCave = {
 		whatElse: function(pawn) {
 			return game.currentLevel.flags.whatElse && pawn.team == 'p1';
 		},
+		hellpuppy: function(pawn) {
+			return !game.currentLevel.flags.hellpuppy && pawn.team == 'p1';
+		},
 	},
 	
 	flags: {
@@ -106,6 +111,7 @@ var hellhoundCave = {
 		undergroundRiver: true,
 		chestSpotted: false,
 		whatElse: true,
+		hellpuppy: false,
 	},
 	
 	events: {
@@ -117,11 +123,24 @@ var hellhoundCave = {
 			gamen.displayPassage(introOne);
 			gamen.displayPassage(introTwo);
 		},
+		signpost: function() {
+			var choiceArray = [new Choice('Stay here'),new Choice('Return to the city',game.switchMaps.bind(game,level_orktown))];
+			if (game.currentLevel.flags.hellpuppy) {
+				var signpostPassage = new Passage("Now that you have... dealt with... the hellhound, do you want to head home?",choiceArray,false);
+			} else {
+				var signpostPassage = new Passage("Use the signpost to head back to the city once you've completed the level.  Take care of that hellhound!",choiceArray);
+			};
+			gamen.displayPassage(signpostPassage);
+		},
 		caveEntrance: function(pawn,tile) {
 			var passage = new Passage("Ugh, I see rat droppings.  Is this cave filled with giant rats?  What is this, the first level of a fantasy RPG?",undefined,undefined,pawn.name,pawn.avatar.svg('bust'),'left');
 			gamen.displayPassage(passage);
 			game.currentLevel.flags.caveEntrance = false;
-			console.log('activate rate ai');
+			for (var pawn of game.map.pawns) {
+				if (pawn.team == 'rats') {
+					pawn.priorities.freeze = undefined;
+				};
+			};
 		},
 		undergroundRiver: function(pawn,tile) {
 			var passage = new Passage("Wow, look at all that water!  Fast-flowing, too.  Do you think it's an underground river?" ,undefined,undefined,pawn.name,pawn.avatar.svg('bust'),'left');
@@ -144,7 +163,20 @@ var hellhoundCave = {
 			if (pawn == game.map.heroes[0]) {otherPawn = game.map.heroes[1]};
 			var passage = new Passage("...they might have lost a hellhound, too.",undefined,undefined,otherPawn.name,otherPawn.avatar.svg('bust'),'right');
 			gamen.displayPassage(passage);
-			game.currentLevel.flags.undergroundRiver = false;
+			game.currentLevel.flags.whatElse = false;
+		},
+		hellpuppy: function(pawn,tile) {
+			game.currentLevel.flags.hellpuppy = true;
+			for (var potential of game.map.pawns) {
+				if (potential.id == 'hellpuppy') {
+					var hellpuppy = potential;
+				};
+			};
+			hellpuppy.moveTo(game.map.findTile(12,2));
+			gamen.displayPassage(new Passage("Growl? >snurfle< Woof.",undefined,true,"Terrifying Helhound... Whelp",hellpuppy.avatar.svg(),'left'));
+			gamen.displayPassage(new Passage("Gasp!  Aren't you just the cutest little puppy?  Yes you are!  YES YOU ARE!!!<br />That's it, I'm taking you home!",undefined,true,pawn.name,pawn.avatar.svg('bust'),'right'));
+			gamen.displayPassage(new Passage("Hellpuppy has joined the party!",undefined,true,undefined,hellpuppy.avatar.svg(),'left'));
+			hellpuppy.team = 'p1';
 		},
 	},
 

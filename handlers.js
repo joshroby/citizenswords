@@ -64,8 +64,8 @@ var handlers = {
 	confirmAndPlay: function() {
 		game.confirmCreation(document.getElementById('nameInput').value,document.getElementById('pronounSelect').value);
 		view.hideCreation();
-		game.loadMap(hellhoundCave);
-// 		game.loadMap();
+// 		game.loadMap(hellhoundCave);
+		game.loadMap(level_orktown);
 	},
 	
 	// Map Handlers
@@ -306,6 +306,21 @@ var handlers = {
 		view.clearMoveOptions();
 		view.clearRangeOptions();
 		view.hideSheets();
+	},
+	
+	endLevel: function() {
+		console.log("Ending Level");
+	},
+
+
+	// Debugging
+
+	revealMap: function() {
+		for (var tile of game.map.tiles) {
+			tile.seen = true;
+			view.strokeTile(tile);
+			view.revealTile(tile);
+		};
 	},
 
 };

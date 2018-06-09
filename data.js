@@ -1,14 +1,56 @@
 var data = {
 
 	cast: {
+	
+		aaron: {
+			name: "Aaron Pegomancer",
+			unique: true,
+			pronoun: "Himself",
+			description: "Master Aaron Pegomancer remains an enigmatic figure in Pileas.  Technically a master sorcerer, Aaron shows little interest in business or politics, instead preferring to wander the city, observing the clouds, and dispensing largely inscrutable advice.",
+			avatarParameters: {"eyeColor":"#9a9f35","hairColor":"#473525","blackEumelanin":1,"brownEumelanin":47,"pinkPheomelanin":26,"greenKeratin":21,"noseShading":-4,"nosePinkness":14,"lipShading":43,"lipPinkness":22,"earShading":90,"earPinkness":33,"templePosition":9,"templeWidth":0,"templeHeight":10,"cheekbonePosition":9,"cheekboneWidth":1,"cheekboneHeight":3,"chinHeight":43,"chinWidth":21,"eyeDistance":12,"eyeSize":5,"browSize":5,"insideEyelidCurve":0,"outsideEyelidCurve":6,"lowerEyelidCurve":4,"noseHeight":43,"noseSize":2,"noseWidth":4,"nostrilHeight":5,"noseBump":10,"mouthWidth":12,"lipSize":3,"teeth":1,"leftTusk":0,"rightTusk":0,"earSize":17,"earDip":-14,"earTilt":4,"earWidth":-11,"earLobe":10,"shoulders":31,"belly":17,"hips":15,"feet":15,"hindquarters":0,"leftBrowTilt":1,"rightBrowTilt":0,"smile":7,"mouthOpen":2,"hairLength":21,"hairPart":0,"hairBangs":4,"hairBangsLength":12,"hairSweep":4,"topHairHeight":4,"topHairBase":20,"topHairWidth":13,"hairCurl":1,"horns":3,"bust":4,"heritage":"quarter ogrish quarter gnollish quarter orcish quarter trollish ","skinColor":"#ebbf44","noseColor":"#e29d38","lipColor":"#f4aa74","earColor":"#fda79e"},
+			stats: {move:12,strength:12,focus:20},
+			equipment: {
+				garb: {template:'pegomancersRobes'},
+				left: {template:'pegomancersTome'},
+			},
+			inventory: [],
+		},
+		
+		bossNosh: {
+			name: "Boss Nosh",
+			unique: true,
+			pronoun: "Himmself",
+			description: "Foreman at the warehouse.  Nosh's ears are as round as the King's, but he lives here in Orktown with all the points.",
+			avatarHeritage: ['ogrish'],
+			stats: {move:7,strength:12,focus:4},
+			equipment: {
+				garb: {template: 'roughspun'},
+			},
+			inventory: [],
+		},
 		
 		daisy: {
 			name: "Daisy Moucau",
 			unique: true,
 			pronoun: "Herself",
-			avatarParameters: {skinColor:'#824c38', templePosition:15, templeWidth:1, templeHeight:6, cheekbonePosition:14, cheekboneWidth:5, cheekboneHeight:6, chinHeight:47, chinWidth:30, eyeColor:'#1b0ec0', eyeDistance:19, eyeSize:9, browSize:2, leftBrowTilt:3, rightBrowTilt:1, insideEyelidCurve:0, outsideEyelidCurve:7, lowerEyelidCurve:7, noseColor:'#f37776', noseHeight:73, noseSize:2, noseWidth:9, nostrilHeight:7, noseBump:-3, lipColor:'#551f17', mouthWidth:15, lipSize:2, smile:-2, mouthOpen:1, teeth:0, leftTusk:0, rightTusk:0, earColor:'#9c493f', earSize:21, earDip:-8, earTilt:3, earWidth:-7, earLobe:7, hairColor:'#55284f', hairLength:50, hairCurl:1, hairPart:-4, hairBangs:2, hairBangsLength:2, hairSweep:3, topHairHeight:7, topHairBase:13, topHairWidth:18, horns:7, shoulders:38, bust:22, belly:22, hips:22, feet:0},
+			avatarParameters: {"eyeColor":"#af5088","hairColor":"#edda75","blackEumelanin":54,"brownEumelanin":64,"pinkPheomelanin":25,"greenKeratin":0,"noseShading":61,"nosePinkness":23,"lipShading":-37,"lipPinkness":9,"earShading":66,"earPinkness":41,"templePosition":11,"templeWidth":2,"templeHeight":4,"cheekbonePosition":11,"cheekboneWidth":2,"cheekboneHeight":7,"chinHeight":45,"chinWidth":21,"eyeDistance":15,"eyeSize":7,"browSize":2,"insideEyelidCurve":0,"outsideEyelidCurve":7,"lowerEyelidCurve":4,"noseHeight":65,"noseSize":3,"noseWidth":6,"nostrilHeight":6,"noseBump":9,"mouthWidth":15,"lipSize":4,"teeth":1,"leftTusk":0,"rightTusk":0,"earSize":17,"earDip":-8,"earTilt":0,"earWidth":-5,"earLobe":12,"shoulders":37,"belly":23,"hips":21,"feet":3,"hindquarters":0,"leftBrowTilt":1,"rightBrowTilt":2,"smile":1,"mouthOpen":1,"hairLength":52,"hairPart":-10,"hairBangs":2,"hairBangsLength":8,"hairSweep":2,"topHairHeight":11,"topHairBase":9,"topHairWidth":13,"hairCurl":15,"horns":8,"bust":28,"heritage":"half satyric half centaur ","skinColor":"#75521b","noseColor":"#c99080","lipColor":"#4a2f10","earColor":"#d07469"},
 			stats: {move:9,strength:12,focus:7},
-			equipment: {},
+			equipment: {
+				garb: {template: 'scrapArmor'},
+			},
+			inventory: [],
+		},
+		
+		donRondel: {
+			name: "Don Rondel",
+			unique: true,
+			pronoun: "Himself",
+			description: "Master of the Orktown Racket, influential in the Thieves' Guild.  In addition to providing 'protection' to local merchants, he oversees extensive burglary and smuggling operations.",
+			avatarHeritage: ['trollish'],
+			stats: {move:13,strength:10,focus:8},
+			equipment: {
+				garb: {template: 'scrapArmor'},
+			},
 			inventory: [],
 		},
 		
@@ -16,18 +58,33 @@ var data = {
 			name: "Doti",
 			unique: true,
 			pronoun: "Emself",
+			description: "A hard-as-nails member of the city watch, Doti hails from Orktown but swears ey's left er old neighborhood loyalties behind.  Still, ey's usually good for a little information, at least.",
 			avatarHeritage: ['goblin'],
 			stats: {move:12,strength:12,focus:12},
 			equipment: {
 				left: {template:'simpleSpear'},
+				right: {template:'shield'},
 				garb: {template: 'scrapArmor'},
+			},
+			inventory: [],
+		},
+		
+		elderBock: {
+			name: "Elder Bock",
+			unique: true,
+			pronoun: "Herself",
+			description: "The ranking elder of the Bock Clan, this dwarf is a mover and shaker in the city, even though she has no profession and holds no guild position.",
+			avatarHeritage: ['dwarven'],
+			stats: {move:6,strength:9,focus:16},
+			equipment: {
+				garb: {template:'roughspun'},
 			},
 			inventory: [],
 		},
 		
 		hellpuppy: {
 			name: "Hellpuppy",
-			unique: false,
+			unique: true,
 			pronoun: "Herself",
 			description: "Summoned from an abyssal plane of darkness and fire, this pupper is eager to give you sloppy kisses.",
 			beastType: 'hellpuppy',
@@ -37,17 +94,67 @@ var data = {
 			inventory: [],
 		},
 		
+		iconoclast: {
+			unique: true,
+			description: "A raving would-be revolutionary fixated on religious iconography.",
+			stats: {move:6,strength:8,focus:5},
+			equipment: {
+				garb: {template:'roughspun'},
+			},
+			inventory: [],
+		},
+		
+		guildmasterMoucau: {
+			name: "Guildmaster Moucau",
+			unique: true,
+			pronoun: "Himself",
+			description: "The Mercer Guildmaster, Moucau is a young and energetic politician in addition to a wealthy importer of porcelain.  Someday he'll be mayor... assuming the city survives the next year.",
+			avatarHeritage: ['minotaur'],
+			stats: {move:5,strength:11,focus:11},
+			equipment: {
+				garb: {template:'roughspun'},
+			},
+			inventory: [],
+		},
+		
+		looter: {
+			name: 'Looter',
+			unique: false,
+			description: "Round punks from a better part of town, here in Orktown to smash and grab what they can in the chaos.",
+			avatarHeritage: ['centaur'],
+			stats: {move:8,strength:10,focus:4},
+			equipment: {
+				garb: {template:'scrapArmor'},
+			},
+			inventory: [],
+		},
+		
 		mixterStout: {
 			name: 'Mx. Stout',
 			unique: true,
 			pronoun: 'Themself',
-			avatarParameters: { hairColor:'aqua', skinColor:'#d9895a', templePosition:12, templeWidth:2, templeHeight:5, cheekbonePosition:11, cheekboneWidth:2, cheekboneHeight:6, chinHeight:43, chinWidth:22, eyeColor:'#0e9bb4', eyeDistance:13, eyeSize:8, browSize:4, leftBrowTilt:2, rightBrowTilt:0, insideEyelidCurve:1, outsideEyelidCurve:7, lowerEyelidCurve:5, noseColor:'#de6c50', noseHeight:46, noseSize:3, noseWidth:6, nostrilHeight:8, noseBump:10, lipColor:'#e96557', mouthWidth:13, lipSize:5, smile:3, mouthOpen:3, teeth:2, leftTusk:0, rightTusk:0, earColor:'#e08465', earSize:14, earDip:-8, earTilt:-3, earWidth:-5, earLobe:14, hairLength:14, hairCurl:4, hairPart:-7, hairBangs:6, hairBangsLength:14, hairSweep:5, topHairHeight:2, topHairBase:12, topHairWidth:6, horns:0, shoulders:32, bust:10, belly:20, hips:15, feet:20},
+			avatarParameters: { hairColor:'aqua', blackEumelanin:5, brownEumelanin:12, pinkPheomelanin:38, greenKeratin:9, noseShading:7, nosePinkness:20, lipShading:12, lipPinkness:28, earShading:18, earPinkness:36, templePosition:12, templeWidth:2, templeHeight:5, cheekbonePosition:11, cheekboneWidth:2, cheekboneHeight:6, chinHeight:43, chinWidth:22, eyeColor:'#0e9bb4', eyeDistance:13, eyeSize:8, browSize:4, leftBrowTilt:2, rightBrowTilt:0, insideEyelidCurve:1, outsideEyelidCurve:7, lowerEyelidCurve:5, noseColor:'#de6c50', noseHeight:46, noseSize:3, noseWidth:6, nostrilHeight:8, noseBump:10, lipColor:'#e96557', mouthWidth:13, lipSize:5, smile:3, mouthOpen:3, teeth:2, leftTusk:0, rightTusk:0, earColor:'#e08465', earSize:14, earDip:-8, earTilt:-3, earWidth:-5, earLobe:14, hairLength:14, hairCurl:4, hairPart:-7, hairBangs:6, hairBangsLength:14, hairSweep:5, topHairHeight:2, topHairBase:12, topHairWidth:6, horns:0, shoulders:32, bust:10, belly:20, hips:15, feet:20},
 			stats: {move:8,strength:9,focus:12},
 			equipment: {
 				left: {template:'initiatesTome'},
 				garb: {template:'initiatesRobes'},
+				right: undefined,
 			},
 			inventory: [{template:'firstAidKit'}],
+		},
+		
+		motherSkullgoblet: {
+			name: 'Mother Skullgoblet',
+			unique: true,
+			pronoun: "Herself",
+			description: "A fixture of Orktown for as long as anyone can remember, Mother Skullgoblet runs a shop catering to the neighborhood's needs.  While no one would call her soft-hearted, everyone in the neighborhood knows her kitchen table always has an extra seat for hungry kids.",
+			avatarParameters: {blackEumelanin:38,brownEumelanin:22,pinkPheomelanin:27,greenKeratin:29,noseShading:0,nosePinkness:0,lipShading:0,lipPinkness:0,earShading:18,earPinkness:0,"templePosition":10,"templeWidth":5,"templeHeight":4,"cheekbonePosition":13,"cheekboneWidth":3,"cheekboneHeight":5,"chinHeight":50,"chinWidth":26,"eyeColor":"#a27666","eyeDistance":11,"eyeSize":6,"browSize":0,"leftBrowTilt":-2,"rightBrowTilt":2,"insideEyelidCurve":-2,"outsideEyelidCurve":8,"lowerEyelidCurve":5,"noseColor":"#9e6710","noseHeight":34,"noseSize":5,"noseWidth":5,"nostrilHeight":4,"noseBump":-2,"lipColor":"#bd7641","mouthWidth":15,"lipSize":3,"smile":-7,"mouthOpen":5,"teeth":2,"leftTusk":2,"rightTusk":0,"earColor":"#be9050","earSize":13,"earDip":-20,"earTilt":0,"earWidth":29,"earLobe":12,"hairColor":"#c3bcb5","hairLength":22,"hairCurl":12,"hairPart":-1,"hairBangs":8,"hairBangsLength":5,"hairSweep":0,"topHairHeight":0,"topHairBase":15,"topHairWidth":2,"horns":0,"shoulders":30,"bust":32,"belly":25,"hips":23,"feet":12},
+			stats: {move:4,strength:10,focus:12},
+			equipment: {
+				garb: {template: 'roughspun'},
+			},
+			inventory: [],
+			vendor: true,
 		},
 		
 		rat: {
@@ -60,6 +167,19 @@ var data = {
 			equipment: {
 				teeth: {template: 'ratTeeth'},
 				hide: {template: 'ratHide'},
+			},
+			inventory: [],
+		},
+		
+		vicarKakkel: {
+			name: "Vicar Kakkel",
+			unique: true,
+			pronoun: "Herself",
+			description: "The only clergy assigned to the dilapidated Orktown Temple, Kakkel is a subject of both great respect and great mistrust in the community, mostly because she's been here for less than a year.",
+			avatarHeritage: ['gnollish','gnollish','gnollish','gnomish'],
+			stats: {move:6,strength:6,focus:12},
+			equipment: {
+				garb: {template:'initiatesRobes'},
 			},
 			inventory: [],
 		},
@@ -284,6 +404,14 @@ var data = {
 			svgNodes: undefined,
 		},
 		
+		candelabrum: {
+			name: "Candelabrum",
+			slots: [],
+			colors: {
+				base: 'goldenrod',
+			},
+		},
+		
 		cargoHook: {
 			name: "Cargo Hook",
 			slots: ['left','right'],
@@ -364,7 +492,7 @@ var data = {
 			maneuvers: ['beam','quickTrance'],
 			svgNodes: function(item) {return item.pawn.avatar.book(item)},
 		},
-	
+		
 		mothersSword: {
 			name: "Mother's Sword",
 			description: "This broken sword is the only thing you have left from your Mother.",
@@ -386,6 +514,44 @@ var data = {
 			svgNodes: function(item) {return item.pawn.avatar.simpleSword(item)},
 		},
 		
+		pegomancersRobes: {
+			name: "Sky Blue Robes",
+			slots: ['garb'],
+			colors: {
+				robe: 'steelblue',
+				edging: 'ivory',
+				panel: 'skyblue',
+				sash: 'ivory',
+				torso: {fill:'steelblue'},
+				upperArms: {fill:'steelblue'},
+				lowerArms: {fill:'steelblue'},
+				legs: {fill:'steelblue'},
+			},
+			stats: {
+				deflection: 3,
+				soak: 3,
+				weight: 5,
+				aegis: 5,
+			},
+			svgNodes: function(item) {return item.pawn.avatar.simpleRobe(item)},
+		},
+		
+		pegomancersTome: {
+			name: "Pegomancy Tome",
+			slots: ['left','right'],
+			colors: {
+				cover: 'indigo',
+				pages: 'aliceblue',
+			},
+			stats: {
+				aegis: 3,
+				arcane: 5,
+				weight: 8,
+			},
+			maneuvers: ['beam','quickTrance'],
+			svgNodes: function(item) {return item.pawn.avatar.book(item)},
+		},
+	
 		ratHide: {
 			name: "Rat Hide",
 			slots: ['hide'],
@@ -413,6 +579,7 @@ var data = {
 		
 		roughspun: {
 			name: "Roughspun Clothes",
+			description: "Commoner's clothes, sturdy and easily laundered.",
 			slots: ['garb'],
 			colors: {
 				shirt: ["INDIANRED","LIGHTCORAL","SALMON","DARKSALMON","LIGHTSALMON","CRIMSON","RED","FIREBRICK","DARKRED","PINK","LIGHTPINK","HOTPINK","DEEPPINK","MEDIUMVIOLETRED","PALEVIOLETRED","LIGHTSALMON","CORAL","TOMATO","ORANGERED","DARKORANGE","ORANGE","GOLD","YELLOW","LIGHTYELLOW","LEMONCHIFFON","LIGHTGOLDENRODYELLOW","PAPAYAWHIP","MOCCASIN","PEACHPUFF","PALEGOLDENROD","KHAKI","DARKKHAKI","LAVENDER","THISTLE","PLUM","VIOLET","ORCHID","FUCHSIA","MAGENTA","MEDIUMORCHID","MEDIUMPURPLE","REBECCAPURPLE","BLUEVIOLET","DARKVIOLET","DARKORCHID","DARKMAGENTA","PURPLE","INDIGO","SLATEBLUE","DARKSLATEBLUE","MEDIUMSLATEBLUE","GREENYELLOW","CHARTREUSE","LAWNGREEN","LIME","LIMEGREEN","PALEGREEN","LIGHTGREEN","MEDIUMSPRINGGREEN","SPRINGGREEN","MEDIUMSEAGREEN","SEAGREEN","FORESTGREEN","GREEN","DARKGREEN","YELLOWGREEN","OLIVEDRAB","OLIVE","DARKOLIVEGREEN","MEDIUMAQUAMARINE","DARKSEAGREEN","LIGHTSEAGREEN","DARKCYAN","TEAL","AQUA","CYAN","LIGHTCYAN","PALETURQUOISE","AQUAMARINE","TURQUOISE","MEDIUMTURQUOISE","DARKTURQUOISE","CADETBLUE","STEELBLUE","LIGHTSTEELBLUE","POWDERBLUE","LIGHTBLUE","SKYBLUE","LIGHTSKYBLUE","DEEPSKYBLUE","DODGERBLUE","CORNFLOWERBLUE","MEDIUMSLATEBLUE","ROYALBLUE","BLUE","MEDIUMBLUE","DARKBLUE","NAVY","MIDNIGHTBLUE","CORNSILK","BLANCHEDALMOND","BISQUE","NAVAJOWHITE","WHEAT","BURLYWOOD","TAN","ROSYBROWN","SANDYBROWN","GOLDENROD","DARKGOLDENROD","PERU","CHOCOLATE","SADDLEBROWN","SIENNA","BROWN","MAROON","SNOW","HONEYDEW","MINTCREAM","AZURE","ALICEBLUE","GHOSTWHITE","WHITESMOKE","SEASHELL","BEIGE","OLDLACE","FLORALWHITE","IVORY","ANTIQUEWHITE","LINEN","LAVENDERBLUSH","MISTYROSE","GAINSBORO","LIGHTGRAY","SILVER","DARKGRAY","GRAY","DIMGRAY","LIGHTSLATEGRAY","SLATEGRAY","DARKSLATEGRAY"],
@@ -431,6 +598,7 @@ var data = {
 		
 		scrapArmor: {
 			name: "Scrap Armor",
+			description: "Leather armor built out of scraps.",
 			slots: ['garb'],
 			colors: {
 				bandOne: '#A0522D',
@@ -464,6 +632,25 @@ var data = {
 			},
 			maneuvers: ['shieldBash'],
 			svgNodes: function(item) {return item.pawn.avatar.simpleShield(item)},
+		},
+		
+		simpleSpear: {
+			name: "Spear",
+			slots: ['left','right'],
+			colors: {
+				head: 'silver',
+				shaft: 'saddlebrown',
+				bindings: 'blue',
+			},
+			stats: {
+				balance: 1,
+				reach: 4,
+				sharp: 3,
+				sharpBase: 3,
+				weight: 3,
+			},
+			maneuvers: ['lunge'],
+			svgNodes: function(item) {return item.pawn.avatar.simpleSpear(item)},
 		},
 	
 		shortSword: {
@@ -800,11 +987,74 @@ var data = {
 			exclusive: false,
 			cover: 0.5,
 		},
+		
+		brickWallTower: {
+			sprite: 'brickWallTower',
+			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
+		
+		brickWallLeft: {
+			sprite: 'brickWallLeft',
+			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
+		
+		brickWallRight: {
+			sprite: 'brickWallRight',
+			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
+		
+		cityWall: {
+			sprite: 'cityWall',
+			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
+	
+		fence: {
+			sprite: 'fence',
+			blockView: false,
+			exclusive: true,
+			cover: 0,
+		},
 	
 		house: {
 			sprite: 'house',
 			blockView: true,
 			exclusive: true,
+			cover: 0,
+		},
+		
+		marketLeft: {
+			sprite: 'marketLeft',
+			blockView: false,
+			exclusive: false,
+			cover: 0.9,
+		},
+		
+		marketCenter: {
+			sprite: 'marketCenter',
+			blockView: false,
+			exclusive: false,
+			cover: 0.9,
+		},
+		
+		marketRight: {
+			sprite: 'marketRight',
+			blockView: false,
+			exclusive: true,
+			cover: 0.9,
+		},
+		
+		marketBacking: {
+			sprite: 'marketBacking',
+			blockView: false,
+			exclusive: false,
 			cover: 0,
 		},
 	
@@ -821,10 +1071,38 @@ var data = {
 			exclusive: true,
 			cover: 0,
 		},
+		
+		signpost: {
+			sprite: 'signpost',
+			blockView: false,
+			exclusive: false,
+			cover: 0,
+		},
+		
+		silo: {
+			sprite: 'silo',
+			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
 	
 		trees: {
 			sprite: 'trees',
 			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
+	
+		wagon: {
+			sprite: 'wagon',
+			blockView: false,
+			exclusive: false,
+			cover: 0,
+		},
+	
+		well: {
+			sprite: 'well',
+			blockView: false,
 			exclusive: true,
 			cover: 0,
 		},

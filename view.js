@@ -4,7 +4,7 @@ var view = {
 		x: 100,
 		y: 100,
 		z: 10,
-		offsetY: 5,
+		offsetY: 3,
 		distCameraToScreen: 20,
 		destinations: [],
 	},
@@ -261,6 +261,7 @@ var view = {
 		} else {
 			raceString += 'round.';
 		};
+		game.avatar.pointness = pointness;
 		raceP.innerHTML = raceString;
 	},	
 	
@@ -483,25 +484,6 @@ var view = {
 			};
 		};
 		
-		var house = document.createElementNS('http://www.w3.org/2000/svg','g');
-		house.id = 'house';
-		defs.appendChild(house);
-		var longSide = document.createElementNS('http://www.w3.org/2000/svg','polygon');
-		house.appendChild(longSide);
-		longSide.setAttribute('points','-50,-40 -50,0 20,20 20,-20');
-		longSide.setAttribute('fill','floralwhite');
-		longSide.setAttribute('stroke','black');
-		var shortSide = document.createElementNS('http://www.w3.org/2000/svg','polygon');
-		house.appendChild(shortSide);
-		shortSide.setAttribute('points','50,-40 50,0 20,20 20,-20 35,-60');
-		shortSide.setAttribute('fill','floralwhite');
-		shortSide.setAttribute('stroke','black');
-		var top = document.createElementNS('http://www.w3.org/2000/svg','polygon');
-		house.appendChild(top);
-		top.setAttribute('points','20,-20 -50,-40 -35,-80 35,-60');
-		top.setAttribute('fill','saddlebrown');
-		top.setAttribute('stroke','black');
-		
 		var boulder = document.createElementNS('http://www.w3.org/2000/svg','g');
 		boulder.id = 'boulder';
 		defs.appendChild(boulder);
@@ -525,6 +507,261 @@ var view = {
 			polygon.setAttribute('stroke',facet.stroke);
 			polygon.setAttribute('points',facet.points);
 		};
+		
+		var bushes = document.createElementNS('http://www.w3.org/2000/svg','g');
+		bushes.id = 'bushes';
+		defs.appendChild(bushes);
+		for (var bush of [{x:-20,y:-10},{x:20,y:-8},{x:-5,y:5},]) {
+			var polygon = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+			bushes.appendChild(polygon);
+			polygon.setAttribute('points',bush.x + ',' + bush.y + ' ' + (bush.x-2) + ',' + (bush.y+17) + ' ' + (bush.x+2) + ',' + (bush.y+17) );
+			polygon.setAttribute('fill','saddlebrown');
+			polygon.setAttribute('stroke','black');
+			var ellipse = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+			bushes.appendChild(ellipse);
+			ellipse.setAttribute('cx',bush.x);
+			ellipse.setAttribute('cy',bush.y);
+			ellipse.setAttribute('rx',16);
+			ellipse.setAttribute('ry',12);
+			ellipse.setAttribute('fill','green');
+			ellipse.setAttribute('stroke','black');
+		}
+		
+		var brickWallTower = document.createElementNS('http://www.w3.org/2000/svg','g');
+		brickWallTower.id = 'brickWallTower';
+		defs.appendChild(brickWallTower);
+		brickWallTower.setAttribute('stroke','black');
+		brickWallTower.setAttribute('stroke-width','0.5');
+		brickWallTower.setAttribute('stroke-linecap','round');
+		brickWallTower.setAttribute('stroke-linejoin','round');
+		var shapes = [
+			{tag:"rect", x:"-0.833", y:"-127.667", fill:"#C49A6C", width:"1.5", height:"25.167"},
+			{tag:"path", fill:"#009444", d:"M9.312-121.777c-0.207-1.757,3.896-2.157,4.197-3.344l-0.442,5.309C13.066-119.812,9.519-120.021,9.312-121.777z"},
+			{tag:"path", fill:"#006838", d:"M9.312-121.777c0.449,3.8,14.366-1.579,16.832-2.016c-2.629,3.493-9.473,7.926-16.144,7.419C9.954-117.874,8.674-120.249,9.312-121.777z"},
+			{tag:"path", fill:"#006838", d:"M0.579-119.201c1.609-0.412,3.479-0.484,5.191-0.494c1.156-0.007,2.416-0.028,3.525,0.188l-0.137-2.087c-0.272-2.309,7.137-2.444,3.192-4.824c-2.276-1.375-8.948-0.582-11.738-0.386L0.579-119.201z"},
+			{tag:"circle", fill:"#FBB040", cx:"-0.083", cy:"-129.221", r:"1.554"},
+			{tag:"polyline", fill:"#622130", points:"-3.06,-17.144 27.996,-17.144 29.71,-2.601 25.619,11.859 -25.759,11.859 -29.851,-2.601 -28.136,-17.144 2.921,-17.144"},
+			{tag:"polygon", fill:"#622130", points:"27.996,-17.144 22.816,-2.685 -22.957,-2.685 -28.136,-17.144"},
+			{tag:"polygon", fill:"#3A1414", points:"-15.818,-101.5 -12.711,-106.666 -18.691,-8.122 -22.938,-14.783"},
+			{tag:"polygon", fill:"#622130", points:"18.551,-8.122 12.569,-106.666 -0.07,-106.666 -12.711,-106.666 -18.691,-8.122"},
+			{tag:"polygon", fill:"#622130", points:"15.678,-101.5 12.569,-106.666 18.551,-8.122 22.797,-14.783"},
+			{tag:"polygon", fill:"#3A1414", points:"-22.957,-2.685 -28.136,-17.144 -29.851,-2.601 -25.759,11.859"},
+// 			{tag:"polyline", fill:"#622130", points:"51,3.705 28.216,3.705 25.482,-10.975 20.533,-11.232 15.153,-95.111 51,-95.111"},
+// 			{tag:"polyline", fill:"#622130", points:"-51,3.705 -28.215,3.705 -25.482,-10.975 -20.533,-11.232 -15.152,-95.111 -51,-95.111"},
+		];
+		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			brickWallTower.appendChild(newShape);
+			for (var tag in shape) {
+				if (tag !== 'tag') {
+					newShape.setAttribute(tag,shape[tag]);
+				};
+			};
+		};
+		
+		var brickWallLeft = document.createElementNS('http://www.w3.org/2000/svg','g');
+		brickWallLeft.id = 'brickWallLeft';
+		defs.appendChild(brickWallLeft);
+		brickWallLeft.setAttribute('stroke','black');
+		brickWallLeft.setAttribute('stroke-width','0.5');
+		brickWallLeft.setAttribute('stroke-linecap','round');
+		brickWallLeft.setAttribute('stroke-linejoin','round');
+		var shapes = [
+// 			{tag:"polyline", fill:"#622130", points:"51,3.705 28.216,3.705 25.482,-10.975 20.533,-11.232 15.153,-95.111 51,-95.111"},
+			{tag:"polyline", fill:"#622130", points:"-51,3.705 -28.215,3.705 -25.482,-10.975 -20.533,-11.232 -15.152,-95.111 -51,-95.111"},
+		];
+		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			brickWallLeft.appendChild(newShape);
+			for (var tag in shape) {
+				if (tag !== 'tag') {
+					newShape.setAttribute(tag,shape[tag]);
+				};
+			};
+		};
+		
+		var brickWallRight = document.createElementNS('http://www.w3.org/2000/svg','g');
+		brickWallRight.id = 'brickWallRight';
+		defs.appendChild(brickWallRight);
+		brickWallRight.setAttribute('stroke','black');
+		brickWallRight.setAttribute('stroke-width','0.5');
+		brickWallRight.setAttribute('stroke-linecap','round');
+		brickWallRight.setAttribute('stroke-linejoin','round');
+		var shapes = [
+			{tag:"polyline", fill:"#622130", points:"51,3.705 28.216,3.705 25.482,-10.975 20.533,-11.232 15.153,-95.111 51,-95.111"},
+// 			{tag:"polyline", fill:"#622130", points:"-51,3.705 -28.215,3.705 -25.482,-10.975 -20.533,-11.232 -15.152,-95.111 -51,-95.111"},
+		];
+		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			brickWallRight.appendChild(newShape);
+			for (var tag in shape) {
+				if (tag !== 'tag') {
+					newShape.setAttribute(tag,shape[tag]);
+				};
+			};
+		};
+		
+		var cityWall = document.createElementNS('http://www.w3.org/2000/svg','g');
+		cityWall.id = 'cityWall';
+		defs.appendChild(cityWall);
+		cityWall.setAttribute('stroke','black');
+		cityWall.setAttribute('stroke-width','0.5');
+		cityWall.setAttribute('stroke-linecap','round');
+		cityWall.setAttribute('stroke-linejoin','round');
+		var shapes = [
+			{tag:"path", fill:"#E6E7E8", stroke:'none', d:"M46.333-29.292c0-5.294-11.193-9.586-25-9.586s-27,4.292-27,9.586s-9.193,9.586-23,9.586 s-25-4.292-25-9.586v-14.516c0,0,2,0.726,2,4.434c0,1.956,12.854,7.318,23,7.319c13.807,0,23-4.292,23-9.586 s13.193-9.586,27-9.586s25,4.292,25,9.586V-29.292z"},
+			{tag:"path", fill:"#A7A9AC", d:"M46.335-43.809c-4.197-3.562-14.419-6.083-25.001-6.083 c-13.807,0-27,4.292-27,9.586s-9.193,9.586-23,9.586s-23-4.292-23-9.586v-4.559c0,5.294,9.193,9.586,23,9.586s23-4.292,23-9.586 s13.193-9.586,27-9.586c10.578,0,20.794,2.519,24.995,6.078L46.335-43.809z"},
+			{tag:"path", fill:"#A7A9AC", d:"M-53.67-34.051c4.195,3.562,14.419,6.084,25.004,6.084 c13.807,0,27-4.292,27-9.586s9.193-9.586,23-9.586s25,4.292,25,9.586c0,1.235,0,47.027,0,47.027c0-5.294-11.193-9.586-25-9.586 s-23,4.292-23,9.586s-13.193,9.586-27,9.586s-25-4.292-25-9.586L-53.67-34.051z"},
+			{tag:"path", fill:"#A7A9AC", d:"M-7.531-31.74 l1.287-0.756V14.02H-6.25c1.342,0.433,2.946,0.685,4.671,0.685c4.708,0,8.525-1.877,8.525-4.191v-60.404h-17.052v15.431 L-7.531-31.74z"},
+			{tag:"path", fill:"#006838", d:"M8.44-49.892 c0,2.314-4.486,4.191-10.019,4.191c-5.534,0-10.02-1.876-10.02-4.191s10.02-15.55,10.02-15.55S8.44-52.206,8.44-49.892z"},
+			{tag:"polyline", points:"-8.857,-33.143  -8.857,-40.096 -7.841,-39.57 -7.858,-32.086 "},
+			{tag:"path", d:"M1.191-36.251 c1.002,0,1.867-0.5,2.263-1.216v-4.31l-1.28-1.264l-0.996,1.686L1.191-36.251z"},
+			{tag:"path", fill:"#A7A9AC", d:"M-53.671-48.373c1.283,1.086,2.005,2.27,2.005,3.508v4.559 c0-1.236-0.72-2.418-1.999-3.503"},
+		];
+		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			cityWall.appendChild(newShape);
+			for (var tag in shape) {
+				if (tag !== 'tag') {
+					newShape.setAttribute(tag,shape[tag]);
+				};
+			};
+		};
+		
+		var fence = document.createElementNS('http://www.w3.org/2000/svg','g');
+		fence.id = 'fence';
+		defs.appendChild(fence);
+		fence.setAttribute('fill','ivory');
+		fence.setAttribute('stroke','black');
+		fence.setAttribute('stroke-width','0.5');
+		fence.setAttribute('stroke-linecap','round');
+		fence.setAttribute('stroke-linejoin','round');
+		for (var p=0;p<4;p++) {
+			var post = document.createElementNS('http://www.w3.org/2000/svg','rect');
+			fence.appendChild(post);
+			post.setAttribute('x',p * 25 - 37.5);
+			post.setAttribute('y',-5);
+			post.setAttribute('width',5);
+			post.setAttribute('height',30);
+		};
+		var topRail = document.createElementNS('http://www.w3.org/2000/svg','rect');
+		fence.appendChild(topRail);
+		topRail.setAttribute('x',-51);
+		topRail.setAttribute('y',-0);
+		topRail.setAttribute('width',102);
+		topRail.setAttribute('height',5);
+		var bottomRail = document.createElementNS('http://www.w3.org/2000/svg','rect');
+		fence.appendChild(bottomRail);
+		bottomRail.setAttribute('x',-51);
+		bottomRail.setAttribute('y',10);
+		bottomRail.setAttribute('width',102);
+		bottomRail.setAttribute('height',5);
+
+		var house = document.createElementNS('http://www.w3.org/2000/svg','g');
+		house.id = 'house';
+		defs.appendChild(house);
+		var longSide = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+		house.appendChild(longSide);
+		longSide.setAttribute('points','-50,-40 -50,0 20,20 20,-20');
+		longSide.setAttribute('fill','floralwhite');
+		longSide.setAttribute('stroke','black');
+		var shortSide = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+		house.appendChild(shortSide);
+		shortSide.setAttribute('points','50,-40 50,0 20,20 20,-20 35,-60');
+		shortSide.setAttribute('fill','floralwhite');
+		shortSide.setAttribute('stroke','black');
+		var top = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+		house.appendChild(top);
+		top.setAttribute('points','20,-20 -50,-40 -35,-80 35,-60');
+		top.setAttribute('fill','saddlebrown');
+		top.setAttribute('stroke','black');
+		
+		var marketLeft = document.createElementNS('http://www.w3.org/2000/svg','g');
+		marketLeft.id = 'marketLeft';
+		defs.appendChild(marketLeft);
+		marketLeft.setAttribute('stroke','black');
+		var shapes = [
+// 			{tag:'polygon', fill:"#3C2415", points:"-1,92.663 99,90.735 99,10.876 -1,10.876"},
+			{tag:'polyline', fill:"#A97C50", points:"101.721,96.809 67.623,98.124 67.623,21.48 30.842,20.945 30.842,99.543 19,100 19,0 101.721,2.358"},	
+			{tag:'polygon', fill:"#A97C50", points:"-1,5.42 19,0 19,100 -1,92.663"},
+		];
+		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			marketLeft.appendChild(newShape);
+			for (var tag in shape) {
+				if (tag !== 'tag') {
+					newShape.setAttribute(tag,shape[tag]);
+				};
+			};
+		};
+		
+		var marketCenter = document.createElementNS('http://www.w3.org/2000/svg','g');
+		marketCenter.id = 'marketCenter';
+		defs.appendChild(marketCenter);
+		marketCenter.setAttribute('stroke','black');
+		var shapes = [
+// 			{tag:'polygon', fill:"#3C2415", points:"0,92.663 95,90.735 95,10.876 0,10.876"},
+			{tag:'path', fill:"#A97C50", d:"M105.14,92.663l-108.66,4.193V2.323L105.14,5.42V92.663z M82.493,61.604V26.545l-3.063-3.494l-44.522-0.653l-3.287,3.533v36.406"},	
+			{tag:'polygon', fill:"#8B5E3C", points:"89.396,70.747 82.493,65.391 82.493,61.621 31.62,62.357 31.62,66.27 26.195,72.151"},	
+			{tag:'polygon', fill:"#C49A6C", points:"26.195,76.295 26.195,72.151 89.396,70.747 89.396,74.701"},
+		];
+		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			marketCenter.appendChild(newShape);
+			for (var tag in shape) {
+				if (tag !== 'tag') {
+					newShape.setAttribute(tag,shape[tag]);
+				};
+			};
+		};
+		
+		var marketRight = document.createElementNS('http://www.w3.org/2000/svg','g');
+		marketRight.id = 'marketRight';
+		defs.appendChild(marketRight);
+		marketRight.setAttribute('stroke','black');
+		var shapes = [
+			{tag:'polyline', fill:"#A97C50", points:"4.048,91.744 96,88.196 96,6.982 4.048,4.361"},
+			{tag:'path', fill:"#BE1E2D", d:"M35.257,27.341c0,5.23-2.534,9.461-5.675,9.45c-3.154-0.012-5.725-4.299-5.725-9.576c0-5.277,2.57-9.508,5.725-9.449C32.723,17.824,35.257,22.112,35.257,27.341z M30.254,21.628c-1.671-0.026-3.03,2.524-3.03,5.696c0,3.173,1.359,5.753,3.03,5.764c1.668,0.011,3.018-2.54,3.018-5.697S31.922,21.654,30.254,21.628z"},
+			{tag:'polygon', fill:"#BE1E2D", points:"37.688,36.084 36.646,25.24 39.025,25.271 39.025,26.667 41.691,25.305 42.429,27.421 39.544,28.94 39.025,36.09"},
+			{tag:'polygon', fill:"#BE1E2D", points:"42.429,18.005 43.314,36.108 45.081,36.116 45.081,31.427 47.429,33.179 48.159,30.758 45.301,28.477 48.159,25.387 46.842,23.636 44.492,25.34 43.903,18.032"},
+			{tag:'path', fill:"#BE1E2D", d:"M48.159,27.139v2.773l1.753,0.016l-0.876,6.051c0,0,1.607,0.353,1.752,0.008s0-6.051,0-6.051l2.181-0.652v-2.089l-2.181-0.025v-3.977l-1.604-0.023l0.291,3.985L48.159,27.139z"},
+			{tag:'polygon', fill:"#BE1E2D", points:"66.449,36.562 67.319,26.518 69.054,26.242 70.31,33.088 70.791,27.507 72.613,27.756 71.251,36.975 69.145,36.702 68.376,30.775 67.596,36.502"},
+			{tag:'path', fill:"#BE1E2D", d:"M59.322,31.455c0,2.893-1.191,5.233-2.663,5.227c-1.477-0.005-2.676-2.365-2.676-5.27c0-2.905,1.199-5.246,2.676-5.227C58.131,26.203,59.322,28.562,59.322,31.455z M56.453,28.537c-0.705-0.007-1.278,1.193-1.278,2.682s0.573,2.698,1.278,2.703c0.706,0.004,1.277-1.196,1.277-2.682C57.73,29.754,57.159,28.544,56.453,28.537z"},
+			{tag:'polygon', fill:"#BE1E2D", points:"34.806,38.939 36.84,38.943 39.234,46.829 40.878,38.212 42.498,38.217 44.623,55.318 42.872,55.337 40.878,44.125 40.178,49.599 37.985,49.761 35.701,43.097 35.08,55.422 33.165,54.699"},
+			{tag:'path', fill:"#BE1E2D", d:"M44.623,52.224l1.559-8.846l1.677-0.002l2.602,8.798l-0.839,0.594l-2.072-3.51l-1.367-0.139l-0.811,3.688L44.623,52.224z M47.549,47.493l-0.56-2.792L46.182,47.5L47.549,47.493z"},
+			{tag:'polygon', fill:"#BE1E2D", points:"50.46,44.692 51.324,54.219 53.051,54.201 52.314,46.773 54.996,44.68 53.911,43.367 52.314,44.687 51.694,43.37"},
+			{tag:'polygon', fill:"#BE1E2D", points:"65.165,46.15 65.165,48.18 67.377,48.168 67.377,53.378 68.777,53.364 68.777,47.472 70.462,47.464 70.462,45.119 68.656,45.125 68.536,42.089 66.732,42.09 66.732,45.42"},
+			{tag:'polygon', opacity:"0.2", fill:"#FFE09F", points:"59.952,27.254 60.438,36.182 64.561,36.199 65.769,27.321"},
+			{tag:'path', opacity:"0.2", fill:"#FFE09F", d:"M55.921,38.993l0.738,15.171l6.207-0.743c0,0,0.97-2.098,0.97-4.699c0-2.602-3.154-3.9-3.154-3.9l-2.314-0.139l-1.101-5.687L55.921,38.993z"},
+			{tag:'polygon', fill:"#8B5E3C", points:"44.562,83.323 66.327,79.223 56.289,75.688 38.637,79.248 "},
+			{tag:'polygon', fill:"#8B5E3C", points:"44.562,95.213 44.562,83.323 66.327,79.223 66.327,90.392 "},
+			{tag:'polygon', fill:"#8B5E3C", points:"38.637,91.099 38.637,79.248 44.562,83.323 44.562,95.213 "},
+			{tag:'path', fill:"#8B5E3C", d:"M86.982,92.88c0,1.289-5.349,2.333-11.946,2.333S63.09,94.169,63.09,92.88c0,0-1-6.007-1-14.631s1-14.633,1-14.633c0-1.288,5.349-2.332,11.946-2.332s11.946,1.044,11.946,2.332c0,0,1,5.443,1,14.633S86.982,92.88,86.982,92.88z"},
+			{tag:'ellipse', fill:"#A97C50", cx:"75.036", cy:"63.096", rx:"11.946", ry:"2.333"},
+		];
+		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			marketRight.appendChild(newShape);
+			for (var tag in shape) {
+				if (tag !== 'tag') {
+					newShape.setAttribute(tag,shape[tag]);
+				};
+			};
+		};
+		marketRight.setAttribute('transform','translate(-50,-75)');
+		marketLeft.setAttribute('transform','translate(-50,-75)');
+		marketCenter.setAttribute('transform','translate(-50,-75)');
+
+		var marketBacking = document.createElementNS('http://www.w3.org/2000/svg','g');
+		marketBacking.id = 'marketBacking';
+		defs.appendChild(marketBacking);
+		var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+		marketBacking.appendChild(rect);
+		rect.setAttribute('x',-50);
+		rect.setAttribute('y',-70);
+		rect.setAttribute('height',70);
+		rect.setAttribute('width',100);
+		rect.setAttribute('fill','#3C2415');
 		
 		var riverStones = document.createElementNS('http://www.w3.org/2000/svg','g');
 		riverStones.id = 'riverStones';
@@ -571,26 +808,48 @@ var view = {
 				shape.setAttribute('points',facet);
 			};
 		};
-
 		
-		var bushes = document.createElementNS('http://www.w3.org/2000/svg','g');
-		bushes.id = 'bushes';
-		defs.appendChild(bushes);
-		for (var bush of [{x:-20,y:-10},{x:20,y:-8},{x:-5,y:5},]) {
-			var polygon = document.createElementNS('http://www.w3.org/2000/svg','polygon');
-			bushes.appendChild(polygon);
-			polygon.setAttribute('points',bush.x + ',' + bush.y + ' ' + (bush.x-2) + ',' + (bush.y+17) + ' ' + (bush.x+2) + ',' + (bush.y+17) );
-			polygon.setAttribute('fill','saddlebrown');
-			polygon.setAttribute('stroke','black');
-			var ellipse = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
-			bushes.appendChild(ellipse);
-			ellipse.setAttribute('cx',bush.x);
-			ellipse.setAttribute('cy',bush.y);
-			ellipse.setAttribute('rx',16);
-			ellipse.setAttribute('ry',12);
-			ellipse.setAttribute('fill','green');
-			ellipse.setAttribute('stroke','black');
-		}
+		var silo = document.createElementNS('http://www.w3.org/2000/svg','g');
+		silo.id = 'silo';
+		defs.appendChild(silo);
+		silo.setAttribute('stroke','black');
+		silo.setAttribute('stroke-width','0.5');
+		silo.setAttribute('stroke-linecap','round');
+		silo.setAttribute('stroke-linejoin','round');
+		var shapes = [
+			{tag:"path", fill:"#A7A9AC", stroke:"#231F20", d:"M45.582-155.828c0,9.873-20.408,17.877-45.583,17.877c-25.174,0-45.581-8.005-45.581-17.877L-48.55,0.188 c0,10.516,21.736,19.041,48.549,19.041c26.814,0,48.55-8.525,48.55-19.041L45.582-155.828z"},
+			{tag:"path", fill:"#E3C058", stroke:"#231F20", d:"M50.102-156.312c0,10.852-22.432,19.65-50.102,19.65s-50.101-8.798-50.101-19.65c0-10.852,22.43-64.656,50.101-64.656 S50.102-167.164,50.102-156.312z"},
+			{tag:"path", fill:"#A7A9AC", stroke:"#231F20", d:"M17.687-151.14l-2.492-1.45c0,0,0.559-14.969-2.787-19.397l4.916-2.066L17.687-151.14z"},
+			{tag:"polygon", fill:"#006838", stroke:"#231F20", points:"27.452,-182.878 36.659,-175.246 33.181,-175.594 24.176,-183.839"},
+			{tag:"polyline", fill:"#A7A9AC", stroke:"#231F20", points:"17.323,-154.282 17.323,-174.054 25.628,-183.082 33.932,-176.745 33.932,-159.95"},
+			{tag:"path", fill:"#C49A6C", stroke:"#231F20", d:"M31.942-159.989v-12.628c0,0-1.528-6.764-6.204-5.594c-4.677,1.168-6.073,8.127-6.073,8.127v14.771"},
+			{tag:"polygon", fill:"#8B5E3C", stroke:"#231F20", points:"17.323,-151.14 25.159,-145.987 40.877,-152.429 40.877,-155.055 17.323,-153.766"},
+			{tag:"polygon", fill:"#C49A6C", stroke:"#231F20", points:"17.323,-153.766 25.159,-148.613 40.877,-155.055 33.92,-159.95"},
+			{tag:"path", fill:"#006838", stroke:"#231F20", d:"M16.705-169.982l10.747-12.896l-10.747-3.152c-4.298,3.061-4.298,9.123-4.298,14.042L16.705-169.982z"},
+			{tag:"line", fill:"none", stroke:"#231F20", x1:"25.738", y1:"-178.211", x2:"25.738", y2:"-156.926"},
+			{tag:"path", fill:"none", stroke:"#231F20", d:"M33.92-93.165c-1.43,0.139-4.229,0.196-5.417,1.038c-1.664,1.179-0.696,2.601-0.728,4.592c1.35,0.133,2.202-0.548,3.567-0.477"},
+			{tag:"path", fill:"none", stroke:"#231F20", d:"M34.178-97.029c-0.167,1.231,0.112,2.431,0.297,3.581c1.226-0.386,2.597-0.625,3.568-1.521"},
+			{tag:"path", fill:"none", stroke:"#231F20", d:"M21.294-92.391c1.268,0,2.893,0.161,3.865-0.258"},
+			{tag:"path", fill:"none", stroke:"#231F20", d:"M32.889-84.404c-0.05-1.292-0.362-2.375-0.476-3.571c1.004-0.177,1.943-0.567,2.795-1.067"},
+			{tag:"path", fill:"none", stroke:"#231F20", d:"M27.736-83.888c0.446-3.969-2.079-3.092-5.411-3.092"},
+			{tag:"path", fill:"none", stroke:"#231F20", d:"M-29.209-42.661c0.973,0.569,1.927,1.024,3.053,1.069c0.06,1.175,0.04,2.381,0.04,3.569"},
+			{tag:"path", fill:"none", stroke:"#231F20", d:"M-23.798-45.496c1.37,0.421,2.708,0.533,4.084,0.812c0.029,1.517,0.208,2.849,0.336,4.303c1.196,0.023,2.433-0.021,3.568,0.296"},
+			{tag:"path", fill:"none", stroke:"#231F20", d:"M-19.417-49.618c0,1.274-0.025,2.567,0.039,3.826c1.479,0.08,3.002-0.19,4.341,0.554"},
+			{tag:"path", fill:"none", stroke:"#231F20", d:"M-27.663-47.042c-1.57-0.101-2.871-0.557-4.341-1.075c-0.099-1.259-0.778-2.376-0.297-3.563"},
+			{tag:"path", fill:"none", stroke:"#231F20", d:"M-26.117-55.287c-0.359,3.527,1.128,3.356,3.865,4.38"},
+			{tag:"path", fill:"none", stroke:"#231F20", d:"M-41.062-141.349c0.67,1.562-0.224,2.996,1.289,4.123c0.951,0.709,3.649,0.956,4.896,1.031"},
+			{tag:"path", fill:"none", stroke:"#231F20", d:"M-28.951-136.968c0.006,1.856-0.341,2.763,1.031,3.665c1.059,0.695,3.316,0.79,4.38,0.457"},
+			{tag:"path", fill:"none", stroke:"#231F20", d:"M-38.485-131.815c1.528,0.612,3.979,0.226,5.425,1.017c1.962,1.074,1.533,2.475,1.532,4.651"},
+ 		];
+ 		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			silo.appendChild(newShape);
+			for (var tag in shape) {
+				if (tag !== 'tag') {
+					newShape.setAttribute(tag,shape[tag]);
+				};
+			};
+		};
 
 		
 		var trees = document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -611,6 +870,76 @@ var view = {
 			ellipse.setAttribute('fill','green');
 			ellipse.setAttribute('stroke','black');
 		}
+		
+		var signpost = document.createElementNS('http://www.w3.org/2000/svg','g');
+		signpost.id = 'signpost';
+		defs.appendChild(signpost);
+		signpost.setAttribute('fill','goldenrod');
+		signpost.setAttribute('stroke','black');
+		signpost.setAttribute('stroke-width',0.5);
+		signpost.setAttribute('line-join','round');
+		var shapes = [
+			"12,-68 42,-62 40,-56 10,-60 -10,-60 -11,-66",
+			"-3,0 3,0 13,-70 7,-71",
+			"-7,-46 -8,-46.5 -8,-52.5 6,-58 8,-58 7,-51",
+			"8,-58 7,-51 -7,-46 -7,-52",
+		];
+		for (var points of shapes) {
+			var shape = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+			signpost.appendChild(shape);
+			shape.setAttribute('points',points);
+		};
+		
+		var wagon = document.createElementNS('http://www.w3.org/2000/svg','g');
+		wagon.id = 'wagon';
+		defs.appendChild(wagon);
+		wagon.setAttribute('stroke','black');
+		wagon.setAttribute('stroke-width','0.5');
+		wagon.setAttribute('stroke-linecap','round');
+		wagon.setAttribute('stroke-linejoin','round');
+		var shapes = [
+			{tag:"polygon", fill:"#A97C50", points:"-2.433,-12.827 -2.433,10.49 34.844,-6.763 34.844,-31.782 "},
+			{tag:"polygon", fill:"#A97C50", points:"-42.703,-38.342 -2.433,-12.827 -2.433,10.49 -44.065,-10.646 "},
+			{tag:"path", fill:"#D4CA30", d:"M-18.068-58.959 c-7.336,0.327-36.189,13.577-34.273,25.117c3.046,1.568,6.528,0.78,9.69,0.259c0.357,5.649-5.552,7.862-5.121,13.176 c6.848,0.998,12.912-2.978,19.65-2.131c0.497,7.357-6.899,10.216,3.003,10.317c5.683,0.058,11.251-2.9,16.876-3.214 c0.617,3.664-2.101,8.703,0.843,10.969c2.816,2.165,9.79-1.715,12.312-2.361c3.118-0.801,10.664,0.212,12.955-0.818 c5.67-2.555,0.48-4.425,0.115-9.37c6.434-2.118,16.588-1.404,22.823,0.751c4.537-4.098-2.863-4.829-1.56-8.8 c0.917-2.803,6.229-3.279,8.327-5.639c-1.289-4.023-4.758-2.456-6.61-4.738c-1.827-2.251-1.085-5.335-3.177-7.754 c-4.27-4.937-12.496-4.072-17.644-7.24C6.261-58.969-10.732-59.286-18.068-58.959z"},
+			{tag:"ellipse", fill:"#A97C50", cx:"-29.841", cy:"-0.125", rx:"13.514", ry:"19.059"},
+			{tag:"polygon", fill:"#A97C50", points:"24.021,12.736 -6.756,2.119 -5.303,-2.37 25.476,8.246 "},
+			{tag:"polygon", fill:"#A97C50", points:"51.042,-4.57 33.979,-11.733 35.71,-16.119 52.772,-8.956 "},
+		];
+		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			wagon.appendChild(newShape);
+			for (var tag in shape) {
+				if (tag !== 'tag') {
+					newShape.setAttribute(tag,shape[tag]);
+				};
+			};
+		};
+		
+		var well = document.createElementNS('http://www.w3.org/2000/svg','g');
+		well.id = 'well';
+		defs.appendChild(well);
+		well.setAttribute('stroke','black');
+		well.setAttribute('stroke-width','0.5');
+		well.setAttribute('stroke-linecap','round');
+		well.setAttribute('stroke-linejoin','round');
+		var shapes = [
+			{tag:"path", fill:"#bbbbbb", d:" M-29.265-22.313c0-5.83,12.916-10.557,28.85-10.557c15.937,0,28.853,4.727,28.853,10.557v21.106 c0,5.83-12.916,10.555-28.853,10.555c-15.934,0-28.85-4.725-28.85-10.555V-22.313L-29.265-22.313z"}, 
+			{tag:"ellipse", fill:"#bbbbbb", cx:"-0.415", cy:"-22.313", rx:"28.852", ry:"10.557"}, 
+			{tag:"ellipse", fill:"#353535", cx:"-0.415", cy:"-22.313", rx:"22.118", ry:"8.093"}, 
+			{tag:"polygon", fill:"#A97C50", points:" -24.844,-55.727 -24.844,-26.573 -22.291,-25.446 -19.738,-26.807 -20.204,-54.438"}, 
+			{tag:"polyline", fill:"#A97C50", points:" 19.253,-45.893 19.895,-19.078 22.111,-17.356 24.966,-18.846 24.193,-44.436"}, 
+			{tag:"polygon", fill:"#A97C50", points:" -21.895,-61.347 29.265,-51.979 29.265,-44.042 24.966,-41.482 -27.113,-59.942"}, 
+			{tag:"polygon", fill:"#A97C50", points:" -27.113,-54.087 24.966,-41.482 23.995,-50.224 -27.113,-59.942"},
+		];
+		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			well.appendChild(newShape);
+			for (var tag in shape) {
+				if (tag !== 'tag') {
+					newShape.setAttribute(tag,shape[tag]);
+				};
+			};
+		};
 		
 		var pawn = document.createElementNS('http://www.w3.org/2000/svg','g');
 		pawn.id = 'pawn';
@@ -1560,7 +1889,7 @@ var view = {
 			tile.hover = true;
 			view.strokeTile(tile);
 		};
-// 		console.log('tile',tile.x,tile.y);
+		console.log('tile',tile.x,tile.y);
 	},
 	
 	unhoverTile: function(tile) {
