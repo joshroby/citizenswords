@@ -75,7 +75,7 @@ function Game() {
 	this.loadMap = function(level) {
 		game.map = new Map(level);
 		game.map.loadLevel(level);
-		var mapSVG = view.buildMapSVG();
+		var mapSVG = view.buildMapSVG(level);
 		view.displayMap(mapSVG);
 		view.buildStandees();
 		view.buildCharacterSheets();
@@ -211,7 +211,18 @@ function Map(level) {
 						if (standee.priorities.freeze == true) {
 							pawn.priorities.freeze = true;
 						};
-						// will need to translate coords to tiles for patrol and post
+						if (standee.priorities.post !== undefined) {
+							pawn.priorities.post = game.map.findTile(standee.priorities.post.x,standee.priorities.post.y);
+						};
+						if (standee.priorities.patrol !== undefined) {
+							pawn.priorities.patrol = [];
+							for (var coords of standee.priorities.patrol) {
+								pawn.priorities.patrol.push(game.map.findTile(coords.x,coords.y));
+							};
+						};
+					};
+					if (standee.events !== undefined) {
+						pawn.events = standee.events;
 					};
 				} else if (standee.type == 'bystanders') {
 					bystander = new Pawn(undefined,tile,bystander);
@@ -478,6 +489,9 @@ function Pawn(template,tile,ai) {
 			neck: undefined,
 			garb: new Item('roughspun',this),
 			pouch: undefined,
+		};
+		if (Math.random() < 0.5) {
+			this.equipment.garb = new Item('sundress',this);
 		};
 		this.inventory = [];
 	} else {
@@ -794,23 +808,22 @@ function Pawn(template,tile,ai) {
 	};
 	
 	this.moveTo = function(destination) {
-		var moveOptions = this.moveOptions();
-		var mostRemainingMove = -1, shortestRoute = undefined;
-		for (var option of moveOptions) {
-			if (option.tile == destination && option.remainingMove > mostRemainingMove) {
-				mostRemainingMove = option.remainingMove;
-				shortestRoute = option.route;
+		if (destination !== this.tile) {
+			var moveOptions = this.moveOptions();
+			var mostRemainingMove = -1, shortestRoute = undefined;
+			for (var option of moveOptions) {
+				if (option.tile == destination && option.remainingMove > mostRemainingMove) {
+					mostRemainingMove = option.remainingMove;
+					shortestRoute = option.route;
+				};
 			};
+			view.clearMoveOptions();
+			this.moveStep(shortestRoute);
 		};
-// 		for (var option of moveOptions) {
-// 			option.tile.moveOption = false;
-// 			view.strokeTile(option.tile);
-// 		};
-		view.clearMoveOptions();
-		this.moveStep(shortestRoute);
 	};
 	
 	this.moveStep = function(route) {
+		var noEventTriggered = true;
 		var destination = route.shift();
 		this.stats.move -= destination.moveCost;
 		view.updateSheet(this);
@@ -822,13 +835,15 @@ function Pawn(template,tile,ai) {
 		for (var trigger of destination.triggers) {
 			if (trigger.check(this,this.tile)) {
 				route = [];
+				if (this.team == 'p1') {handlers.pawnSelect(this);};
 				trigger.event(this,this.tile);
+				noEventTriggered = false;
 			};
 
 		};
 		if (route.length > 0) {
 			var timedEvent = setTimeout(this.moveStep.bind(this,route),100);
-		} else if (this.team == 'p1') {
+		} else if (this.team == 'p1' && noEventTriggered) {
 			handlers.pawnSelect(this);
 		};
 	};
@@ -1004,6 +1019,10 @@ function Pawn(template,tile,ai) {
 	};
 	
 	this.defeat = function() {
+		if (this.events !== undefined && this.events.defeat !== undefined) {
+			console.log('defeat event:',this.events.defeat);
+			game.currentLevel.events[this.events.defeat](this);
+		};
 		this.exclusive = false;
 		view.refreshManeuvers(this);
 		view.animateDefeat(this);
@@ -1139,14 +1158,17 @@ function Pawn(template,tile,ai) {
 		} else {
 			this.wander();
 		};
-// 		'check for heal/rally targets'
-		var closestTarget = this.findClosestTarget();
-		if (closestTarget !== undefined) {
-			this.acquireTarget(closestTarget);
+		if (this.priorities.freeze !== true) {
+			var closestTarget = this.findClosestTarget();
+			if (closestTarget !== undefined) {
+				this.acquireTarget(closestTarget);
+			};
+// 			should also check for heal/rally targets'
 		};
 	};
 	
 	this.attack = function(target) {
+		console.log(this.id + ' attacking ' + target.id);
 		var distance = Math.pow(Math.pow(this.tile.x - target.tile.x,2) + Math.pow(this.tile.y - target.tile.y,2),0.5);
 		for (var maneuver of this.maneuvers) {
 			var canAfford = true;
@@ -1165,7 +1187,7 @@ function Pawn(template,tile,ai) {
 		var potentials = [], distance, closestDist = Infinity, bestOption;
 		var moveOptions = this.moveOptions();
 		for (var option of moveOptions) {
-			if (option.remainingMove >= this.stats.moveMax / 2) {
+			if (option.remainingMove >= this.stats.moveMax * 0.2) {
 				distance = Math.pow(Math.pow(option.tile.x - tile.x,2)+Math.pow(option.tile.y - tile.y,2),0.5);
 				if (distance < closestDist) {
 					closestDist = distance;
@@ -1199,8 +1221,9 @@ function Pawn(template,tile,ai) {
 	
 	this.findClosestTarget = function() {
 		var targets = [], distance, shortestDistance = Infinity, closest;
+		var hostileTeams = game.currentLevel.teams[this.team].hostile;
 		for (var pawn of game.map.pawns) {
-			if (pawn.team !== this.team && pawn.morale > 0 && this.inLOS(pawn.tile)) {
+			if (hostileTeams.indexOf(pawn.team) !== -1 && pawn.morale > 0 && this.inLOS(pawn.tile)) {
 				targets.push(pawn);
 			};
 		};
@@ -1531,11 +1554,11 @@ function Maneuver(maneuver,item) {
 			};
 			actionRoll = this.roll(this.item.pawn,'action',penalty);
 			reactionRoll = this.roll(target,'reaction');
-			console.log(actionRoll > reactionRoll,'ACT',Math.round(actionRoll*10)/10,'REA',Math.round(reactionRoll*10)/10);
+			console.log(this.id,actionRoll > reactionRoll,'ACT',Math.round(actionRoll*10)/10,'REA',Math.round(reactionRoll*10)/10);
 			if (actionRoll > reactionRoll) {
 				powerRoll = this.roll(this.item.pawn,'power');
 				resistRoll = this.roll(target,'resist');
-				console.log(powerRoll > resistRoll,'POW',powerRoll,'RES',resistRoll);
+				console.log(this.id,powerRoll > resistRoll,'POW',powerRoll,'RES',resistRoll);
 				if (resistRoll == 0) {resistRoll = 1};
 				strength = Math.max(1,powerRoll / resistRoll);
 				target.applyEffects(this.effects,strength,this.item.pawn);

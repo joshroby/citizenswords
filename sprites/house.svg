@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" width="110" height="150" viewBox="-55 -100 110 150">
+	<g>
+		<polygon points="-50,-40 -50,0 20,20 20,-20" fill="floralwhite" stroke="black"/>
+		<polygon points="50,-40 50,0 20,20 20,-20 35,-60" fill="floralwhite" stroke="black"/>
+		<polygon points="20,-20 -50,-40 -35,-80 35,-60" fill="saddlebrown" stroke="black"/>
+	</g>
+</svg>

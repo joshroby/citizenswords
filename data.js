@@ -29,6 +29,17 @@ var data = {
 			inventory: [],
 		},
 		
+		circleJerkAssassin: {
+			name: "Assassin",
+			description: "Some asshole.",
+			avatarHeritage: ['dwarven','gnomish'],
+			stats: {move: 12,strength:12,focus:8},
+			equipment: {
+				garb: {template: 'roughspun',colors:{shirt:'black',shorts:'black',upperArms:'black',lowerArms:'black',legs:'black',feet:'black'}},
+			},
+			inventory: [],
+		},
+		
 		daisy: {
 			name: "Daisy Moucau",
 			unique: true,
@@ -37,6 +48,8 @@ var data = {
 			stats: {move:9,strength:12,focus:7},
 			equipment: {
 				garb: {template: 'scrapArmor'},
+				left: {template: 'hammer'},
+				right: {template: 'hammer'},
 			},
 			inventory: [],
 		},
@@ -77,7 +90,7 @@ var data = {
 			avatarHeritage: ['dwarven'],
 			stats: {move:6,strength:9,focus:16},
 			equipment: {
-				garb: {template:'roughspun'},
+				garb: {template:'sundress',colors:{dress:'midnightblue',sash:'silver'}},
 			},
 			inventory: [],
 		},
@@ -112,7 +125,7 @@ var data = {
 			avatarHeritage: ['minotaur'],
 			stats: {move:5,strength:11,focus:11},
 			equipment: {
-				garb: {template:'roughspun'},
+				garb: {template:'guildmasterRobes'},
 			},
 			inventory: [],
 		},
@@ -179,7 +192,7 @@ var data = {
 			avatarHeritage: ['gnollish','gnollish','gnollish','gnomish'],
 			stats: {move:6,strength:6,focus:12},
 			equipment: {
-				garb: {template:'initiatesRobes'},
+				garb: {template:'vicarRobes'},
 			},
 			inventory: [],
 		},
@@ -438,6 +451,28 @@ var data = {
 			maneuvers: ['heal'],
 		},
 		
+		guildmasterRobes: {
+			name: "Guildmaster Robes",
+			slots: ['garb'],
+			colors: {
+				robe: '#006838',
+				edging: 'goldenrod',
+				panel: '#009444',
+				sash: 'goldenrod',
+				torso: {fill:'#006838'},
+				upperArms: {fill:'#006838'},
+				lowerArms: {fill:'#006838'},
+				legs: {fill:'#006838'},
+			},
+			stats: {
+				deflection: 3,
+				soak: 3,
+				weight: 3,
+				aegis: 3,
+			},
+			svgNodes: function(item) {return item.pawn.avatar.simpleRobe(item)},
+		},
+		
 		hammer: {
 			name: "Hammer",
 			slots: ['left+right'],
@@ -460,9 +495,9 @@ var data = {
 			slots: ['garb'],
 			colors: {
 				robe: 'beige',
-				edging: 'darkblue',
+				edging: 'blue',
 				panel: 'gold',
-				sash: 'darkblue',
+				sash: 'blue',
 				torso: {fill:'beige'},
 				upperArms: {fill:'beige'},
 				lowerArms: {fill:'beige'},
@@ -561,7 +596,6 @@ var data = {
 				weight: 4,
 			},
 			maneuvers: [],
-// 			svgNodes: function(item) {return item.pawn.avatar.roughspun(item);},
 		},
 		
 		ratTeeth: {
@@ -574,7 +608,6 @@ var data = {
 				weight: 1,
 			},
 			maneuvers: ['bite'],
-// 			svgNodes: function(item) {return item.pawn.avatar.simpleShield(item)},
 		},
 		
 		roughspun: {
@@ -596,6 +629,20 @@ var data = {
 			svgNodes: function(item) {return item.pawn.avatar.roughspun(item);},
 		},
 		
+		sundress: {
+			name: "Sundress",
+			description: "A light sundress for warm weather.",
+			slots: ['garb'],
+			colors: {
+				dress: ["INDIANRED","LIGHTCORAL","SALMON","DARKSALMON","LIGHTSALMON","CRIMSON","RED","FIREBRICK","DARKRED","PINK","LIGHTPINK","HOTPINK","DEEPPINK","MEDIUMVIOLETRED","PALEVIOLETRED","LIGHTSALMON","CORAL","TOMATO","ORANGERED","DARKORANGE","ORANGE","GOLD","YELLOW","LIGHTYELLOW","LEMONCHIFFON","LIGHTGOLDENRODYELLOW","PAPAYAWHIP","MOCCASIN","PEACHPUFF","PALEGOLDENROD","KHAKI","DARKKHAKI","LAVENDER","THISTLE","PLUM","VIOLET","ORCHID","FUCHSIA","MAGENTA","MEDIUMORCHID","MEDIUMPURPLE","REBECCAPURPLE","BLUEVIOLET","DARKVIOLET","DARKORCHID","DARKMAGENTA","PURPLE","INDIGO","SLATEBLUE","DARKSLATEBLUE","MEDIUMSLATEBLUE","GREENYELLOW","CHARTREUSE","LAWNGREEN","LIME","LIMEGREEN","PALEGREEN","LIGHTGREEN","MEDIUMSPRINGGREEN","SPRINGGREEN","MEDIUMSEAGREEN","SEAGREEN","FORESTGREEN","GREEN","DARKGREEN","YELLOWGREEN","OLIVEDRAB","OLIVE","DARKOLIVEGREEN","MEDIUMAQUAMARINE","DARKSEAGREEN","LIGHTSEAGREEN","DARKCYAN","TEAL","AQUA","CYAN","LIGHTCYAN","PALETURQUOISE","AQUAMARINE","TURQUOISE","MEDIUMTURQUOISE","DARKTURQUOISE","CADETBLUE","STEELBLUE","LIGHTSTEELBLUE","POWDERBLUE","LIGHTBLUE","SKYBLUE","LIGHTSKYBLUE","DEEPSKYBLUE","DODGERBLUE","CORNFLOWERBLUE","MEDIUMSLATEBLUE","ROYALBLUE","BLUE","MEDIUMBLUE","DARKBLUE","NAVY","MIDNIGHTBLUE","CORNSILK","BLANCHEDALMOND","BISQUE","NAVAJOWHITE","WHEAT","BURLYWOOD","TAN","ROSYBROWN","SANDYBROWN","GOLDENROD","DARKGOLDENROD","PERU","CHOCOLATE","SADDLEBROWN","SIENNA","BROWN","MAROON","SNOW","HONEYDEW","MINTCREAM","AZURE","ALICEBLUE","GHOSTWHITE","WHITESMOKE","SEASHELL","BEIGE","OLDLACE","FLORALWHITE","IVORY","ANTIQUEWHITE","LINEN","LAVENDERBLUSH","MISTYROSE","GAINSBORO","LIGHTGRAY","SILVER","DARKGRAY","GRAY","DIMGRAY","LIGHTSLATEGRAY","SLATEGRAY","DARKSLATEGRAY"],
+				sash: ["INDIANRED","LIGHTCORAL","SALMON","DARKSALMON","LIGHTSALMON","CRIMSON","RED","FIREBRICK","DARKRED","PINK","LIGHTPINK","HOTPINK","DEEPPINK","MEDIUMVIOLETRED","PALEVIOLETRED","LIGHTSALMON","CORAL","TOMATO","ORANGERED","DARKORANGE","ORANGE","GOLD","YELLOW","LIGHTYELLOW","LEMONCHIFFON","LIGHTGOLDENRODYELLOW","PAPAYAWHIP","MOCCASIN","PEACHPUFF","PALEGOLDENROD","KHAKI","DARKKHAKI","LAVENDER","THISTLE","PLUM","VIOLET","ORCHID","FUCHSIA","MAGENTA","MEDIUMORCHID","MEDIUMPURPLE","REBECCAPURPLE","BLUEVIOLET","DARKVIOLET","DARKORCHID","DARKMAGENTA","PURPLE","INDIGO","SLATEBLUE","DARKSLATEBLUE","MEDIUMSLATEBLUE","GREENYELLOW","CHARTREUSE","LAWNGREEN","LIME","LIMEGREEN","PALEGREEN","LIGHTGREEN","MEDIUMSPRINGGREEN","SPRINGGREEN","MEDIUMSEAGREEN","SEAGREEN","FORESTGREEN","GREEN","DARKGREEN","YELLOWGREEN","OLIVEDRAB","OLIVE","DARKOLIVEGREEN","MEDIUMAQUAMARINE","DARKSEAGREEN","LIGHTSEAGREEN","DARKCYAN","TEAL","AQUA","CYAN","LIGHTCYAN","PALETURQUOISE","AQUAMARINE","TURQUOISE","MEDIUMTURQUOISE","DARKTURQUOISE","CADETBLUE","STEELBLUE","LIGHTSTEELBLUE","POWDERBLUE","LIGHTBLUE","SKYBLUE","LIGHTSKYBLUE","DEEPSKYBLUE","DODGERBLUE","CORNFLOWERBLUE","MEDIUMSLATEBLUE","ROYALBLUE","BLUE","MEDIUMBLUE","DARKBLUE","NAVY","MIDNIGHTBLUE","CORNSILK","BLANCHEDALMOND","BISQUE","NAVAJOWHITE","WHEAT","BURLYWOOD","TAN","ROSYBROWN","SANDYBROWN","GOLDENROD","DARKGOLDENROD","PERU","CHOCOLATE","SADDLEBROWN","SIENNA","BROWN","MAROON","SNOW","HONEYDEW","MINTCREAM","AZURE","ALICEBLUE","GHOSTWHITE","WHITESMOKE","SEASHELL","BEIGE","OLDLACE","FLORALWHITE","IVORY","ANTIQUEWHITE","LINEN","LAVENDERBLUSH","MISTYROSE","GAINSBORO","LIGHTGRAY","SILVER","DARKGRAY","GRAY","DIMGRAY","LIGHTSLATEGRAY","SLATEGRAY","DARKSLATEGRAY"],
+			},
+			stats: {
+			},
+			maneuvers: [],
+			svgNodes: function(item) {return item.pawn.avatar.sundress(item);},
+		},
+		
 		scrapArmor: {
 			name: "Scrap Armor",
 			description: "Leather armor built out of scraps.",
@@ -615,6 +662,7 @@ var data = {
 				weight: 10,
 				healing: 3,
 			},
+			maneuvers: ['defensiveStance'],
 			svgNodes: function(item) {return item.pawn.avatar.scrapArmor(item)},
 		},
 		
@@ -671,6 +719,28 @@ var data = {
 			},
 			maneuvers: ['slash','lunge'],
 			svgNodes: function(item) {return item.pawn.avatar.simpleSword(item)},
+		},
+		
+		vicarRobes: {
+			name: "Vicar's Robes",
+			slots: ['garb'],
+			colors: {
+				robe: 'ivory',
+				edging: 'darkblue',
+				panel: 'goldenrod',
+				sash: 'darkblue',
+				torso: {fill:'ivory'},
+				upperArms: {fill:'ivory'},
+				lowerArms: {fill:'ivory'},
+				legs: {fill:'ivory'},
+			},
+			stats: {
+				deflection: 2,
+				soak: 2,
+				weight: 3,
+				healing: 5,
+			},
+			svgNodes: function(item) {return item.pawn.avatar.simpleRobe(item)},
 		},
 	
 		wand: {
@@ -754,6 +824,21 @@ var data = {
 			],
 		},
 	
+		defensiveStance: {
+			name: "Defensive Stance",
+			description: "Take a moment to gather your strength",
+			targetType: 'pawn',
+			costs: {
+				move: function(item) {return 4}
+			},
+			rollStats: {
+				action: {pawnStat:1},
+			},
+			effects: [
+				{type:'refresh', stat:'strength', num:3},
+			],
+		},
+	
 		exhort: {
 			name: "Exhort",
 			description: "Replenish the morale of your comrade",
@@ -790,6 +875,22 @@ var data = {
 			},
 			effects: [
 				{type:'wound',stat:'focus',name:'confuse',woundType:'mental'}
+			],
+		},
+	
+		foolsRush: {
+			name: "Fools Rush",
+			description: "Discard focus and strength for speed.",
+			targetType: 'pawn',
+			costs: {
+				strength: function(item) {return 1},
+				focus: function(item) {return 1},
+			},
+			rollStats: {
+				action: {pawnStat:1},
+			},
+			effects: [
+				{type:'refresh', stat:'move', num:1},
 			],
 		},
 		
@@ -965,8 +1066,23 @@ var data = {
 		// End
 	},
 	
+	things: {
+		chest: {
+			sprite: 'chest',
+			path: undefined,
+		},
+	},
+	
 	landscapes: {
-		
+	
+		testSprite: {
+			sprite: 'testSprite',
+			path: 'sprites/testSprite.svg',
+			blockView: true,
+			exclusive: false,
+			cover: 0,
+		},
+				
 		block: {
 			sprite: 'block',
 			blockView: true,
@@ -976,6 +1092,7 @@ var data = {
 	
 		boulder: {
 			sprite: 'boulder',
+			path: 'sprites/boulder.svg',
 			blockView: false,
 			exclusive: true,
 			cover: 0,
@@ -983,6 +1100,7 @@ var data = {
 	
 		bushes: {
 			sprite: 'bushes',
+			path: 'sprites/bushes.svg',
 			blockView: false,
 			exclusive: false,
 			cover: 0.5,
@@ -990,6 +1108,8 @@ var data = {
 		
 		brickWallTower: {
 			sprite: 'brickWallTower',
+			path: 'sprites/brickWallTower.svg',
+			height: 200,
 			blockView: true,
 			exclusive: true,
 			cover: 0,
@@ -997,6 +1117,9 @@ var data = {
 		
 		brickWallLeft: {
 			sprite: 'brickWallLeft',
+			path: 'sprites/brickWallLeft.svg',
+			width: 102,
+			height: 200,
 			blockView: true,
 			exclusive: true,
 			cover: 0,
@@ -1004,6 +1127,9 @@ var data = {
 		
 		brickWallRight: {
 			sprite: 'brickWallRight',
+			path: 'sprites/brickWallRight.svg',
+			width: 102,
+			height: 200,
 			blockView: true,
 			exclusive: true,
 			cover: 0,
@@ -1018,6 +1144,7 @@ var data = {
 	
 		fence: {
 			sprite: 'fence',
+			path: 'sprites/fence.svg',
 			blockView: false,
 			exclusive: true,
 			cover: 0,
@@ -1025,6 +1152,9 @@ var data = {
 	
 		house: {
 			sprite: 'house',
+			path: 'sprites/house.svg',
+			height: 150,
+			width:110,
 			blockView: true,
 			exclusive: true,
 			cover: 0,
@@ -1032,6 +1162,7 @@ var data = {
 		
 		marketLeft: {
 			sprite: 'marketLeft',
+			path: 'sprites/marketLeft.svg',
 			blockView: false,
 			exclusive: false,
 			cover: 0.9,
@@ -1039,6 +1170,7 @@ var data = {
 		
 		marketCenter: {
 			sprite: 'marketCenter',
+			path: 'sprites/marketCenter.svg',
 			blockView: false,
 			exclusive: false,
 			cover: 0.9,
@@ -1046,6 +1178,7 @@ var data = {
 		
 		marketRight: {
 			sprite: 'marketRight',
+			path: 'sprites/marketRight.svg',
 			blockView: false,
 			exclusive: true,
 			cover: 0.9,
@@ -1053,13 +1186,22 @@ var data = {
 		
 		marketBacking: {
 			sprite: 'marketBacking',
+			path: 'sprites/marketBacking.svg',
 			blockView: false,
 			exclusive: false,
 			cover: 0,
 		},
+		
+		pierFront: {
+			sprite: 'pierFront',
+			blockView: false,
+			exclusive: false,
+			cover: 0.2,
+		},
 	
 		riverStones: {
 			sprite: 'riverStones',
+			path: 'sprites/riverStones.svg',
 			blockView: false,
 			exclusive: false,
 			cover: 0,
@@ -1067,6 +1209,8 @@ var data = {
 		
 		rockface: {
 			sprite: 'rockface',
+			path: 'sprites/rockface.svg',
+			width: 110,
 			blockView: true,
 			exclusive: true,
 			cover: 0,
@@ -1074,6 +1218,8 @@ var data = {
 		
 		signpost: {
 			sprite: 'signpost',
+			path: 'sprites/signpost.svg',
+			height: 150,
 			blockView: false,
 			exclusive: false,
 			cover: 0,
@@ -1081,6 +1227,9 @@ var data = {
 		
 		silo: {
 			sprite: 'silo',
+			path: 'sprites/silo.svg',
+			height: 300,
+			yOffset: -50,
 			blockView: true,
 			exclusive: true,
 			cover: 0,
@@ -1088,6 +1237,7 @@ var data = {
 	
 		trees: {
 			sprite: 'trees',
+			path: 'sprites/trees.svg',
 			blockView: true,
 			exclusive: true,
 			cover: 0,
@@ -1095,6 +1245,9 @@ var data = {
 	
 		wagon: {
 			sprite: 'wagon',
+			path: 'sprites/wagon.svg',
+			width: 110,
+			height: 150,
 			blockView: false,
 			exclusive: false,
 			cover: 0,
@@ -1102,6 +1255,8 @@ var data = {
 	
 		well: {
 			sprite: 'well',
+			path: 'sprites/well.svg',
+			height: 150,
 			blockView: false,
 			exclusive: true,
 			cover: 0,

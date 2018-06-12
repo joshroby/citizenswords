@@ -28,22 +28,70 @@ TO DO LIST CITIZEN SWORDS REDUX
 - defeated pawns do not block movement
 - pawns that aren't yours do not display maneuvers
 - pawns that aren't yours don't move for you / display move options
-
-
-- load level
-	- enemies / other teams
-	- events
-	- move costs
-- GAMEN SVG passages
-- contextual actions (loot, slaughter, bind, interact)
-- multi-hex targets
+- load other teams and pawns
+- load triggers and events
+- load level: move costs
 - display move costs /remainingMove moveOptions
-- trading items between pawns
-	- shops
+- new game wipes the map div
+- "always succeeds" tooltip displays power roll if applicable
+- disarm updates avatar
+- level archive save structure and the reading thereof
+- level load positions camera
+- return key for end turn, space and arrows for next/last pawn
+- trigger events on level load
+- selectables (NPCs, lootable chests, switches) have names and descriptions in place of maneuvers
+	- contextual actions (open/loot, slaughter/murder, bind, shop, interact/pull-lever) go here
+	- pawn.select needs to reserve what was selected before this was selected
+- correctly removes moved/equiped/unequiped items from whence they came
+- opening trade charges 5 move and enables swapping
+- transfered items get their pawn attribute updated
+- poison can kill folk
+- tile background colors display
+- load tile background colors
+- mobs with non-Avatar avatars
+- gamen.displayPassage makes uiGroup invisible and then revisible on passage close
+- ai takes turns
+- button for outputing JSON.stringified parameters
+	- hide it in invisible text in exported SVG?
+- heroes loaded in startLoc and its adjacent tiles
+- sliders in Coloring hit the updateColoring() function
+
+- trigger events on pawn defeat
+	- incorporate that into level archives somehow
+- head buttons for entire party along bottom of viewbox
+- Pawn.moveTo() does nothing if you tell a pawn to move to its current tile
+- load pawns with ai priorities (freeze, post, and patrol)
+
+
+
+CORE FUNCTIONALITY
+- the default maneuver animation is always going from the pawn that's focused on, not necessarily the pawn actually attacking.
+- storing landscape draw algorithms somewhere other than view
+- more garb & items
+	- hammer
+	- cool armor
+	- city watch livery
+	- assassin gear
+	- hatchet
+	- wand
+	- icon
+	- candelabrum
+- stocking chests infrastructure
+- split power/resist rolls for multiple effects
+- switching maps
+- archiving maps
+- ai heals and rallies
+- envision trade/shop/loot interface
+	- trading items between your own pawns
+	- how is shop different from loot?
+
+OPTIONAL DISPLAY UPGRADES
+- wounds display as little fading pop-ups
+- list totals for deflection, soak and aegis in inventory
+- display cover on map
+
+OPTIONAL FUNCTIONAL UPGRADES
+- multi-hex targets
 - disarm to floor (requires items-on-floor architecture)
-- ai
-
-GAMEN
-
-- generate main menu buttons
-- view.colors
+- ablative-use items
+- standardized/frequently-used map events / macros

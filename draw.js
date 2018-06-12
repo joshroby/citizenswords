@@ -4253,6 +4253,168 @@ function Avatar(pawn,heritages) {
 		return svgNodes;
 	};
 	
+	this.sundress = function(item) {
+		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
+		svgNodes.setAttribute('fill',item.colors.dress);
+
+		var dress = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		svgNodes.appendChild(dress);
+		dress.setAttribute('fill','inherit');
+		dress.setAttribute("stroke","#000000");
+		dress.setAttribute("stroke-width","1");
+		dress.setAttribute("stroke-linecap","round");
+		path = 'm 0,'+this.bodyConstants.neck;
+		path += ' h-12';
+		var x = this.parameters.shoulders * -0.8 + 12;
+		var y = 30;
+		var c1y = 10
+		path += ' c 0,'+c1y+' '+x+','+y+' '+x+','+y;
+		
+		// to right belly
+		x = this.parameters.shoulders * 0.8 - this.parameters.belly;
+		y = 10;
+		c1x = 0;
+		c1y = 3;
+		c2x = x;
+		c2y = y-3;
+		path += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+
+		// to right hip
+		x = this.parameters.belly - this.parameters.hips;
+		y = 15;
+		c1x = 0;
+		c1y = this.parameters.belly / 3;
+		c2x = x;
+		c2y = y - this.parameters.hips/3;
+		path += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+
+		// to right side of skirt
+		x = -20;
+		y = 25;
+		c1x = 0;
+		c1y = 10;
+		c2x = x;
+		c2y = y;
+		path += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+
+		// to left side of skirt
+		x = this.parameters.hips * 2 + 40;
+		y = 0;
+		c1x = 0;
+		c1y = 5;
+		c2x = x;
+		c2y = y+5;
+		path += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+
+		// to left hip
+		x = -20;
+		y = -25;
+		c1x = 0;
+		c1y = 0;
+		c2x = x;
+		c2y = y+10;
+		path += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+
+		// to left belly
+		x = this.parameters.belly - this.parameters.hips;
+		y = -15;
+		c1x = 0;
+		c1y = this.parameters.hips/-3;
+		c2x = x;
+		c2y = y + this.parameters.belly / 3;
+		path += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+
+		// to left rib
+		x = this.parameters.shoulders * 0.8 - this.parameters.belly;
+		y = -10;
+		c1x = 0;
+		c1y = -3;
+		c2x = x;
+		c2y = y+3;
+		path += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+		
+		x = this.parameters.shoulders * -0.8 + 12;
+		y = -32;
+		c2y = y + 10;
+		path += ' c 0,0 '+x+','+c2y+' '+x+','+y;
+		
+		dress.setAttributeNS(null,"d",path);
+		
+		if (this.parameters.bust > this.parameters.shoulders * 0.7) {
+			var rightBreastPath = document.createElementNS('http://www.w3.org/2000/svg',"path");
+			var leftBreastPath = document.createElementNS('http://www.w3.org/2000/svg',"path");
+			rightBreastPath.setAttribute("fill",'inherit');
+			rightBreastPath.setAttribute("stroke","#000000");
+			rightBreastPath.setAttribute("stroke-width","1");
+			rightBreastPath.setAttribute("stroke-linecap","round");
+		
+			leftBreastPath.setAttribute("fill",'inherit');
+			leftBreastPath.setAttribute("stroke","#000000");
+			leftBreastPath.setAttribute("stroke-width","1");
+			leftBreastPath.setAttribute("stroke-linecap","round");
+
+			var startX = 12;
+
+			// start 
+			x = 0 - startX;
+			y = this.bodyConstants.neck;
+			path = 'm '+x+','+y;
+		
+			x = 0 + startX;
+			otherPath = 'm '+x+','+y;
+
+			// to outside of bust
+			x = startX - this.parameters.bust;
+			y = 10 + this.parameters.bust * 0.4;
+			c1x = 0;
+			c1y = this.parameters.bust * 0.2;
+			c2x = x + this.parameters.bust * 0.1;
+			c2y = y;
+			path += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+			x *= -1;
+			c1x *= -1;
+			c2x *= -1;
+			otherPath += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+
+			// to bottom of bust
+			x = this.parameters.bust * 0.5;
+			y = this.parameters.bust * 0.5;
+			c1x = 0;
+			c1y = this.parameters.bust * 0.3;
+			c2x = x - this.parameters.bust * 0.33;
+			c2y = y;
+			path += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+			x *= -1;
+			c1x *= -1;
+			c2x *= -1;
+			otherPath += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+
+			// to inside of bust
+			x = this.parameters.bust * 0.5;
+			y = 0 - this.parameters.bust * 0.1;
+			c1x = this.parameters.bust * 0.33;
+			c1y = 0;
+			c2x = x-3;
+			c2y = y;
+			path += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+			x *= -1;
+			c1x *= -1;
+			c2x *= -1;
+			otherPath += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+		
+			rightBreastPath.setAttributeNS(null,"d",path);
+			svgNodes.appendChild(rightBreastPath);
+		
+			leftBreastPath.setAttributeNS(null,"d",otherPath);
+			svgNodes.appendChild(leftBreastPath);
+		};
+		
+		var sashSVG = this.simpleSash(item);
+		svgNodes.appendChild(sashSVG);
+		
+		return svgNodes;
+	};
+	
 	this.wand = function(item) {
 		console.log('drawing wand!');
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -4541,6 +4703,11 @@ function AvatarBeast(pawn,type) {
 		bodyNodes.setAttribute('stroke','#000000');
 		bodyNodes.setAttribute('stroke-width','0.5');
 		bodyNodes.setAttribute('transform','scale(0.4)');
+		var bodyGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+		bodyNodes.appendChild(bodyGroup);
+		var headGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+		bodyNodes.appendChild(headGroup);
+		headGroup.id = 'hellpuppyHeadGroup';
 
 		var shapes = [
 			{tag:"path", fill:"#414042", stroke:"#000000", d:"M9.777-10.65 c2.15,0.059,1.66,2.527,1.028,3.728c-0.69,1.311-1.684,2.375-3.171,2.516c-3.845,0.362-4.383-2.929-4.08-5.943 c0.167-1.674,0.104-3.576-0.839-5.056c-1.229-1.928-4.799-1.708-5.612,0.566c-1.038,2.902,0.602,6.867,1.932,9.336 C0.194-3.35,0.334-1.047,0.738,1.351C0.805,1.749,0.74,3.661,1.012,3.958c0.393,0.429,1.106,3.481,1.403,4.587 c0.549,2.036-3.075,1.521-4.286,1.306c-3.198-0.572-2.216-6.08-2.351-8.547C-4.325-0.577-4.897-2.684-6.063-4.2 c-0.696-0.905-1.761-1.468-2.353-2.42c-0.473-0.761-0.684-1.661-0.818-2.539c-0.336-2.197-0.181-4.402-0.091-6.601 c0.025-0.608,0.164-1.42,0.092-2.001c-0.129-1.033-1.137-1.881-1.56-2.885c-0.547-1.299-0.923-2.635-1.308-4.008 c-0.8-2.86-2.595-6.601-2.183-9.576c0.404-2.921,2.108-3.848,4.604-5.493c1.649-1.087,3.247-1.715,5.239-1.777 c1.997-0.062,3.293,0.555,4.892,1.625c0.847,0.568,1.508,1.117,2.097,1.935c0.491,0.682,0.747,1.404,1.269,2.034 c0.795,0.961,1.477,1.537,1.788,2.796c0.211,0.853,0.577,2.532,0.26,3.354"},

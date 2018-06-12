@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" width="100" height="150" viewBox="-50 -100 100 150">
+	<g fill="goldenrod" stroke="black" stroke-width="0.5" line-join="round">
+		<polygon points="12,-68 42,-62 40,-56 10,-60 -10,-60 -11,-66"/>
+		<polygon points="-3,0 3,0 13,-70 7,-71"/>
+		<polygon points="-7,-46 -8,-46.5 -8,-52.5 6,-58 8,-58 7,-51"/>
+		<polygon points="8,-58 7,-51 -7,-46 -7,-52"/>
+	</g>
+</svg>

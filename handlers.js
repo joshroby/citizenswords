@@ -64,8 +64,8 @@ var handlers = {
 	confirmAndPlay: function() {
 		game.confirmCreation(document.getElementById('nameInput').value,document.getElementById('pronounSelect').value);
 		view.hideCreation();
-// 		game.loadMap(hellhoundCave);
-		game.loadMap(level_orktown);
+		game.loadMap(hellhoundCave);
+// 		game.loadMap(level_orktown);
 	},
 	
 	// Map Handlers
@@ -205,7 +205,7 @@ var handlers = {
 			if (view.focus.pawn !== undefined) {
 				view.hideSheets();
 			};
-			view.panToTile(pawn.tile);
+			view.panToTile(pawn.tile,true);
 			pawn.select();
 			view.focus.pawn = pawn;
 			if (true) { // if controlled by player
@@ -227,13 +227,16 @@ var handlers = {
 	lastPawn: function() {
 		var pawnList = game.map.heroes;
 		var currentIndex = pawnList.indexOf(view.focus.pawn);
+		if (currentIndex == -1) {
+			currentIndex = game.map.heroes.length;
+		};
 		var targetIndex = currentIndex - 1;
 		if (targetIndex == -1) {targetIndex = pawnList.length - 1};
 		handlers.pawnSelect(pawnList[targetIndex]);
 	},
 	
-	firstPawn: function() {
-		handlers.pawnSelect(game.map.pawns[0]);
+	pawnButton: function(heroIndex) {
+		handlers.pawnSelect(game.map.heroes[heroIndex]);
 	},
 	
 	inventory: function() {
