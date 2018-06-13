@@ -427,6 +427,7 @@ function Landscape(tile,key) {
 	if (key == undefined) {
 		key = ['house','bushes'][Math.random() * 2 << 0];
 	};
+	this.landscape = true;
 	this.sprite = data.landscapes[key].sprite;
 	this.blockView = data.landscapes[key].blockView;
 	this.exclusive = data.landscapes[key].exclusive;

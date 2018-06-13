@@ -35,7 +35,8 @@ var data = {
 			avatarHeritage: ['dwarven','gnomish'],
 			stats: {move: 12,strength:12,focus:8},
 			equipment: {
-				garb: {template: 'roughspun',colors:{shirt:'black',shorts:'black',upperArms:'black',lowerArms:'black',legs:'black',feet:'black'}},
+				garb: {template: 'fineBlacks'},
+				neck: {template: 'circleMedallion'},
 			},
 			inventory: [],
 		},
@@ -47,9 +48,8 @@ var data = {
 			avatarParameters: {"eyeColor":"#af5088","hairColor":"#edda75","blackEumelanin":54,"brownEumelanin":64,"pinkPheomelanin":25,"greenKeratin":0,"noseShading":61,"nosePinkness":23,"lipShading":-37,"lipPinkness":9,"earShading":66,"earPinkness":41,"templePosition":11,"templeWidth":2,"templeHeight":4,"cheekbonePosition":11,"cheekboneWidth":2,"cheekboneHeight":7,"chinHeight":45,"chinWidth":21,"eyeDistance":15,"eyeSize":7,"browSize":2,"insideEyelidCurve":0,"outsideEyelidCurve":7,"lowerEyelidCurve":4,"noseHeight":65,"noseSize":3,"noseWidth":6,"nostrilHeight":6,"noseBump":9,"mouthWidth":15,"lipSize":4,"teeth":1,"leftTusk":0,"rightTusk":0,"earSize":17,"earDip":-8,"earTilt":0,"earWidth":-5,"earLobe":12,"shoulders":37,"belly":23,"hips":21,"feet":3,"hindquarters":0,"leftBrowTilt":1,"rightBrowTilt":2,"smile":1,"mouthOpen":1,"hairLength":52,"hairPart":-10,"hairBangs":2,"hairBangsLength":8,"hairSweep":2,"topHairHeight":11,"topHairBase":9,"topHairWidth":13,"hairCurl":15,"horns":8,"bust":28,"heritage":"half satyric half centaur ","skinColor":"#75521b","noseColor":"#c99080","lipColor":"#4a2f10","earColor":"#d07469"},
 			stats: {move:9,strength:12,focus:7},
 			equipment: {
-				garb: {template: 'scrapArmor'},
+				garb: {template: 'boiledLeathers'},
 				left: {template: 'hammer'},
-				right: {template: 'hammer'},
 			},
 			inventory: [],
 		},
@@ -62,7 +62,7 @@ var data = {
 			avatarHeritage: ['trollish'],
 			stats: {move:13,strength:10,focus:8},
 			equipment: {
-				garb: {template: 'scrapArmor'},
+				garb: {template: 'nightworkArmor'},
 			},
 			inventory: [],
 		},
@@ -77,7 +77,7 @@ var data = {
 			equipment: {
 				left: {template:'simpleSpear'},
 				right: {template:'shield'},
-				garb: {template: 'scrapArmor'},
+				garb: {template: 'watchArmor'},
 			},
 			inventory: [],
 		},
@@ -91,6 +91,7 @@ var data = {
 			stats: {move:6,strength:9,focus:16},
 			equipment: {
 				garb: {template:'sundress',colors:{dress:'midnightblue',sash:'silver'}},
+				neck: {template:'fineNecklace'},
 			},
 			inventory: [],
 		},
@@ -126,6 +127,7 @@ var data = {
 			stats: {move:5,strength:11,focus:11},
 			equipment: {
 				garb: {template:'guildmasterRobes'},
+				neck: {template:'chainsOfOffice'},
 			},
 			inventory: [],
 		},
@@ -425,6 +427,44 @@ var data = {
 			},
 		},
 		
+		chainsOfOffice: {
+			name: "Chains of Office",
+			slots: ['neck'],
+			colors: {
+				chain: 'gold',
+				medallion: 'green',
+			},
+			stats: {
+				aegis: 5,
+				weight: 2,
+			},
+			svgNodes: function(item) {return item.pawn.avatar.chainsOfOffice(item)},
+		},
+		
+		boiledLeathers: {
+			name: "Boiled Leathers",
+			description: "Cheap leather armor.",
+			slots: ['garb'],
+			colors: {
+				primary: '#A0522D',
+				secondary: '#A05221',
+				accent: '#A0452D',
+				studs: 'darkkhaki',
+				torso: {fill: '#A05221'},
+				upperArms: {fill:'tan'},
+				bust: {fill:'none',stroke:'none'},
+				legs: {fill:'tan'},
+				feet: {fill:'darkgrey',stroke:'#000000'},
+			},
+			stats: {
+				deflection: 3,
+				soak: 3,
+				weight: 15,
+			},
+			maneuvers: ['defensiveStance'],
+			svgNodes: function(item) {return item.pawn.avatar.boiledLeathers(item)},
+		},
+		
 		cargoHook: {
 			name: "Cargo Hook",
 			slots: ['left','right'],
@@ -439,6 +479,50 @@ var data = {
 			},
 			maneuvers: ['hook','gouge'],
 			svgNodes: function(item) {return item.pawn.avatar.cargoHook(item)},
+		},
+		
+		circleMedallion: {
+			name: "Circle Medallion",
+			slots: ['neck'],
+			colors: {
+				medallion: 'silver',
+				chain: 'silver',
+			},
+			stats: {},
+			svgNodes: function(item) {return item.pawn.avatar.circleMedallion(item)},
+		},
+		
+		fineBlacks: {
+			name: "Fine Blacks",
+			slots: ['garb'],
+			colors: {
+				shirt: '#272727',
+				sash: 'maroon',
+				upperArms: {fill:'#272727'},
+				lowerArms: {fill:'#272727'},
+				legs: {fill:'#272727'},
+				feet: {fill:'#272727',stroke:'#000000'},
+			},
+			stats: {
+				deflection: 3,
+				soak: 1,
+				weight: 2,
+				aegis: 1,
+			},
+			svgNodes:function(item) {return item.pawn.avatar.fineBlacks(item)},
+		},
+		
+		fineNecklace: {
+			name: 'Fine Necklace',
+			slots: ['neck'],
+			colors: {
+				metal: 'gold',
+				jewels: 'darkred',
+			},
+			stats: {
+				aegis: 3,
+			},
+			svgNodes:function(item) {return item.pawn.avatar.fineNecklace(item)},
 		},
 		
 		firstAidKit: {
@@ -487,7 +571,7 @@ var data = {
 				weight: 4,
 			},
 			maneuvers: ['batter','swing'],
-			svgNodes: function(item) {return item.pawn.avatar.simpleSpear(item)},
+			svgNodes: function(item) {return item.pawn.avatar.hammer(item)},
 		},
 		
 		initiatesRobes: {
@@ -547,6 +631,31 @@ var data = {
 			},
 			maneuvers: ['slash','lunge','feint'],
 			svgNodes: function(item) {return item.pawn.avatar.simpleSword(item)},
+		},
+		
+		nightworkArmor: {
+			name: "Nightwork Armor",
+			description: "Tailored leather dyed so dark as to appear almost black.",
+			slots: ['garb'],
+			colors: {
+				primary: '#532A0F',
+				secondary: '#1F3F3F',
+				accent: '#5B3B26',
+				studs: 'silver',
+				belt: '#532A0F',
+				torso: {fill: '#1F3F3F'},
+				upperArms: {fill:'#5F5F5F'},
+				bust: {fill:'none',stroke:'none'},
+				legs: {fill:'#5F5F5F'},
+				feet: {fill:'#272727',stroke:'#000000'},
+			},
+			stats: {
+				deflection: 6,
+				soak: 6,
+				weight: 10,
+			},
+			maneuvers: ['defensiveStance','foolsRush'],
+			svgNodes: function(item) {return item.pawn.avatar.boiledLeathers(item)},
 		},
 		
 		pegomancersRobes: {
@@ -688,7 +797,7 @@ var data = {
 			colors: {
 				head: 'silver',
 				shaft: 'saddlebrown',
-				bindings: 'blue',
+				bindings: 'forestgreen',
 			},
 			stats: {
 				balance: 1,
@@ -719,6 +828,44 @@ var data = {
 			},
 			maneuvers: ['slash','lunge'],
 			svgNodes: function(item) {return item.pawn.avatar.simpleSword(item)},
+		},
+		
+		skoglandArmor: {
+			name: "Skogland Armor",
+			description: "Mass-produced leather armor topped with the arms of the kingdom.",
+			slots: ['garb'],
+			colors: {
+				primary: '#A0522D',
+				secondary: '#A05221',
+				accent: '#A0452D',
+				studs: 'silver',
+				liveryBack: 'maroon',
+				liveryPiping: 'silver',
+				torso: {fill: '#A05221'},
+				upperArms: {fill:'maroon'},
+				legs: {fill:'maroon'},
+				feet: {fill:'darkgrey',stroke:'#000000'},
+				bust: {fill:'none',stroke:'none'},
+			},
+			stats: {
+				deflection: 3,
+				soak: 3,
+				weight: 15,
+			},
+			maneuvers: ['defensiveStance'],
+			svgNodes: function(item) {return item.pawn.avatar.skoglandArmor(item)},
+		},
+		
+		staff: {
+			name: "Staff",
+			slots: ['left','right'],
+			colors: {
+				staff: 'saddlebrown',
+			},
+			stats: {
+			},
+			maneuvers: [],
+			svgNodes: function(item) {return item.pawn.avatar.simpleStaff(item)},
 		},
 		
 		vicarRobes: {
@@ -753,6 +900,32 @@ var data = {
 			},
 			maneuvers: ['beam'],
 			svgNodes: function(item) {return item.pawn.avatar.wand(item)},
+		},
+		
+		watchArmor: {
+			name: "City Watch Armor",
+			description: "Mass-produced leather armor topped with the arms of the city.",
+			slots: ['garb'],
+			colors: {
+				primary: '#A0522D',
+				secondary: '#A05221',
+				accent: '#A0452D',
+				studs: 'gold',
+				liveryBack: 'forestgreen',
+				liveryPiping: 'gold',
+				torso: {fill: '#A05221'},
+				upperArms: {fill:'forestgreen'},
+				bust: {fill:'none',stroke:'none'},
+				legs: {fill:'forestgreen'},
+				feet: {fill:'darkgrey',stroke:'#000000'},
+			},
+			stats: {
+				deflection: 3,
+				soak: 3,
+				weight: 15,
+			},
+			maneuvers: ['defensiveStance'],
+			svgNodes: function(item) {return item.pawn.avatar.watchArmor(item)},
 		},
 	},
 	

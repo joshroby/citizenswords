@@ -23,6 +23,10 @@ svg {
 	font-weight: bold;
 }
 
+.landscape {
+	pointer-events: none;
+}
+
 /* CHARACTER CREATION LAYOUT */
 #creationLeftDiv {
 	width: 45%;
@@ -135,4 +139,10 @@ svg {
 
 .categoryContentsDiv {
 	padding-bottom: 3%;
+}
+
+/* Paperdoll */
+
+#paperdoll {
+	height: 80vh;
 }

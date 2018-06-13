@@ -61,21 +61,25 @@ TO DO LIST CITIZEN SWORDS REDUX
 - head buttons for entire party along bottom of viewbox
 - Pawn.moveTo() does nothing if you tell a pawn to move to its current tile
 - load pawns with ai priorities (freeze, post, and patrol)
+- sprites can load from external svg files
+	- landscape has the css { pointer-events: none } to prevent clip-blocking mouse events
+- new items w svg functions
+	- hammer
+	- cool armor
+	- city watch livery
+	- assassin gear
 
 
 
 CORE FUNCTIONALITY
 - the default maneuver animation is always going from the pawn that's focused on, not necessarily the pawn actually attacking.
-- storing landscape draw algorithms somewhere other than view
+- hellpuppy.avatar.svg() returns a group, not an svg
 - more garb & items
-	- hammer
-	- cool armor
-	- city watch livery
-	- assassin gear
 	- hatchet
 	- wand
 	- icon
 	- candelabrum
+	- cheap necklace for Boss Nosh
 - stocking chests infrastructure
 - split power/resist rolls for multiple effects
 - switching maps
@@ -89,9 +93,11 @@ OPTIONAL DISPLAY UPGRADES
 - wounds display as little fading pop-ups
 - list totals for deflection, soak and aegis in inventory
 - display cover on map
+- can floor tiles have round edges?
 
 OPTIONAL FUNCTIONAL UPGRADES
 - multi-hex targets
 - disarm to floor (requires items-on-floor architecture)
 - ablative-use items
 - standardized/frequently-used map events / macros
+- way to export svgs of any character, plus 'group shots'

@@ -173,10 +173,13 @@ var hellhoundCave = {
 				};
 			};
 			hellpuppy.moveTo(game.map.findTile(12,2));
-			gamen.displayPassage(new Passage("Growl? >snurfle< Woof.",undefined,true,"Terrifying Helhound... Whelp",hellpuppy.avatar.svg(),'left'));
+			gamen.displayPassage(new Passage("Growl? >snurfle< Woof.",undefined,true,"Terrifying Hellhound... Whelp",hellpuppy.avatar.svg(),'left'));
 			gamen.displayPassage(new Passage("Gasp!  Aren't you just the cutest little puppy?  Yes you are!  YES YOU ARE!!!<br />That's it, I'm taking you home!",undefined,true,pawn.name,pawn.avatar.svg('bust'),'right'));
 			gamen.displayPassage(new Passage("Hellpuppy has joined the party!",undefined,true,undefined,hellpuppy.avatar.svg(),'left'));
 			hellpuppy.team = 'p1';
+			game.map.heroes.push(hellpuppy);
+			game.players[0].heroes.push(hellpuppy.id);
+			view.refreshPawnButtons();
 		},
 	},
 
