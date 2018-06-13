@@ -25,6 +25,7 @@ var data = {
 			stats: {move:7,strength:12,focus:4},
 			equipment: {
 				garb: {template: 'roughspun'},
+				neck: {template: 'bauble'},
 			},
 			inventory: [],
 		},
@@ -37,6 +38,7 @@ var data = {
 			equipment: {
 				garb: {template: 'fineBlacks'},
 				neck: {template: 'circleMedallion'},
+				right: {template: 'knife'},
 			},
 			inventory: [],
 		},
@@ -71,7 +73,7 @@ var data = {
 			name: "Doti",
 			unique: true,
 			pronoun: "Emself",
-			description: "A hard-as-nails member of the city watch, Doti hails from Orktown but swears ey's left er old neighborhood loyalties behind.  Still, ey's usually good for a little information, at least.",
+			description: "A hard-as-nails member of the city watch, Doti hails from Orktown but swears ey've left eir old neighborhood loyalties behind.  Still, ey's usually good for a little information, at least.",
 			avatarHeritage: ['goblin'],
 			stats: {move:12,strength:12,focus:12},
 			equipment: {
@@ -114,6 +116,8 @@ var data = {
 			stats: {move:6,strength:8,focus:5},
 			equipment: {
 				garb: {template:'roughspun'},
+				right: {template: 'bronzeHatchet'},
+				left: {template: 'sovereignIcon'},
 			},
 			inventory: [],
 		},
@@ -419,26 +423,16 @@ var data = {
 			svgNodes: undefined,
 		},
 		
-		candelabrum: {
-			name: "Candelabrum",
-			slots: [],
-			colors: {
-				base: 'goldenrod',
-			},
-		},
-		
-		chainsOfOffice: {
-			name: "Chains of Office",
+		bauble: {
+			name: "Bauble",
+			description: "A bit of colorful glass jewelry.",
 			slots: ['neck'],
 			colors: {
-				chain: 'gold',
-				medallion: 'green',
+				chain: ['silver','darkgoldenrod','#6d5d04'],
+				pendant: ["INDIANRED","LIGHTCORAL","SALMON","DARKSALMON","LIGHTSALMON","CRIMSON","RED","FIREBRICK","DARKRED","PINK","LIGHTPINK","HOTPINK","DEEPPINK","MEDIUMVIOLETRED","PALEVIOLETRED","LIGHTSALMON","CORAL","TOMATO","ORANGERED","DARKORANGE","ORANGE","GOLD","YELLOW","LIGHTYELLOW","LEMONCHIFFON","LIGHTGOLDENRODYELLOW","PAPAYAWHIP","MOCCASIN","PEACHPUFF","PALEGOLDENROD","KHAKI","DARKKHAKI","LAVENDER","THISTLE","PLUM","VIOLET","ORCHID","FUCHSIA","MAGENTA","MEDIUMORCHID","MEDIUMPURPLE","REBECCAPURPLE","BLUEVIOLET","DARKVIOLET","DARKORCHID","DARKMAGENTA","PURPLE","INDIGO","SLATEBLUE","DARKSLATEBLUE","MEDIUMSLATEBLUE","GREENYELLOW","CHARTREUSE","LAWNGREEN","LIME","LIMEGREEN","PALEGREEN","LIGHTGREEN","MEDIUMSPRINGGREEN","SPRINGGREEN","MEDIUMSEAGREEN","SEAGREEN","FORESTGREEN","GREEN","DARKGREEN","YELLOWGREEN","OLIVEDRAB","OLIVE","DARKOLIVEGREEN","MEDIUMAQUAMARINE","DARKSEAGREEN","LIGHTSEAGREEN","DARKCYAN","TEAL","AQUA","CYAN","LIGHTCYAN","PALETURQUOISE","AQUAMARINE","TURQUOISE","MEDIUMTURQUOISE","DARKTURQUOISE","CADETBLUE","STEELBLUE","LIGHTSTEELBLUE","POWDERBLUE","LIGHTBLUE","SKYBLUE","LIGHTSKYBLUE","DEEPSKYBLUE","DODGERBLUE","CORNFLOWERBLUE","MEDIUMSLATEBLUE","ROYALBLUE","BLUE","MEDIUMBLUE","DARKBLUE","NAVY","MIDNIGHTBLUE","CORNSILK","BLANCHEDALMOND","BISQUE","NAVAJOWHITE","WHEAT","BURLYWOOD","TAN","ROSYBROWN","SANDYBROWN","GOLDENROD","DARKGOLDENROD","PERU","CHOCOLATE","SADDLEBROWN","SIENNA","BROWN","MAROON","SNOW","HONEYDEW","MINTCREAM","AZURE","ALICEBLUE","GHOSTWHITE","WHITESMOKE","SEASHELL","BEIGE","OLDLACE","FLORALWHITE","IVORY","ANTIQUEWHITE","LINEN","LAVENDERBLUSH","MISTYROSE","GAINSBORO","LIGHTGRAY","SILVER","DARKGRAY","GRAY","DIMGRAY","LIGHTSLATEGRAY","SLATEGRAY","DARKSLATEGRAY"],
 			},
-			stats: {
-				aegis: 5,
-				weight: 2,
-			},
-			svgNodes: function(item) {return item.pawn.avatar.chainsOfOffice(item)},
+			stats: {},
+			svgNodes: function(item) {return item.pawn.avatar.simpleNecklace(item)},
 		},
 		
 		boiledLeathers: {
@@ -463,6 +457,43 @@ var data = {
 			},
 			maneuvers: ['defensiveStance'],
 			svgNodes: function(item) {return item.pawn.avatar.boiledLeathers(item)},
+		},
+		
+		bronzeHatchet: {
+			name: "Bronze Hatchet",
+			slots: ['left','right'],
+			colors: {
+				head: '#6d5d04',
+				shaft: 'saddlebrown',
+			},
+			stats: {},
+			maneuvers: [],
+			svgNodes: function(item) {return item.pawn.avatar.simpleAxe(item)},
+		},
+		
+		candelabrum: {
+			name: "Candelabrum",
+			slots: ['left','right'],
+			colors: {
+				metal: 'goldenrod',
+				candles: 'ivory',
+				flame: 'orange',
+			},
+			svgNodes: function(item) {return item.pawn.avatar.candelabrum(item)},
+		},
+		
+		chainsOfOffice: {
+			name: "Chains of Office",
+			slots: ['neck'],
+			colors: {
+				chain: 'gold',
+				medallion: 'green',
+			},
+			stats: {
+				aegis: 5,
+				weight: 2,
+			},
+			svgNodes: function(item) {return item.pawn.avatar.chainsOfOffice(item)},
 		},
 		
 		cargoHook: {
@@ -610,6 +641,25 @@ var data = {
 			},
 			maneuvers: ['beam','quickTrance'],
 			svgNodes: function(item) {return item.pawn.avatar.book(item)},
+		},
+		
+		knife: {
+			name: "Knife",
+			slots: ['left','right'],
+			colors: {
+				blade: 'silver',
+				grip: 'darkslategray',
+				hilt: 'silver',
+				pommel: 'silver',
+			},
+			stats: {
+				reach: 1,
+				sharp: 5,
+				sharpBase: 1,
+				weight: 2,
+			},
+			maneuvers: ['slash','feint'],
+			svgNodes: function(item) {return item.pawn.avatar.simpleKnife(item)},
 		},
 		
 		mothersSword: {
@@ -854,6 +904,21 @@ var data = {
 			},
 			maneuvers: ['defensiveStance'],
 			svgNodes: function(item) {return item.pawn.avatar.skoglandArmor(item)},
+		},
+		
+		sovereignIcon: {
+			name: "Sovereign Icon",
+			description: "A portrait of the Divine Sovereign, one of the six gods of the Pantheon.  Used in religious rituals.",
+			slots: ['left','right'],
+			colors: {
+				primary: 'saddlebrown',
+				secondary: 'peru',
+				figure: 'indigo',
+				crown: 'yellow',
+			},
+			stats: {},
+			maneuvers: [],
+			svgNodes: function(item) {return item.pawn.avatar.sovereignIcon(item)},
 		},
 		
 		staff: {

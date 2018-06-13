@@ -715,15 +715,6 @@ var view = {
 			sheet.setAttribute('fill','white');
 			sheet.setAttribute('stroke','black');
 			sheet.setAttribute('stroke-width',0.25);
-			var portrait = document.createElementNS('http://www.w3.org/2000/svg','use');
-			sheetGroup.appendChild(portrait);
-			view.setHref(portrait,pawn.sprite);
-			portrait.setAttribute('x',-75);
-			portrait.setAttribute('y',160);
-			portrait.addEventListener('click',view.toggleInventoryPane);
-			if (pawn.stats == undefined) {
-				portrait.setAttribute('transform','translate(-27.5 70) scale(0.5)');
-			};
 			if (pawn.morale !== undefined) {
 				var moraleBarGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
 				sheetGroup.appendChild(moraleBarGroup);
@@ -802,6 +793,15 @@ var view = {
 					statGroup.appendChild(woundGroup);
 					woundGroup.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'WoundGroup';
 				};
+			};
+			var portrait = document.createElementNS('http://www.w3.org/2000/svg','use');
+			sheetGroup.appendChild(portrait);
+			view.setHref(portrait,pawn.sprite);
+			portrait.setAttribute('x',-75);
+			portrait.setAttribute('y',160);
+			portrait.addEventListener('click',view.toggleInventoryPane);
+			if (pawn.stats == undefined) {
+				portrait.setAttribute('transform','translate(-27.5 70) scale(0.5)');
 			};
 
 			var maneuversGroup = document.createElementNS('http://www.w3.org/2000/svg','g');

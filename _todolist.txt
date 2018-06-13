@@ -68,18 +68,22 @@ TO DO LIST CITIZEN SWORDS REDUX
 	- cool armor
 	- city watch livery
 	- assassin gear
+	- hatchet
+	- icon
+	- cheap necklaces
+	- candelabrum
+- AvatarBeast now has separate draw() and svg() functions
 
 
 
 CORE FUNCTIONALITY
 - the default maneuver animation is always going from the pawn that's focused on, not necessarily the pawn actually attacking.
-- hellpuppy.avatar.svg() returns a group, not an svg
+- Fire Mob
 - more garb & items
-	- hatchet
+	- knife
+	- pail
+	- fine clothes for looters
 	- wand
-	- icon
-	- candelabrum
-	- cheap necklace for Boss Nosh
 - stocking chests infrastructure
 - split power/resist rolls for multiple effects
 - switching maps
@@ -101,3 +105,5 @@ OPTIONAL FUNCTIONAL UPGRADES
 - ablative-use items
 - standardized/frequently-used map events / macros
 - way to export svgs of any character, plus 'group shots'
+- salon to change hair
+- armor dummies to display sets of armor (pawns with garb)

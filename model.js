@@ -45,14 +45,17 @@ function Game() {
 	this.costumes.work.equipment.garb = new Item('roughspun',this.costumes.work);
 	this.costumes.work.equipment.garb.colors.shirt = 'firebrick';
 	this.costumes.work.equipment.garb.colors.upperArms.fill = 'firebrick';
+	this.costumes.work.equipment.neck = undefined;
 	this.costumes.work.stats = {move:8,moveMax:8,strength:11,strengthMax:11,focus:10,focusMax:10};
 	
 	this.costumes.fight.equipment.garb = new Item('scrapArmor',this.costumes.fight);
 	this.costumes.fight.equipment.right = new Item('shield',this.costumes.fight);
+	this.costumes.fight.equipment.neck = undefined;
 	this.costumes.fight.stats = {move:11,moveMax:11,strength:10,strengthMax:10,focus:8,focusMax:8};
 	
 	this.costumes.pray.equipment.right = new Item('initiatesTome',this.costumes.pray);
 	this.costumes.pray.equipment.garb = new Item('initiatesRobes',this.costumes.pray);
+	this.costumes.pray.equipment.neck = undefined;
 	this.costumes.pray.stats = {move:9,moveMax:9,strength:9,strengthMax:9,focus:11,focusMax:11};
 	
 	this.avatar.pawn = this.costumes[['work','fight','pray'][Math.random() * 3 << 0]];
@@ -493,6 +496,9 @@ function Pawn(template,tile,ai) {
 		};
 		if (Math.random() < 0.5) {
 			this.equipment.garb = new Item('sundress',this);
+		};
+		if (Math.random() < 0.5) {
+			this.equipment.neck = new Item('bauble',this);
 		};
 		this.inventory = [];
 	} else {

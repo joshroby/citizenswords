@@ -3171,6 +3171,43 @@ function Avatar(pawn,heritages) {
 
 	};
 	
+	this.palm = function() {
+		if (this.bodyConstants.wrist.id === 'rightWristPivot') {var reflect = 1} else {var reflect = -1};
+		var wrist = {
+			x: this.bodyConstants.wrist.cx.animVal.value,
+			y: this.bodyConstants.wrist.cy.animVal.value,
+		};
+		
+		var ellipse = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+		ellipse.setAttribute('cx',wrist.x - 10*reflect);
+		ellipse.setAttribute('cy',wrist.y);
+		ellipse.setAttribute('rx',12);
+		ellipse.setAttribute('ry',10);
+		ellipse.setAttribute('stroke','black');
+		return ellipse;
+	};
+	
+	this.straightThumb = function() {
+		if (this.bodyConstants.wrist.id === 'rightWristPivot') {var reflect = 1} else {var reflect = -1};
+		var wrist = {
+			x: this.bodyConstants.wrist.cx.animVal.value,
+			y: this.bodyConstants.wrist.cy.animVal.value,
+		};
+		
+		var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+		path.setAttribute('stroke','black');
+		var d = 'M '+(wrist.x-4*reflect)+','+wrist.y+' ';
+		d += 'Q '+(wrist.x-8*reflect)+','+(wrist.y)+' '+(wrist.x-8*reflect)+','+(wrist.y-5)+' ';
+		d += 'L '+(wrist.x-11*reflect)+','+(wrist.y-8)+' ';
+		d += 'L '+(wrist.x-14*reflect)+','+(wrist.y-9)+' ';
+		d += 'Q '+(wrist.x-16*reflect)+','+(wrist.y-9)+' '+(wrist.x-16*reflect)+','+(wrist.y-14)+' ';
+		d += 'L '+(wrist.x-9*reflect)+','+(wrist.y-12.5)+' ';
+		d += 'L '+(wrist.x-4*reflect)+','+(wrist.y-9)+' ';
+		path.setAttribute('d',d);
+		
+		return path;
+	};
+	
 	this.legs = function() {
 
 		var legGroup = document.createElementNS('http://www.w3.org/2000/svg',"g");
@@ -3533,14 +3570,103 @@ function Avatar(pawn,heritages) {
 		
 		return svgNodes;
 		};
+		
+	this.candelabrum = function(item) {
+		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
+		svgNodes.appendChild(this.thumb());
+		
+		var wrist = {
+			x: this.bodyConstants.wrist.cx.animVal.value,
+			y: this.bodyConstants.wrist.cy.animVal.value,
+		};
+		
+		var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+		svgNodes.appendChild(path);
+		path.setAttribute('stroke-width',5);
+		path.setAttribute('stroke','black');
+		path.setAttribute('fill','none');
+		var d = 'M '+(wrist.x-25)+','+(wrist.y-37)+' ';
+		d += 'Q '+(wrist.x-25)+','+(wrist.y-14)+' '+wrist.x+','+(wrist.y-14)+' ';
+		d += 'Q '+(wrist.x+25)+','+(wrist.y-14)+' '+(wrist.x+25)+','+(wrist.y-37)+' ';
+		path.setAttribute('d',d);
+		var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+		svgNodes.appendChild(path);
+		path.setAttribute('stroke-width',3);
+		path.setAttribute('stroke',item.colors.metal);
+		path.setAttribute('fill','none');
+		path.setAttribute('d',d);
+				
+		var shapes = [
+			{cx:wrist.x,cy:wrist.y+35,rx:15,ry:8,color:'metal'},
+			{cx:wrist.x,cy:wrist.y+30,rx:10,ry:5,color:'metal'},
+			{cx:wrist.x,cy:wrist.y+20,rx:6,ry:10,color:'metal'},
+			{cx:wrist.x,cy:wrist.y,rx:4,ry:12,color:'metal'},
+			{cx:wrist.x,cy:wrist.y-24,rx:3,ry:8,color:'metal'},
+			{cx:wrist.x,cy:wrist.y-14,rx:4,ry:4,color:'metal'},
+			{cx:wrist.x,cy:wrist.y-37,rx:6,ry:6,color:'metal'},
+			{cx:wrist.x,cy:wrist.y-42,rx:9,ry:5,color:'metal'},
+			{cx:wrist.x+25,cy:wrist.y-37,rx:5,ry:5,color:'metal'},
+			{cx:wrist.x+25,cy:wrist.y-40,rx:8,ry:4.5,color:'metal'},
+			{cx:wrist.x-25,cy:wrist.y-37,rx:5,ry:5,color:'metal'},
+			{cx:wrist.x-25,cy:wrist.y-40,rx:8,ry:4.5,color:'metal'},
+			{cx:wrist.x-25,cy:wrist.y-40,rx:5,ry:2.5,color:'candles'},
+			{x:wrist.x-30,y:wrist.y-55,width:10,height:15,color:'candles'},
+			{cx:wrist.x-25,cy:wrist.y-55,rx:5,ry:2.5,color:'candles'},
+			{cx:wrist.x+25,cy:wrist.y-40,rx:5,ry:2.5,color:'candles'},
+			{x:wrist.x+20,y:wrist.y-55,width:10,height:15,color:'candles'},
+			{cx:wrist.x+25,cy:wrist.y-55,rx:5,ry:2.5,color:'candles'},
+			{cx:wrist.x,cy:wrist.y-42,rx:7,ry:3,color:'candles'},
+			{x:wrist.x-7,y:wrist.y-65,width:14,height:23,color:'candles'},
+			{cx:wrist.x,cy:wrist.y-65,rx:7,ry:3,color:'candles'},
+			{x:wrist.x,y:wrist.y-70,width:0,height:5,color:'candles'},
+			{x:wrist.x-25,y:wrist.y-60,width:0,height:5,color:'candles'},
+			{x:wrist.x+25,y:wrist.y-60,width:0,height:5,color:'candles'},
+		];
+		for (var shape of shapes) {
+			if (shape.cx !== undefined) {
+				var node = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+				svgNodes.appendChild(node);
+				node.setAttribute('cx',shape.cx);
+				node.setAttribute('cy',shape.cy);
+				node.setAttribute('rx',shape.rx);
+				node.setAttribute('ry',shape.ry);
+				node.setAttribute('stroke','black');
+			} else {
+				var node = document.createElementNS('http://www.w3.org/2000/svg','rect');
+				svgNodes.appendChild(node);
+				node.setAttribute('x',shape.x);
+				node.setAttribute('y',shape.y);
+				node.setAttribute('width',shape.width);
+				node.setAttribute('height',shape.height);
+				node.setAttribute('stroke','none');
+				var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+				svgNodes.appendChild(line);
+				line.setAttribute('x1',shape.x);
+				line.setAttribute('y1',shape.y);
+				line.setAttribute('x2',shape.x);
+				line.setAttribute('y2',shape.y+shape.height);
+				line.setAttribute('stroke','black');
+				var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+				svgNodes.appendChild(line);
+				line.setAttribute('x1',shape.x+shape.width);
+				line.setAttribute('y1',shape.y);
+				line.setAttribute('x2',shape.x+shape.width);
+				line.setAttribute('y2',shape.y+shape.height);
+				line.setAttribute('stroke','black');
+			};
+			node.setAttribute('fill',item.colors[shape.color]);
+		};
+		
+		svgNodes.appendChild(this.fist());
+		return svgNodes;
+	};
 	
 	this.cargoHook = function(item) {
 		if (this.bodyConstants.wrist.id === 'rightWristPivot') {var reflect = 1} else {var reflect = -1};
 
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
 		
-		var thumb = this.thumb();
-		svgNodes.appendChild(thumb);
+		svgNodes.appendChild(this.thumb());
 		
 		var handle = document.createElementNS('http://www.w3.org/2000/svg',"path");
 		handle.setAttribute("fill",item.colors.handle);
@@ -3553,8 +3679,7 @@ function Avatar(pawn,heritages) {
 		handle.setAttributeNS(null,'d',path);
 		svgNodes.appendChild(handle);
 		
-		var fist = this.fist();
-		svgNodes.appendChild(fist);
+		svgNodes.appendChild(this.fist());
 		
 		var hook = document.createElementNS('http://www.w3.org/2000/svg',"path");
 		hook.setAttribute("fill",item.colors.hook);
@@ -3752,8 +3877,7 @@ function Avatar(pawn,heritages) {
 
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
 		
-		var thumb = this.thumb();
-		svgNodes.appendChild(thumb);
+		svgNodes.appendChild(this.thumb());
 		
 		var handle = document.createElementNS('http://www.w3.org/2000/svg',"path");
 		handle.setAttribute("fill",item.colors.shaft);
@@ -3806,8 +3930,7 @@ function Avatar(pawn,heritages) {
 		
 		// Fist Front
 		
-		var fist = this.fist();
-		svgNodes.appendChild(fist);
+		svgNodes.appendChild(this.fist());
 		
 		return svgNodes;
 	};
@@ -4014,6 +4137,51 @@ function Avatar(pawn,heritages) {
 		return svgNodes;
 	
 	};
+
+	this.simpleAxe = function(item) {
+		if (this.bodyConstants.wrist.id === 'rightWristPivot') {var reflect = 1} else {var reflect = -1};
+
+		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
+		
+		svgNodes.appendChild(this.thumb());
+		
+		var axeHead = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		axeHead.setAttribute("fill",item.colors.head);
+		axeHead.setAttribute("stroke","#000000");
+		axeHead.setAttribute("stroke-width","1");
+		axeHead.setAttribute("stroke-linecap","round");
+		path = 'm'+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value;
+		path += 'm0,-40 ';
+		path += 'c -10,0 -20,4 -20,4 ';
+		path += 'c -6,10 -4,30 2,30 ';
+		path += 'c 0,0 8,-14 18,-14 ';
+		path += 'c 4,-4 16,-8 20,-4 ';
+		path += 'c 2,0 2,-6 0,-6 ';
+		path += 'c 0,0 -10,-10 -20,-10 ';
+		axeHead.setAttributeNS(null,'d',path);
+		if (reflect === -1) {
+			var offset = this.bodyConstants.wrist.cx.animVal.value * -2;
+			axeHead.setAttribute('transform','scale(-1,1) translate('+offset+',0)');
+		};
+		svgNodes.appendChild(axeHead);
+		
+		var handle = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		handle.setAttribute("fill",item.colors.shaft);
+		handle.setAttribute("stroke","#000000");
+		handle.setAttribute("stroke-width","1");
+		handle.setAttribute("stroke-linecap","round");
+		path = 'm'+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value;
+		path += ' m -3,0 ';
+		path += 'v-40 c 0,-3 6,-3 6,0 v70 c 0,2 -6,2 -6,0 v-20';
+		handle.setAttributeNS(null,'d',path);
+		svgNodes.appendChild(handle);
+		
+		// Fist Front
+		
+		svgNodes.appendChild(this.fist());
+		
+		return svgNodes;
+	},
 	
 	this.simpleBelt = function(item) {
 		
@@ -4083,6 +4251,95 @@ function Avatar(pawn,heritages) {
 		d += 'Q -10,'+(this.bodyConstants.neck+20)+' 0,'+(this.bodyConstants.neck+21)+' ';
 		d += 'Q 10,'+(this.bodyConstants.neck+20)+' 10,'+this.bodyConstants.neck;
 		chain.setAttribute('d',d);
+		return svgNodes;
+	};
+	
+	this.simpleKnife = function(item) {
+		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg','g');
+		
+		svgNodes.appendChild(this.thumb());
+		
+		var blade = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		blade.setAttribute('fill',item.colors.blade);
+		blade.setAttribute("stroke","#000000");
+		blade.setAttribute("stroke-width","1");
+		blade.setAttribute("stroke-linecap","round");
+		path = 'm'+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value;
+		path += 'm -5,-7 l0,-50 ';
+		path += 'q 10,0 10,50';
+		blade.setAttributeNS(null,"d",path);
+		svgNodes.appendChild(blade);
+		
+		var bladeShading = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		bladeShading.setAttribute('fill','black');
+		bladeShading.setAttribute('opacity','0.5');
+		bladeShading.setAttribute("stroke","#000000");
+		bladeShading.setAttribute("stroke-width","1");
+		bladeShading.setAttribute("stroke-linecap","round");
+		path = 'm'+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value;
+		path += 'm -3,-7 l0,-40 ';
+		path += 'q 3,0 3,40';
+		bladeShading.setAttributeNS(null,"d",path);
+		svgNodes.appendChild(bladeShading);
+		
+		var grip = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		grip.setAttribute('fill',item.colors.grip);
+		grip.setAttribute("stroke","#000000");
+		grip.setAttribute("stroke-width","1");
+		grip.setAttribute("stroke-linecap","round");
+		path = 'm'+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value;
+		path += 'm -5,-7 h10 l-3,33 h-4 l-3,-33';
+		grip.setAttributeNS(null,"d",path);
+		svgNodes.appendChild(grip);
+		
+		var hilt = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		hilt.setAttribute('fill',item.colors.hilt);
+		hilt.setAttribute("stroke","#000000");
+		hilt.setAttribute("stroke-width","1");
+		hilt.setAttribute("stroke-linecap","round");
+		path = 'm'+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value;
+		path += 'm 0,-7 h-10 v-3 h20 v3 h-10';
+		hilt.setAttributeNS(null,"d",path);
+		svgNodes.appendChild(hilt);
+		
+		var pommel = document.createElementNS('http://www.w3.org/2000/svg',"circle");
+		pommel.setAttribute('fill',item.colors.pommel);
+		pommel.setAttribute("stroke","#000000");
+		pommel.setAttribute("stroke-width","1");
+		pommel.setAttribute("stroke-linecap","round");
+		pommel.setAttribute("cx",this.bodyConstants.wrist.cx.animVal.value);
+		pommel.setAttribute("cy",25+this.bodyConstants.wrist.cy.animVal.value);
+		pommel.setAttribute("r",4);
+		svgNodes.appendChild(pommel);
+		
+		svgNodes.appendChild(this.fist());
+		
+		
+		return svgNodes;
+	};
+	
+	this.simpleNecklace = function(item) {
+		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
+		svgNodes.appendChild(this.simpleChain(item));
+		var pendant = document.createElementNS('http://www.w3.org/2000/svg',"ellipse");
+		svgNodes.appendChild(pendant);
+		pendant.setAttribute('fill',item.colors.chain);
+		pendant.setAttribute('stroke','black');
+		pendant.setAttribute('cx',0);
+		pendant.setAttribute('cy',this.bodyConstants.neck+25);
+		pendant.setAttribute('rx',3);
+		pendant.setAttribute('ry',4);
+		if (item.colors.pendant !== 'none') {
+			var pendant = document.createElementNS('http://www.w3.org/2000/svg',"ellipse");
+			svgNodes.appendChild(pendant);
+			pendant.setAttribute('fill',item.colors.pendant);
+			pendant.setAttribute('stroke','black');
+			pendant.setAttribute('stroke-width',0.5);
+			pendant.setAttribute('cx',0);
+			pendant.setAttribute('cy',this.bodyConstants.neck+25);
+			pendant.setAttribute('rx',1);
+			pendant.setAttribute('ry',2);
+		};
 		return svgNodes;
 	};
 	
@@ -4456,8 +4713,7 @@ function Avatar(pawn,heritages) {
 
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
 		
-		var thumb = this.thumb();
-		svgNodes.appendChild(thumb);
+		svgNodes.appendChild(this.thumb());
 		
 		var spearHead = document.createElementNS('http://www.w3.org/2000/svg',"path");
 		spearHead.setAttribute("fill",item.colors.head);
@@ -4497,8 +4753,7 @@ function Avatar(pawn,heritages) {
 		
 		// Fist Front
 		
-		var fist = this.fist();
-		svgNodes.appendChild(fist);
+		svgNodes.appendChild(this.fist());
 		
 		return svgNodes;
 	};
@@ -4506,10 +4761,7 @@ function Avatar(pawn,heritages) {
 	this.simpleSword = function(item) {
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg','g');
 		
-		// Thumb
-		
-		var thumb = this.thumb();
-		svgNodes.appendChild(thumb);
+		svgNodes.appendChild(this.thumb());
 		
 		var blade = document.createElementNS('http://www.w3.org/2000/svg',"path");
 		blade.setAttribute('fill',item.colors.blade);
@@ -4521,10 +4773,6 @@ function Avatar(pawn,heritages) {
 		blade.setAttributeNS(null,"d",path);
 		svgNodes.appendChild(blade);
 		
-		// Blade Shading
-		
-		// Grip
-		
 		var grip = document.createElementNS('http://www.w3.org/2000/svg',"path");
 		grip.setAttribute('fill',item.colors.grip);
 		grip.setAttribute("stroke","#000000");
@@ -4534,8 +4782,6 @@ function Avatar(pawn,heritages) {
 		path += 'm -5,-7 h10 l-3,33 h-4 l-3,-33';
 		grip.setAttributeNS(null,"d",path);
 		svgNodes.appendChild(grip);
-		
-		// Hilt
 		
 		var hilt = document.createElementNS('http://www.w3.org/2000/svg',"path");
 		hilt.setAttribute('fill',item.colors.hilt);
@@ -4547,8 +4793,6 @@ function Avatar(pawn,heritages) {
 		hilt.setAttributeNS(null,"d",path);
 		svgNodes.appendChild(hilt);
 		
-		// Pommel
-		
 		var pommel = document.createElementNS('http://www.w3.org/2000/svg',"circle");
 		pommel.setAttribute('fill',item.colors.pommel);
 		pommel.setAttribute("stroke","#000000");
@@ -4559,10 +4803,7 @@ function Avatar(pawn,heritages) {
 		pommel.setAttribute("r",4);
 		svgNodes.appendChild(pommel);
 		
-		// Fist Front
-		
-		var fist = this.fist();
-		svgNodes.appendChild(fist);
+		svgNodes.appendChild(this.fist());
 		
 		
 		return svgNodes;
@@ -4605,8 +4846,7 @@ function Avatar(pawn,heritages) {
 
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
 		
-		var thumb = this.thumb();
-		svgNodes.appendChild(thumb);
+		svgNodes.appendChild(this.thumb());
 		
 		var handle = document.createElementNS('http://www.w3.org/2000/svg',"path");
 		handle.setAttribute("fill",item.colors.staff);
@@ -4621,8 +4861,7 @@ function Avatar(pawn,heritages) {
 		
 		// Fist Front
 		
-		var fist = this.fist();
-		svgNodes.appendChild(fist);
+		svgNodes.appendChild(this.fist());
 		
 		return svgNodes;
 	},
@@ -4658,6 +4897,93 @@ function Avatar(pawn,heritages) {
 		points = points + ' ' + reflection;
 		swordCharge.setAttribute('points',points);
 				
+		return svgNodes;
+	};
+	
+	this.sovereignIcon = function(item) {
+		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
+		svgNodes.setAttribute('stroke-linejoin','round');
+		
+		svgNodes.appendChild(this.palm());
+		
+		if (this.bodyConstants.wrist.id === 'rightWristPivot') {var reflect = 1} else {var reflect = -1};
+		var wrist = {
+			x: this.bodyConstants.wrist.cx.animVal.value - 5 * reflect,
+			y: this.bodyConstants.wrist.cy.animVal.value,
+		};
+		
+		svgNodes.setAttribute('transform','translate(0 5) rotate('+-45*reflect+' '+wrist.x+' '+wrist.y+')');
+		
+		var rect = document.createElementNS('http://www.w3.org/2000/svg',"rect");
+		svgNodes.appendChild(rect);
+		var rectX = wrist.x-24
+		if (reflect == -1) {
+			rectX = wrist.x+20
+		};
+		rect.setAttribute('x',rectX);
+		rect.setAttribute('y',wrist.y-25);
+		rect.setAttribute('height',50);
+		rect.setAttribute('width',4);
+		rect.setAttribute('stroke','black');
+		rect.setAttribute('fill',item.colors.secondary);
+		
+		var polygon = document.createElementNS('http://www.w3.org/2000/svg',"polygon");
+		svgNodes.appendChild(polygon);
+		polygon.setAttribute('stroke','black');
+		polygon.setAttribute('fill',item.colors.primary);
+		var pointsArray = [
+			{x:wrist.x,y:wrist.y},
+			{x:wrist.x,y:wrist.y-15},
+			{x:wrist.x-20*reflect,y:wrist.y-25},
+			{x:wrist.x-20*reflect,y:wrist.y+25},
+			{x:wrist.x,y:wrist.y+15},
+			{x:wrist.x,y:wrist.y},
+		];
+		var points = '';
+		for (var point of pointsArray) {
+			points += (point.x) + ',' + point.y + ' ';
+		};
+		polygon.setAttribute('points',points);
+		
+		var crown = document.createElementNS('http://www.w3.org/2000/svg',"polygon");
+		svgNodes.appendChild(crown);
+		crown.setAttribute('stroke','black');
+		crown.setAttribute('fill',item.colors.crown);
+		var pointsArray = [
+			{x:wrist.x-15*reflect,y:wrist.y-2},
+			{x:wrist.x-15*reflect,y:wrist.y-11},
+			{x:wrist.x-12*reflect,y:wrist.y-6},
+			{x:wrist.x-10*reflect,y:wrist.y-13},
+			{x:wrist.x-8*reflect,y:wrist.y-6},
+			{x:wrist.x-5*reflect,y:wrist.y-11},
+			{x:wrist.x-5*reflect,y:wrist.y-2},
+		];
+		var points = '';
+		for (var point of pointsArray) {
+			points += (point.x) + ',' + point.y + ' ';
+		};
+		crown.setAttribute('points',points);
+		
+		var body = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		svgNodes.appendChild(body);
+		body.setAttribute('stroke','black');
+		body.setAttribute('fill',item.colors.figure);
+		var d = 'M '+(wrist.x-15*reflect)+','+(wrist.y+22)+' ';
+		d += 'Q '+(wrist.x-15*reflect)+','+(wrist.y+8)+' '+(wrist.x-10*reflect)+','+(wrist.y+8)+' ';
+		d += 'Q '+(wrist.x-5*reflect)+','+(wrist.y+8)+' '+(wrist.x-5*reflect)+','+(wrist.y+17)+' ';
+		body.setAttribute('d',d);
+		
+		var head = document.createElementNS('http://www.w3.org/2000/svg',"ellipse");
+		svgNodes.appendChild(head);
+		head.setAttribute('cx',wrist.x-10*reflect);
+		head.setAttribute('cy',wrist.y+3);
+		head.setAttribute('rx',4);
+		head.setAttribute('ry',6);
+		head.setAttribute('stroke','black');
+		head.setAttribute('fill',item.colors.figure);
+		
+		svgNodes.appendChild(this.straightThumb());
+		
 		return svgNodes;
 	};
 	
@@ -4885,6 +5211,13 @@ function AvatarBeast(pawn,type) {
 	this.type = type;
 	
 	this.svg = function() {
+		var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+		svg.setAttribute('viewBox','-25 -50 50 50');
+		svg.appendChild(this.draw());
+		return svg;
+	};
+
+	this.draw = function() {
 		
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg','g');
 		svgNodes.id = pawn.id;
@@ -4895,8 +5228,8 @@ function AvatarBeast(pawn,type) {
 		shadow.setAttribute("opacity",0.2);
 		shadow.setAttribute("cx",0);
 		shadow.setAttribute("cy",0);
-		shadow.setAttribute("rx",20);
-		shadow.setAttribute("ry",8);
+		shadow.setAttribute("rx",10);
+		shadow.setAttribute("ry",4);
 		svgNodes.appendChild(shadow);
 		
 		var characterGroup = this[this.type]();
@@ -5072,8 +5405,6 @@ function AvatarBeast(pawn,type) {
 	
 		return svgNodes;
 	};
-	
-	this.draw = function() {return this.svg()};
 	
 	this.rat = function() {
 		var bodyNodes = document.createElementNS('http://www.w3.org/2000/svg','g');
