@@ -72,7 +72,10 @@ TO DO LIST CITIZEN SWORDS REDUX
 	- icon
 	- cheap necklaces
 	- candelabrum
+	- knife
+	- fine clothes
 - AvatarBeast now has separate draw() and svg() functions
+- stocking chests infrastructure
 
 
 
@@ -80,11 +83,8 @@ CORE FUNCTIONALITY
 - the default maneuver animation is always going from the pawn that's focused on, not necessarily the pawn actually attacking.
 - Fire Mob
 - more garb & items
-	- knife
 	- pail
-	- fine clothes for looters
 	- wand
-- stocking chests infrastructure
 - split power/resist rolls for multiple effects
 - switching maps
 - archiving maps

@@ -303,7 +303,7 @@ var view = {
 				var externalSprite = document.createElementNS('http://www.w3.org/2000/svg','image');
 				defs.appendChild(externalSprite);
 				externalSprite.id = standee.key;
-				view.setHref(externalSprite,data.landscapes[standee.key].path,true);
+				view.setHref(externalSprite,data[standee.type+'s'][standee.key].path,true);
 				var imageDimensions = {key:standee.key};
 				if (data[standee.type+'s'][standee.key].height == undefined) {
 					imageDimensions.height = 100;
@@ -620,41 +620,16 @@ var view = {
 	},
 	
 	buildStandees: function() {
-		for (var pawn of game.map.pawns) {
-			document.getElementById('globalDefs').appendChild(pawn.avatar.draw());
-			pawn.sprite = pawn.id;
-		};
 		for (var tile of game.map.tiles) {
 			var displayCoords = view.displayCoords(tile);
 			for (var occupant of tile.occupants) {
-				var occupantUse = document.createElementNS('http://www.w3.org/2000/svg','use');
-				tile.standeeGroup.appendChild(occupantUse);
-				occupant.svg = occupantUse;
-				if (occupant.landscape) {
-					occupantUse.setAttribute('class','standee landscape');
-				} else {
-					occupantUse.setAttribute('class','standee');
-				};
-				view.setHref(occupantUse,occupant.sprite);
-				occupantUse.setAttribute('x',displayCoords.x);
-				occupantUse.setAttribute('y',displayCoords.y);
-				occupantUse.setAttribute('transform',displayCoords.standeeTransform);
-				occupantUse.setAttribute('fill','inherit');
-				occupantUse.setAttribute('stroke','inherit');
-				if (occupant.selectable) {
-					occupantUse.setAttribute('fill',occupant.color);
-					occupantUse.addEventListener('click',handlers.pawnSelect.bind(view,occupant));
-// 					view.itemDrag.dropTargets.push(occupant);
-				} else {
-					occupantUse.addEventListener('mousedown',handlers.dragMapStart);
-					occupantUse.addEventListener('touchstart',handlers.dragMapStart);
-				};
+				view.addStandee(occupant,tile);
 			};
 			var costSphere = document.createElementNS('http://www.w3.org/2000/svg','use');
 			tile.standeeGroup.appendChild(costSphere);
 			view.setHref(costSphere,'moveCostSphere'+tile.moveCost);
 			costSphere.id = 'moveCost_'+tile.x+'x'+tile.y
-			costSphere.setAttribute('class','standee');
+			costSphere.setAttribute('class','standee moveCostSphere');
 			costSphere.setAttribute('fill',view.colors.movePrimary);
 			costSphere.setAttribute('x',displayCoords.x);
 			costSphere.setAttribute('y',displayCoords.y);
@@ -675,253 +650,300 @@ var view = {
 		titleText.innerHTML = game.currentLevel.title;
 	},
 	
+	addStandee: function(occupant,tile) {
+		var displayCoords = view.displayCoords(tile);
+		if (occupant.avatar !== undefined) {
+			document.getElementById('globalDefs').appendChild(occupant.avatar.draw());
+			occupant.sprite = occupant.id
+		};
+		var occupantUse = document.createElementNS('http://www.w3.org/2000/svg','use');
+		tile.standeeGroup.appendChild(occupantUse);
+		for (var node of tile.standeeGroup.childNodes) {
+			console.log(node.className);
+			if (node.className.animVal == 'standee moveCostSphere') {
+				tile.standeeGroup.appendChild(node);
+			};
+		};
+		occupant.svg = occupantUse;
+		if (occupant.landscape) {
+			occupantUse.setAttribute('class','standee landscape');
+		} else {
+			occupantUse.setAttribute('class','standee');
+		};
+		view.setHref(occupantUse,occupant.sprite);
+		occupantUse.setAttribute('x',displayCoords.x);
+		occupantUse.setAttribute('y',displayCoords.y);
+		occupantUse.setAttribute('transform',displayCoords.standeeTransform);
+		occupantUse.setAttribute('fill','inherit');
+		occupantUse.setAttribute('stroke','inherit');
+		if (tile.seen) {
+			occupantUse.setAttribute('visibility','visible');
+			console.log('decloaking');
+		};
+		if (occupant.selectable) {
+			occupantUse.setAttribute('fill',occupant.color);
+			occupantUse.addEventListener('click',handlers.pawnSelect.bind(view,occupant));
+// 					view.itemDrag.dropTargets.push(occupant);
+		} else {
+			occupantUse.addEventListener('mousedown',handlers.dragMapStart);
+			occupantUse.addEventListener('touchstart',handlers.dragMapStart);
+		};
+		if (occupant instanceof Pawn || occupant instanceof Thing) {
+			view.buildCharacterSheet(occupant);
+		};
+	},
+	
 	redrawPawn: function(pawn) {
 		document.getElementById(pawn.id).remove();
 		document.getElementById('globalDefs').appendChild(pawn.avatar.draw());		
 	},
 	
 	buildCharacterSheets: function() {
-		var list = [];
-		list = list.concat(game.map.pawns);
-		list = list.concat(game.map.things);
-		for (var pawn of list) {
-			var inventoryBack = document.createElementNS('http://www.w3.org/2000/svg','g');
-			inventoryBacksLayer.appendChild(inventoryBack);
-			inventoryBack.id = pawn.id + 'InventoryBack';
-			var inventoryItems = document.createElementNS('http://www.w3.org/2000/svg','g');
-			itemsLayer.appendChild(inventoryItems);
-			inventoryItems.id = pawn.id + 'InventoryItems';
-			var inventoryFront = document.createElementNS('http://www.w3.org/2000/svg','g');
-			inventoryFrontsLayer.appendChild(inventoryFront);
-			inventoryFront.id = pawn.id + 'InventoryFront';
-			var sheetGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-			sheetsLayer.appendChild(sheetGroup);
-			sheetGroup.id = pawn.id + 'Sheet';
+// 		var list = [];
+// 		list = list.concat(game.map.pawns);
+// 		list = list.concat(game.map.things);
+// 		for (var pawn of list) {
+// 			view.buildCharacterSheet(pawn);
+// 		};
+	},
+	
+	buildCharacterSheet: function(pawn) {
+		var inventoryBack = document.createElementNS('http://www.w3.org/2000/svg','g');
+		inventoryBacksLayer.appendChild(inventoryBack);
+		inventoryBack.id = pawn.id + 'InventoryBack';
+		var inventoryItems = document.createElementNS('http://www.w3.org/2000/svg','g');
+		itemsLayer.appendChild(inventoryItems);
+		inventoryItems.id = pawn.id + 'InventoryItems';
+		var inventoryFront = document.createElementNS('http://www.w3.org/2000/svg','g');
+		inventoryFrontsLayer.appendChild(inventoryFront);
+		inventoryFront.id = pawn.id + 'InventoryFront';
+		var sheetGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+		sheetsLayer.appendChild(sheetGroup);
+		sheetGroup.id = pawn.id + 'Sheet';
 
 // 			if (pawn.inventory !== undefined || pawn.contents !== undefined) {
 // 				var InventoryPane = document.createElementNS('http://www.w3.org/2000/svg','g');
 // 				sheetGroup.appendChild(InventoryPane);
 // 				InventoryPane.id = pawn.id + 'InventoryPane';
 // 			};
-			
-			var sheet = document.createElementNS('http://www.w3.org/2000/svg','rect');
-			sheetGroup.appendChild(sheet);
-			sheet.setAttribute('x',-90);
-			sheet.setAttribute('y',135);
-			sheet.setAttribute('rx',2);
-			sheet.setAttribute('ry',2);
-			sheet.setAttribute('height',30);
-			sheet.setAttribute('width',180);
-			sheet.setAttribute('fill','white');
-			sheet.setAttribute('stroke','black');
-			sheet.setAttribute('stroke-width',0.25);
-			if (pawn.morale !== undefined) {
-				var moraleBarGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-				sheetGroup.appendChild(moraleBarGroup);
-				moraleBarGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,'morale'));
-				moraleBarGroup.addEventListener('mouseleave',view.clearToolTip);
-				var moraleBarBacking = document.createElementNS('http://www.w3.org/2000/svg','rect');
-				moraleBarGroup.appendChild(moraleBarBacking);
-				moraleBarBacking.setAttribute('x',-85);
-				moraleBarBacking.setAttribute('y',159);
-				moraleBarBacking.setAttribute('width',20);
-				moraleBarBacking.setAttribute('height',2);
-				moraleBarBacking.setAttribute('fill',view.colors.moraleSecondary);
-				var moraleBar = document.createElementNS('http://www.w3.org/2000/svg','rect');
-				moraleBarGroup.appendChild(moraleBar);
-				moraleBar.id = pawn.id + 'MoraleBar';
-				moraleBar.setAttribute('x',-85);
-				moraleBar.setAttribute('y',159);
-				moraleBar.setAttribute('width',20);
-				moraleBar.setAttribute('height',2);
-				moraleBar.setAttribute('fill',view.colors.moralePrimary);
-			};
-			if (pawn.stats !== undefined) {
-				var statNames = ['move','strength','focus'];
-				for (var i in statNames) {
-					var statGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-					sheetGroup.appendChild(statGroup);
-					statGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,statNames[i]));
-					statGroup.addEventListener('mouseleave',view.clearToolTip);
-					var statSquare = document.createElementNS('http://www.w3.org/2000/svg','rect');
-					statGroup.appendChild(statSquare);
-					statSquare.setAttribute('x',-60 + i * 22);
-					statSquare.setAttribute('y',140);
-					statSquare.setAttribute('width',20);
-					statSquare.setAttribute('height',21);
-					statSquare.setAttribute('fill',view.colors[statNames[i]+'Primary']);
-					statSquare.setAttribute('stroke',view.colors[statNames[i]+'Secondary']);
-					var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-					statGroup.appendChild(text);
-					text.setAttribute('x',-50 + i * 22);
-					text.setAttribute('y',141.5);
-					text.setAttribute('text-anchor','middle');
-					text.setAttribute('font-size',3);
-					text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
-					text.setAttribute('class','bold');
-					text.setAttribute('stroke',view.colors[statNames[i]+'Primary']);
-					text.setAttribute('paint-order','stroke');
-					text.innerHTML = statNames[i];
-					var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-					statGroup.appendChild(text);
-					text.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'Text';
-					text.setAttribute('x',-48 + i * 22);
-					text.setAttribute('y',148);
-					text.setAttribute('text-anchor','end');
-					text.setAttribute('font-size',7);
-					text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
-					text.setAttribute('class','bold');
-					text.innerHTML = pawn.stats[statNames[i]];
-					var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-					statGroup.appendChild(text);
-					text.setAttribute('x',-48 + i * 22);
-					text.setAttribute('y',148);
-					text.setAttribute('text-anchor','start');
-					text.setAttribute('font-size',3);
-					text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
-					text.innerHTML = '/';
-					var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-					statGroup.appendChild(text);
-					text.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'MaxText';
-					text.setAttribute('x',-48 + 1 + i * 22);
-					text.setAttribute('y',148);
-					text.setAttribute('text-anchor','start');
-					text.setAttribute('font-size',3);
-					text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
-					text.innerHTML = pawn.stats[statNames[i]+'Max'];
-					var woundGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-					statGroup.appendChild(woundGroup);
-					woundGroup.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'WoundGroup';
-				};
-			};
-			var portrait = document.createElementNS('http://www.w3.org/2000/svg','use');
-			sheetGroup.appendChild(portrait);
-			view.setHref(portrait,pawn.sprite);
-			portrait.setAttribute('x',-75);
-			portrait.setAttribute('y',160);
-			portrait.addEventListener('click',view.toggleInventoryPane);
-			if (pawn.stats == undefined) {
-				portrait.setAttribute('transform','translate(-27.5 70) scale(0.5)');
-			};
-
-			var maneuversGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-			sheetGroup.appendChild(maneuversGroup);
-			maneuversGroup.id = pawn.id + 'ManeuversPane';
-			
-			view.refreshManeuvers(pawn);
-			
-			if (pawn.inventory !== undefined) {
-				view.buildInventory(pawn);
-			};
-						
-			// Buttons
-			var closeButton = document.createElementNS('http://www.w3.org/2000/svg','g');
-			sheetGroup.appendChild(closeButton);
-			closeButton.addEventListener('click',handlers.hideSheets);
-			var closeButtonBack = document.createElementNS('http://www.w3.org/2000/svg','circle');
-			closeButton.appendChild(closeButtonBack);
-			closeButtonBack.setAttribute('cx',89);
-			closeButtonBack.setAttribute('cy',136);
-			closeButtonBack.setAttribute('r',2);
-			closeButtonBack.setAttribute('fill','white');
-			closeButtonBack.setAttribute('stroke','black');
-			closeButtonBack.setAttribute('stroke-width',0.25);
-			var line = document.createElementNS('http://www.w3.org/2000/svg','line');
-			closeButton.appendChild(line);
-			line.setAttribute('x1',89.5);
-			line.setAttribute('y1',136.5);
-			line.setAttribute('x2',88.5);
-			line.setAttribute('y2',135.5);
-			line.setAttribute('stroke','black');
-			line.setAttribute('stroke-width',0.5);
-			line.setAttribute('stroke-linecap','round');
-			var line = document.createElementNS('http://www.w3.org/2000/svg','line');
-			closeButton.appendChild(line);
-			line.setAttribute('x1',88.5);
-			line.setAttribute('y1',136.5);
-			line.setAttribute('x2',89.5);
-			line.setAttribute('y2',135.5);
-			line.setAttribute('stroke','black');
-			line.setAttribute('stroke-width',0.5);
-			line.setAttribute('stroke-linecap','round');	
-			var nextButton = document.createElementNS('http://www.w3.org/2000/svg','g');
-			sheetGroup.appendChild(nextButton);
-			nextButton.addEventListener('click',handlers.nextPawn);
-			var circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
-			nextButton.appendChild(circle);
-			circle.setAttribute('cx',84);
-			circle.setAttribute('cy',136);
-			circle.setAttribute('r',2);
-			circle.setAttribute('fill','white');
-			circle.setAttribute('stroke','black');
-			circle.setAttribute('stroke-width',0.25);
-			var line = document.createElementNS('http://www.w3.org/2000/svg','line');
-			nextButton.appendChild(line);
-			line.setAttribute('x1',84.5);
-			line.setAttribute('y1',136);
-			line.setAttribute('x2',83.5);
-			line.setAttribute('y2',135.5);
-			line.setAttribute('stroke','black');
-			line.setAttribute('stroke-width',0.5);
-			line.setAttribute('stroke-linecap','round');
-			var line = document.createElementNS('http://www.w3.org/2000/svg','line');
-			nextButton.appendChild(line);
-			line.setAttribute('x1',83.5);
-			line.setAttribute('y1',136.5);
-			line.setAttribute('x2',84.5);
-			line.setAttribute('y2',136);
-			line.setAttribute('stroke','black');
-			line.setAttribute('stroke-width',0.5);
-			line.setAttribute('stroke-linecap','round');	
-			var lastButton = document.createElementNS('http://www.w3.org/2000/svg','g');
-			sheetGroup.appendChild(lastButton);
-			lastButton.addEventListener('click',handlers.lastPawn);
-			var circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
-			lastButton.appendChild(circle);
-			circle.setAttribute('cx',79);
-			circle.setAttribute('cy',136);
-			circle.setAttribute('r',2);
-			circle.setAttribute('fill','white');
-			circle.setAttribute('stroke','black');
-			circle.setAttribute('stroke-width',0.25);
-			var line = document.createElementNS('http://www.w3.org/2000/svg','line');
-			lastButton.appendChild(line);
-			line.setAttribute('x1',79.5);
-			line.setAttribute('y1',135.5);
-			line.setAttribute('x2',78.5);
-			line.setAttribute('y2',136);
-			line.setAttribute('stroke','black');
-			line.setAttribute('stroke-width',0.5);
-			line.setAttribute('stroke-linecap','round');
-			var line = document.createElementNS('http://www.w3.org/2000/svg','line');
-			lastButton.appendChild(line);
-			line.setAttribute('x1',78.5);
-			line.setAttribute('y1',136);
-			line.setAttribute('x2',79.5);
-			line.setAttribute('y2',136.5);
-			line.setAttribute('stroke','black');
-			line.setAttribute('stroke-width',0.5);
-			line.setAttribute('stroke-linecap','round');
-			var inventoryButton = document.createElementNS('http://www.w3.org/2000/svg','g');
-			sheetGroup.appendChild(inventoryButton);
-			inventoryButton.addEventListener('click',handlers.inventory);
-			var circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
-			inventoryButton.appendChild(circle);
-			circle.setAttribute('cx',74);
-			circle.setAttribute('cy',136);
-			circle.setAttribute('r',2);
-			circle.setAttribute('fill','white');
-			circle.setAttribute('stroke','black');
-			circle.setAttribute('stroke-width',0.25);
-			var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-			inventoryButton.appendChild(text);
-			text.setAttribute('x',74);
-			text.setAttribute('y',137);
-			text.setAttribute('font-size',3);
-			text.setAttribute('text-anchor','middle');
-			text.setAttribute('class','inventoryButton');
-			text.innerHTML = 'i';
+		
+		var sheet = document.createElementNS('http://www.w3.org/2000/svg','rect');
+		sheetGroup.appendChild(sheet);
+		sheet.setAttribute('x',-90);
+		sheet.setAttribute('y',135);
+		sheet.setAttribute('rx',2);
+		sheet.setAttribute('ry',2);
+		sheet.setAttribute('height',30);
+		sheet.setAttribute('width',180);
+		sheet.setAttribute('fill','white');
+		sheet.setAttribute('stroke','black');
+		sheet.setAttribute('stroke-width',0.25);
+		if (pawn.morale !== undefined) {
+			var moraleBarGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+			sheetGroup.appendChild(moraleBarGroup);
+			moraleBarGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,'morale'));
+			moraleBarGroup.addEventListener('mouseleave',view.clearToolTip);
+			var moraleBarBacking = document.createElementNS('http://www.w3.org/2000/svg','rect');
+			moraleBarGroup.appendChild(moraleBarBacking);
+			moraleBarBacking.setAttribute('x',-85);
+			moraleBarBacking.setAttribute('y',159);
+			moraleBarBacking.setAttribute('width',20);
+			moraleBarBacking.setAttribute('height',2);
+			moraleBarBacking.setAttribute('fill',view.colors.moraleSecondary);
+			var moraleBar = document.createElementNS('http://www.w3.org/2000/svg','rect');
+			moraleBarGroup.appendChild(moraleBar);
+			moraleBar.id = pawn.id + 'MoraleBar';
+			moraleBar.setAttribute('x',-85);
+			moraleBar.setAttribute('y',159);
+			moraleBar.setAttribute('width',20);
+			moraleBar.setAttribute('height',2);
+			moraleBar.setAttribute('fill',view.colors.moralePrimary);
 		};
+		if (pawn.stats !== undefined) {
+			var statNames = ['move','strength','focus'];
+			for (var i in statNames) {
+				var statGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+				sheetGroup.appendChild(statGroup);
+				statGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,statNames[i]));
+				statGroup.addEventListener('mouseleave',view.clearToolTip);
+				var statSquare = document.createElementNS('http://www.w3.org/2000/svg','rect');
+				statGroup.appendChild(statSquare);
+				statSquare.setAttribute('x',-60 + i * 22);
+				statSquare.setAttribute('y',140);
+				statSquare.setAttribute('width',20);
+				statSquare.setAttribute('height',21);
+				statSquare.setAttribute('fill',view.colors[statNames[i]+'Primary']);
+				statSquare.setAttribute('stroke',view.colors[statNames[i]+'Secondary']);
+				var text = document.createElementNS('http://www.w3.org/2000/svg','text');
+				statGroup.appendChild(text);
+				text.setAttribute('x',-50 + i * 22);
+				text.setAttribute('y',141.5);
+				text.setAttribute('text-anchor','middle');
+				text.setAttribute('font-size',3);
+				text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
+				text.setAttribute('class','bold');
+				text.setAttribute('stroke',view.colors[statNames[i]+'Primary']);
+				text.setAttribute('paint-order','stroke');
+				text.innerHTML = statNames[i];
+				var text = document.createElementNS('http://www.w3.org/2000/svg','text');
+				statGroup.appendChild(text);
+				text.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'Text';
+				text.setAttribute('x',-48 + i * 22);
+				text.setAttribute('y',148);
+				text.setAttribute('text-anchor','end');
+				text.setAttribute('font-size',7);
+				text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
+				text.setAttribute('class','bold');
+				text.innerHTML = pawn.stats[statNames[i]];
+				var text = document.createElementNS('http://www.w3.org/2000/svg','text');
+				statGroup.appendChild(text);
+				text.setAttribute('x',-48 + i * 22);
+				text.setAttribute('y',148);
+				text.setAttribute('text-anchor','start');
+				text.setAttribute('font-size',3);
+				text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
+				text.innerHTML = '/';
+				var text = document.createElementNS('http://www.w3.org/2000/svg','text');
+				statGroup.appendChild(text);
+				text.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'MaxText';
+				text.setAttribute('x',-48 + 1 + i * 22);
+				text.setAttribute('y',148);
+				text.setAttribute('text-anchor','start');
+				text.setAttribute('font-size',3);
+				text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
+				text.innerHTML = pawn.stats[statNames[i]+'Max'];
+				var woundGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+				statGroup.appendChild(woundGroup);
+				woundGroup.id = pawn.id + statNames[i].charAt(0).toUpperCase() + statNames[i].slice(1) + 'WoundGroup';
+			};
+		};
+		var portrait = document.createElementNS('http://www.w3.org/2000/svg','use');
+		sheetGroup.appendChild(portrait);
+		view.setHref(portrait,pawn.sprite);
+		portrait.setAttribute('x',-75);
+		portrait.setAttribute('y',160);
+		portrait.addEventListener('click',view.toggleInventoryPane);
+		if (pawn.stats == undefined) {
+			portrait.setAttribute('transform','translate(-27.5 70) scale(0.5)');
+		};
+
+		var maneuversGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+		sheetGroup.appendChild(maneuversGroup);
+		maneuversGroup.id = pawn.id + 'ManeuversPane';
+		
+		view.refreshManeuvers(pawn);
+		
+		if (pawn.inventory !== undefined) {
+			view.buildInventory(pawn);
+		};
+					
+		// Buttons
+		var closeButton = document.createElementNS('http://www.w3.org/2000/svg','g');
+		sheetGroup.appendChild(closeButton);
+		closeButton.addEventListener('click',handlers.hideSheets);
+		var closeButtonBack = document.createElementNS('http://www.w3.org/2000/svg','circle');
+		closeButton.appendChild(closeButtonBack);
+		closeButtonBack.setAttribute('cx',89);
+		closeButtonBack.setAttribute('cy',136);
+		closeButtonBack.setAttribute('r',2);
+		closeButtonBack.setAttribute('fill','white');
+		closeButtonBack.setAttribute('stroke','black');
+		closeButtonBack.setAttribute('stroke-width',0.25);
+		var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+		closeButton.appendChild(line);
+		line.setAttribute('x1',89.5);
+		line.setAttribute('y1',136.5);
+		line.setAttribute('x2',88.5);
+		line.setAttribute('y2',135.5);
+		line.setAttribute('stroke','black');
+		line.setAttribute('stroke-width',0.5);
+		line.setAttribute('stroke-linecap','round');
+		var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+		closeButton.appendChild(line);
+		line.setAttribute('x1',88.5);
+		line.setAttribute('y1',136.5);
+		line.setAttribute('x2',89.5);
+		line.setAttribute('y2',135.5);
+		line.setAttribute('stroke','black');
+		line.setAttribute('stroke-width',0.5);
+		line.setAttribute('stroke-linecap','round');	
+		var nextButton = document.createElementNS('http://www.w3.org/2000/svg','g');
+		sheetGroup.appendChild(nextButton);
+		nextButton.addEventListener('click',handlers.nextPawn);
+		var circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+		nextButton.appendChild(circle);
+		circle.setAttribute('cx',84);
+		circle.setAttribute('cy',136);
+		circle.setAttribute('r',2);
+		circle.setAttribute('fill','white');
+		circle.setAttribute('stroke','black');
+		circle.setAttribute('stroke-width',0.25);
+		var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+		nextButton.appendChild(line);
+		line.setAttribute('x1',84.5);
+		line.setAttribute('y1',136);
+		line.setAttribute('x2',83.5);
+		line.setAttribute('y2',135.5);
+		line.setAttribute('stroke','black');
+		line.setAttribute('stroke-width',0.5);
+		line.setAttribute('stroke-linecap','round');
+		var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+		nextButton.appendChild(line);
+		line.setAttribute('x1',83.5);
+		line.setAttribute('y1',136.5);
+		line.setAttribute('x2',84.5);
+		line.setAttribute('y2',136);
+		line.setAttribute('stroke','black');
+		line.setAttribute('stroke-width',0.5);
+		line.setAttribute('stroke-linecap','round');	
+		var lastButton = document.createElementNS('http://www.w3.org/2000/svg','g');
+		sheetGroup.appendChild(lastButton);
+		lastButton.addEventListener('click',handlers.lastPawn);
+		var circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+		lastButton.appendChild(circle);
+		circle.setAttribute('cx',79);
+		circle.setAttribute('cy',136);
+		circle.setAttribute('r',2);
+		circle.setAttribute('fill','white');
+		circle.setAttribute('stroke','black');
+		circle.setAttribute('stroke-width',0.25);
+		var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+		lastButton.appendChild(line);
+		line.setAttribute('x1',79.5);
+		line.setAttribute('y1',135.5);
+		line.setAttribute('x2',78.5);
+		line.setAttribute('y2',136);
+		line.setAttribute('stroke','black');
+		line.setAttribute('stroke-width',0.5);
+		line.setAttribute('stroke-linecap','round');
+		var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+		lastButton.appendChild(line);
+		line.setAttribute('x1',78.5);
+		line.setAttribute('y1',136);
+		line.setAttribute('x2',79.5);
+		line.setAttribute('y2',136.5);
+		line.setAttribute('stroke','black');
+		line.setAttribute('stroke-width',0.5);
+		line.setAttribute('stroke-linecap','round');
+		var inventoryButton = document.createElementNS('http://www.w3.org/2000/svg','g');
+		sheetGroup.appendChild(inventoryButton);
+		inventoryButton.addEventListener('click',handlers.inventory);
+		var circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+		inventoryButton.appendChild(circle);
+		circle.setAttribute('cx',74);
+		circle.setAttribute('cy',136);
+		circle.setAttribute('r',2);
+		circle.setAttribute('fill','white');
+		circle.setAttribute('stroke','black');
+		circle.setAttribute('stroke-width',0.25);
+		var text = document.createElementNS('http://www.w3.org/2000/svg','text');
+		inventoryButton.appendChild(text);
+		text.setAttribute('x',74);
+		text.setAttribute('y',137);
+		text.setAttribute('font-size',3);
+		text.setAttribute('text-anchor','middle');
+		text.setAttribute('class','inventoryButton');
+		text.innerHTML = 'i';
 	},
 	
 	buildInventory: function(pawn) {
@@ -1667,7 +1689,7 @@ var view = {
 		pawn.svg.setAttribute('y',displayCoords.y);
 		pawn.svg.setAttribute('transform',displayCoords.standeeTransform);
 	},
-	
+		
 	clearMoveOptions: function() {
 		for (var tile of game.map.tiles) {
 			tile.moveOption = false;

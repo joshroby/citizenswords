@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg id='fire' version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-100 -200 200 200" xml:space="preserve">
+
+<defs>
+	<path id='leaping' d='m0,0 c5,0 10,-5 10,-10 c0,-5 -5,-10 -10,-10 c-5,0 -10,5 -10,10 c0,5 5,10 10,10 z' />
+</defs>
+
+<g id='masterGroup'>
+	<g>
+		<path fill="#ED1C24" stroke="#000000" stroke-linecap="round" stroke-miterlimit="10" d="m30,-2
+			c 10,0 20,-10 20,-20
+			c 0,-15 -20,-20 -20,-60
+			c 0,20 -20,45 -20,60
+			c 0,10 10,20 20,20
+			z" />
+		<path fill="#FFF200" stroke="#EF4136" stroke-width="5" stroke-linecap="round" stroke-miterlimit="20" d="m30,-7
+			c 5,0 10,-5 10,-10
+			c 0,-7.5 -10,-10 -10,-30
+			c 0,10 -10,22.5 -10,30
+			c 0,5 5,10 10,10
+			z"/>
+		<animateMotion dur='1.5s' begin='0s' repeatCount='indefinite'>
+			<mpath xlink:href='#leaping' />
+		</animateMotion>
+
+	</g>
+
+	<g>
+		<path fill="#ED1C24" stroke="#000000" stroke-linecap="round" stroke-miterlimit="10" d="m-30,-2
+			c 10,0 20,-10 20,-20
+			c 0,-15 -20,-20 -20,-60
+			c 0,20 -20,45 -20,60
+			c 0,10 10,20 20,20
+			z" />
+		<path fill="#FFF200" stroke="#EF4136" stroke-width="5" stroke-linecap="round" stroke-miterlimit="20" d="m-30,-7
+			c 5,0 10,-5 10,-10
+			c 0,-7.5 -10,-10 -10,-30
+			c 0,10 -10,22.5 -10,30
+			c 0,5 5,10 10,10
+			z"/>
+		<animateMotion dur='1.5s' begin='0.25s' repeatCount='indefinite'>
+			<mpath xlink:href='#leaping' />
+		</animateMotion>
+	</g>
+
+	<g transform='scale(1.2)'>
+		<path fill="#ED1C24" stroke="#000000" stroke-linecap="round" stroke-miterlimit="10" d="m0,-2
+			c 10,0 20,-10 20,-20
+			c 0,-15 -20,-20 -20,-60
+			c 0,20 -20,45 -20,60
+			c 0,10 10,20 20,20
+			z" />
+		<path fill="#FFF200" stroke="#EF4136" stroke-width="5" stroke-linecap="round" stroke-miterlimit="20" d="m0,-7
+			c 5,0 10,-5 10,-10
+			c 0,-7.5 -10,-10 -10,-30
+			c 0,10 -10,22.5 -10,30
+			c 0,5 5,10 10,10
+			z"/>
+		<animateMotion dur='1.5s' begin='0.5s' repeatCount='indefinite'>
+			<mpath xlink:href='#leaping' />
+		</animateMotion>
+	</g>
+</g>
+
+</svg>

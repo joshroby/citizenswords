@@ -3569,7 +3569,142 @@ function Avatar(pawn,heritages) {
 		svgNodes.setAttributeNS(null,'transform','rotate('+rotation+' '+this.bodyConstants.wrist.cx.animVal.value+' '+this.bodyConstants.wrist.cy.animVal.value+')');
 		
 		return svgNodes;
-		};
+	};
+	
+	this.breastplate = function(item) {
+		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
+
+		var leftShoulder = document.createElementNS('http://www.w3.org/2000/svg','path');
+		svgNodes.appendChild(leftShoulder);
+		leftShoulder.setAttribute('fill',item.colors.primary);
+		leftShoulder.setAttribute('stroke','black');
+		var d = 'M '+(this.parameters.shoulders*0.7)+','+(this.bodyConstants.neck+3)+' ';
+		d += 'c 7,0 7,-2 14,-2';
+		d += 'q 0,11 -8,22';
+		d += 'q 0,-7 -4,-14';
+		leftShoulder.setAttribute('d',d);
+		
+		var rightShoulder = document.createElementNS('http://www.w3.org/2000/svg','path');
+		svgNodes.appendChild(rightShoulder);
+		rightShoulder.setAttribute('fill',item.colors.primary);
+		rightShoulder.setAttribute('stroke','black');
+		var d = 'M '+(this.parameters.shoulders*-0.7)+','+(this.bodyConstants.neck+3)+' ';
+		d += 'c -7,0 -7,-2 -14,-2';
+		d += 'q 0,11 8,22';
+		d += 'q 0,-7 4,-14';
+		rightShoulder.setAttribute('d',d);
+		
+		return svgNodes;
+	};
+
+	this.bucket = function(item) {
+		if (this.bodyConstants.wrist.id === 'rightWristPivot') {var reflect = 1} else {var reflect = -1};
+		var rotation = 110 * reflect;
+		var pailRotation = 20 * reflect;
+		var offset = 5 * reflect;
+		
+		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
+		
+		// Thumb
+		var thumb = this.thumb();
+		thumb.setAttribute('transform','translate('+offset+',10) rotate('+rotation+','+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value+')');
+		svgNodes.appendChild(thumb);
+		
+		// Handle
+		
+		var handle = document.createElementNS('http://www.w3.org/2000/svg',"circle");
+		handle.setAttribute('stroke',item.colors.handle);
+		handle.setAttribute('stroke-width',3);
+		handle.setAttribute('fill','none');
+		handle.setAttribute('cx',this.bodyConstants.wrist.cx.animVal.value-reflect*10);
+		handle.setAttribute('cy',this.bodyConstants.wrist.cy.animVal.value+20);
+		handle.setAttribute('r',20);
+		svgNodes.appendChild(handle);
+		
+		var handle = document.createElementNS('http://www.w3.org/2000/svg',"circle");
+		handle.setAttribute('stroke','black');
+		handle.setAttribute('stroke-width',1);
+		handle.setAttribute('fill','none');
+		handle.setAttribute('cx',this.bodyConstants.wrist.cx.animVal.value-reflect*10);
+		handle.setAttribute('cy',this.bodyConstants.wrist.cy.animVal.value+20);
+		handle.setAttribute('r',22);
+		svgNodes.appendChild(handle);
+		
+		var handle = document.createElementNS('http://www.w3.org/2000/svg',"circle");
+		handle.setAttribute('stroke','black');
+		handle.setAttribute('stroke-width',1);
+		handle.setAttribute('fill','none');
+		handle.setAttribute('cx',this.bodyConstants.wrist.cx.animVal.value-reflect*10);
+		handle.setAttribute('cy',this.bodyConstants.wrist.cy.animVal.value+20);
+		handle.setAttribute('r',18);
+		svgNodes.appendChild(handle);
+		
+		// Pail
+		
+		var side = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		side.setAttribute('stroke','black');
+		side.setAttribute('stroke-width',1);
+		side.setAttribute('fill',item.colors.primary);
+		var path = 'm '+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value;
+		var pailOffset = -3 * reflect - 22;
+		path += 'm '+pailOffset+',25';
+		path += 'l 4,20 c 0,8 36,8 36,0 l 4,-20 l -44,0';
+		side.setAttributeNS(null,'d',path);
+		side.setAttribute('transform','rotate('+pailRotation+','+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value+')');
+		svgNodes.appendChild(side);
+		
+		var lip = document.createElementNS('http://www.w3.org/2000/svg',"ellipse");
+		lip.setAttribute('stroke',item.colors.secondary);
+		lip.setAttribute('stroke-width',3);
+		lip.setAttribute('fill',item.colors.contents);
+		lip.setAttribute('cx',this.bodyConstants.wrist.cx.animVal.value-reflect*3);
+		lip.setAttribute('cy',this.bodyConstants.wrist.cy.animVal.value+25);
+		lip.setAttribute('rx',20);
+		lip.setAttribute('ry',5);
+		lip.setAttribute('transform','rotate('+pailRotation+','+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value+')');
+		svgNodes.appendChild(lip);
+		
+		var lip = document.createElementNS('http://www.w3.org/2000/svg',"ellipse");
+		lip.setAttribute('stroke','black');
+		lip.setAttribute('stroke-width',1);
+		lip.setAttribute('fill','none');
+		lip.setAttribute('cx',this.bodyConstants.wrist.cx.animVal.value-reflect*3);
+		lip.setAttribute('cy',this.bodyConstants.wrist.cy.animVal.value+25);
+		lip.setAttribute('rx',22);
+		lip.setAttribute('ry',7);
+		lip.setAttribute('transform','rotate('+pailRotation+','+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value+')');
+		svgNodes.appendChild(lip);
+		
+		var stave = document.createElementNS('http://www.w3.org/2000/svg',"line");
+		stave.setAttribute('stroke','black');
+		stave.setAttribute('stroke-width',1);
+		stave.setAttribute('fill','none');
+		stave.setAttribute('x1',this.bodyConstants.wrist.cx.animVal.value-reflect*3);
+		stave.setAttribute('y1',this.bodyConstants.wrist.cy.animVal.value+32);
+		stave.setAttribute('x2',this.bodyConstants.wrist.cx.animVal.value-reflect*12);
+		stave.setAttribute('y2',this.bodyConstants.wrist.cy.animVal.value+49);
+		lip.setAttribute('transform','rotate('+pailRotation+','+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value+')');
+		svgNodes.appendChild(stave);
+		
+		var stave = document.createElementNS('http://www.w3.org/2000/svg',"line");
+		stave.setAttribute('stroke','black');
+		stave.setAttribute('stroke-width',1);
+		stave.setAttribute('fill','none');
+		stave.setAttribute('x1',this.bodyConstants.wrist.cx.animVal.value+reflect*3);
+		stave.setAttribute('y1',this.bodyConstants.wrist.cy.animVal.value+32);
+		stave.setAttribute('x2',this.bodyConstants.wrist.cx.animVal.value-reflect*7);
+		stave.setAttribute('y2',this.bodyConstants.wrist.cy.animVal.value+49);
+		lip.setAttribute('transform','rotate('+pailRotation+','+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value+')');
+		svgNodes.appendChild(stave);
+		
+		
+		// Fist Front
+		var fist = this.fist();
+		fist.setAttribute('transform','translate('+offset+',10) rotate('+rotation+','+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value+')');
+		svgNodes.appendChild(fist);
+		
+		return svgNodes;
+	},
 		
 	this.candelabrum = function(item) {
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
@@ -3601,8 +3736,8 @@ function Avatar(pawn,heritages) {
 			{cx:wrist.x,cy:wrist.y+30,rx:10,ry:5,color:'metal'},
 			{cx:wrist.x,cy:wrist.y+20,rx:6,ry:10,color:'metal'},
 			{cx:wrist.x,cy:wrist.y,rx:4,ry:12,color:'metal'},
-			{cx:wrist.x,cy:wrist.y-24,rx:3,ry:8,color:'metal'},
 			{cx:wrist.x,cy:wrist.y-14,rx:4,ry:4,color:'metal'},
+			{cx:wrist.x,cy:wrist.y-24.5,rx:3,ry:8,color:'metal'},
 			{cx:wrist.x,cy:wrist.y-37,rx:6,ry:6,color:'metal'},
 			{cx:wrist.x,cy:wrist.y-42,rx:9,ry:5,color:'metal'},
 			{cx:wrist.x+25,cy:wrist.y-37,rx:5,ry:5,color:'metal'},
@@ -3783,6 +3918,78 @@ function Avatar(pawn,heritages) {
 		svgNodes.appendChild(onesie)
 		var sash = this.simpleSash(item);
 		svgNodes.appendChild(sash);
+		return svgNodes;
+	};
+	
+	this.fineClothes = function(item) {
+		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
+		
+		var defs = document.createElementNS('http://www.w3.org/2000/svg',"defs");
+		svgNodes.appendChild(defs);
+		var clipPath = document.createElementNS('http://www.w3.org/2000/svg','clipPath');
+		clipPath.id = item.id+'TorsoClipPath';
+		defs.appendChild(clipPath);
+		clipPath.appendChild(this.torso().svgNodes.firstChild);
+
+		var bustline = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		bustline.setAttribute("fill",item.colors.primary);
+		bustline.setAttribute("stroke",'none');
+		bustline.setAttribute("stroke-width","1");
+		bustline.setAttribute("stroke-linecap","round");
+		x = 0 - this.parameters.bust / 2;
+		y = this.bodyConstants.neck;
+		var depth = this.parameters.bust / 2 + 23.5;
+		var path = 'm '+x+','+y+' v'+depth+' h'+this.parameters.bust+' v-'+depth;
+		bustline.setAttributeNS(null,"d",path);
+		svgNodes.appendChild(bustline);
+		
+		var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+		svgNodes.appendChild(line);
+		line.setAttribute('stroke','black');
+		line.setAttribute('x1',0);
+		line.setAttribute('y1',this.bodyConstants.neck);
+		line.setAttribute('x2',0);
+		line.setAttribute('y2',this.bodyConstants.neck+65);
+		
+		var doubletBottom = document.createElementNS('http://www.w3.org/2000/svg','path');
+		svgNodes.appendChild(doubletBottom);
+		doubletBottom.setAttribute('fill',item.colors.secondary);
+		doubletBottom.setAttribute('stroke','black');
+		d = 'M 0,'+(this.bodyConstants.neck+62)+' ';
+		d += 'q '+(this.parameters.hips*1.1)+',-5 '+(this.parameters.hips*1.25)+',-20 ';
+		d += 'h5 v30 h-10 h'+(this.parameters.hips*-2.5)+'v-30 h5';
+		d += 'q '+(this.parameters.hips*0.1)+',15 '+(this.parameters.hips*1.25)+',20 ';
+		doubletBottom.setAttribute('d',d);
+		doubletBottom.setAttribute('clip-path','url(#'+item.id+'TorsoClipPath)');
+		
+		var torsoStroke = this.torso().svgNodes;
+		torsoStroke.setAttribute('fill','none');
+		torsoStroke.setAttribute('stroke','black');
+		svgNodes.appendChild(torsoStroke);
+		
+		var leftShoulder = document.createElementNS('http://www.w3.org/2000/svg','path');
+		svgNodes.appendChild(leftShoulder);
+		leftShoulder.setAttribute('fill',item.colors.primary);
+		leftShoulder.setAttribute('stroke','black');
+		var d = 'M '+(this.parameters.shoulders*0.7)+','+(this.bodyConstants.neck+3)+' ';
+		d += 'c 7,0 7,-2 14,-2';
+		d += 'q 0,11 -8,22';
+		d += 'q 0,-7 -4,-14';
+		leftShoulder.setAttribute('d',d);
+		
+		var rightShoulder = document.createElementNS('http://www.w3.org/2000/svg','path');
+		svgNodes.appendChild(rightShoulder);
+		rightShoulder.setAttribute('fill',item.colors.primary);
+		rightShoulder.setAttribute('stroke','black');
+		var d = 'M '+(this.parameters.shoulders*-0.7)+','+(this.bodyConstants.neck+3)+' ';
+		d += 'c -7,0 -7,-2 -14,-2';
+		d += 'q 0,11 8,22';
+		d += 'q 0,-7 4,-14';
+		rightShoulder.setAttribute('d',d);
+		
+		if (item.pawn.avatar.parameters.feet > 6) {
+			svgNodes.appendChild(this.simpleBoots(item));
+		};
 		return svgNodes;
 	};
 	
@@ -4241,6 +4448,32 @@ function Avatar(pawn,heritages) {
 		return beltPath;
 	};
 	
+	this.simpleBoots = function(item) {
+		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
+		
+		var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+		svgNodes.appendChild(path);
+		path.setAttribute('fill',item.colors.shoes);
+		path.setAttribute('stroke','black');
+		var d = 'M -19,-23';
+		d += 'l -4.5,-14';
+		d += 'h9';
+		d += 'l 6,19';
+		path.setAttribute('d',d);
+		
+		var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+		svgNodes.appendChild(path);
+		path.setAttribute('fill',item.colors.shoes);
+		path.setAttribute('stroke','black');
+		var d = 'M 19,-23';
+		d += 'l 4.5,-14';
+		d += 'h-9';
+		d += 'l -6,19';
+		path.setAttribute('d',d);
+		
+		return svgNodes;
+	};
+	
 	this.simpleChain = function(item) {
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
 		var chain = document.createElementNS('http://www.w3.org/2000/svg',"path");
@@ -4265,8 +4498,13 @@ function Avatar(pawn,heritages) {
 		blade.setAttribute("stroke-width","1");
 		blade.setAttribute("stroke-linecap","round");
 		path = 'm'+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value;
-		path += 'm -5,-7 l0,-50 ';
-		path += 'q 10,0 10,50';
+		if (this.bodyConstants.wrist.id === 'leftWristPivot') {
+			path += 'm -5,-7 l0,-50 ';
+			path += 'q 10,0 10,50';
+		} else {
+			path += 'm 5,-7 l0,-50 ';
+			path += 'q -10,0 -10,50';
+		};
 		blade.setAttributeNS(null,"d",path);
 		svgNodes.appendChild(blade);
 		
@@ -4277,11 +4515,16 @@ function Avatar(pawn,heritages) {
 		bladeShading.setAttribute("stroke-width","1");
 		bladeShading.setAttribute("stroke-linecap","round");
 		path = 'm'+this.bodyConstants.wrist.cx.animVal.value+','+this.bodyConstants.wrist.cy.animVal.value;
-		path += 'm -3,-7 l0,-40 ';
-		path += 'q 3,0 3,40';
+		if (this.bodyConstants.wrist.id === 'leftWristPivot') {
+			path += 'm -3,-7 l0,-40 ';
+			path += 'q 3,0 3,40';
+		} else {
+			path += 'm 3,-7 l0,-40 ';
+			path += 'q -3,0 -3,40';
+		};
 		bladeShading.setAttributeNS(null,"d",path);
 		svgNodes.appendChild(bladeShading);
-		
+				
 		var grip = document.createElementNS('http://www.w3.org/2000/svg',"path");
 		grip.setAttribute('fill',item.colors.grip);
 		grip.setAttribute("stroke","#000000");
@@ -5232,176 +5475,194 @@ function AvatarBeast(pawn,type) {
 		shadow.setAttribute("ry",4);
 		svgNodes.appendChild(shadow);
 		
-		var characterGroup = this[this.type]();
+		// The Actual Sprite
+		var characterNodes = this[this.type]();
+		var characterGroup = characterNodes.svgNodes;
 		characterGroup.id = pawn.id + "CharacterGroup";
 		svgNodes.appendChild(characterGroup);
 
 		// Nerf Animation
 		
-		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		characterGroup.appendChild(animateTransform);
-		animateTransform.setAttribute('id',this.pawn.id+'NerfStart');
-		animateTransform.setAttribute('attributeName','transform');
-		animateTransform.setAttribute('attributeType','XML');
-		animateTransform.setAttribute('type','rotate');
-		animateTransform.setAttribute('from','0 0 0' );
-		animateTransform.setAttribute('to',' 10 0 0');
-		animateTransform.setAttribute('dur','0.1s');
-		animateTransform.setAttribute('begin','indefinite');
-		animateTransform.setAttribute('additive','sum');
-		animateTransform.setAttribute('repeatCount',1);
-		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		characterGroup.appendChild(animateTransform);
-		animateTransform.setAttribute('id',this.pawn.id+'Nerf2');
-		animateTransform.setAttribute('attributeName','transform');
-		animateTransform.setAttribute('attributeType','XML');
-		animateTransform.setAttribute('type','rotate');
-		animateTransform.setAttribute('from','10 0 0' );
-		animateTransform.setAttribute('to',' -10 0 0');
-		animateTransform.setAttribute('dur','0.2s');
-		animateTransform.setAttribute('begin',this.pawn.id+'NerfStart.end');
-		animateTransform.setAttribute('additive','sum');
-		animateTransform.setAttribute('repeatCount','1');
-		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		characterGroup.appendChild(animateTransform);
-		animateTransform.setAttribute('attributeName','transform');
-		animateTransform.setAttribute('attributeType','XML');
-		animateTransform.setAttribute('type','rotate');
-		animateTransform.setAttribute('from','-10 0 0' );
-		animateTransform.setAttribute('to',' 0 0 0');
-		animateTransform.setAttribute('dur','0.1s');
-		animateTransform.setAttribute('begin',this.pawn.id+'Nerf2.end');
-		animateTransform.setAttribute('additive','sum');
-		animateTransform.setAttribute('repeatCount','1');
+		if (characterNodes.nerf == undefined) {
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			characterGroup.appendChild(animateTransform);
+			animateTransform.setAttribute('id',this.pawn.id+'NerfStart');
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','rotate');
+			animateTransform.setAttribute('from','0 0 0' );
+			animateTransform.setAttribute('to',' 10 0 0');
+			animateTransform.setAttribute('dur','0.1s');
+			animateTransform.setAttribute('begin','indefinite');
+			animateTransform.setAttribute('additive','sum');
+			animateTransform.setAttribute('repeatCount',1);
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			characterGroup.appendChild(animateTransform);
+			animateTransform.setAttribute('id',this.pawn.id+'Nerf2');
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','rotate');
+			animateTransform.setAttribute('from','10 0 0' );
+			animateTransform.setAttribute('to',' -10 0 0');
+			animateTransform.setAttribute('dur','0.2s');
+			animateTransform.setAttribute('begin',this.pawn.id+'NerfStart.end');
+			animateTransform.setAttribute('additive','sum');
+			animateTransform.setAttribute('repeatCount','1');
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			characterGroup.appendChild(animateTransform);
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','rotate');
+			animateTransform.setAttribute('from','-10 0 0' );
+			animateTransform.setAttribute('to',' 0 0 0');
+			animateTransform.setAttribute('dur','0.1s');
+			animateTransform.setAttribute('begin',this.pawn.id+'Nerf2.end');
+			animateTransform.setAttribute('additive','sum');
+			animateTransform.setAttribute('repeatCount','1');
+		} else {
+			characterGroup.appendChild(characterNodes.nerf);
+		};
 
 		// Buff Animation
 		
-		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		characterGroup.appendChild(animateTransform);
-		animateTransform.setAttribute('id',this.pawn.id+'BuffStart');
-		animateTransform.setAttribute('attributeName','transform');
-		animateTransform.setAttribute('attributeType','XML');
-		animateTransform.setAttribute('type','rotate');
-		animateTransform.setAttribute('from','0 0 0' );
-		animateTransform.setAttribute('to',' -10 0 0');
-		animateTransform.setAttribute('dur','0.2s');
-		animateTransform.setAttribute('begin','indefinite');
-		animateTransform.setAttribute('additive','sum');
-		animateTransform.setAttribute('repeatCount',1);
-		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		characterGroup.appendChild(animateTransform);
-		animateTransform.setAttribute('attributeName','transform');
-		animateTransform.setAttribute('attributeType','XML');
-		animateTransform.setAttribute('type','rotate');
-		animateTransform.setAttribute('from','-10 0 0' );
-		animateTransform.setAttribute('to',' 0 0 0');
-		animateTransform.setAttribute('dur','0.2s');
-		animateTransform.setAttribute('begin',this.pawn.id+'BuffStart.end');
-		animateTransform.setAttribute('additive','sum');
-		animateTransform.setAttribute('repeatCount','1');
-		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		characterGroup.appendChild(animateTransform);
-		animateTransform.setAttribute('id',this.pawn.id+'BuffStartJump');
-		animateTransform.setAttribute('attributeName','transform');
-		animateTransform.setAttribute('attributeType','XML');
-		animateTransform.setAttribute('type','translate');
-		animateTransform.setAttribute('from','0 0' );
-		animateTransform.setAttribute('to',' 20 -20');
-		animateTransform.setAttribute('dur','0.2s');
-		animateTransform.setAttribute('begin',this.pawn.id+'BuffStart.begin');
-		animateTransform.setAttribute('additive','sum');
-		animateTransform.setAttribute('repeatCount','1');
-		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		characterGroup.appendChild(animateTransform);
-		animateTransform.setAttribute('attributeName','transform');
-		animateTransform.setAttribute('attributeType','XML');
-		animateTransform.setAttribute('type','translate');
-		animateTransform.setAttribute('from','20 -20' );
-		animateTransform.setAttribute('to',' 0 0');
-		animateTransform.setAttribute('dur','0.2s');
-		animateTransform.setAttribute('begin',this.pawn.id+'BuffStartJump.end');
-		animateTransform.setAttribute('additive','sum');
-		animateTransform.setAttribute('repeatCount','1');
+		if (characterNodes.buff == undefined) {
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			characterGroup.appendChild(animateTransform);
+			animateTransform.setAttribute('id',this.pawn.id+'BuffStart');
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','rotate');
+			animateTransform.setAttribute('from','0 0 0' );
+			animateTransform.setAttribute('to',' -10 0 0');
+			animateTransform.setAttribute('dur','0.2s');
+			animateTransform.setAttribute('begin','indefinite');
+			animateTransform.setAttribute('additive','sum');
+			animateTransform.setAttribute('repeatCount',1);
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			characterGroup.appendChild(animateTransform);
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','rotate');
+			animateTransform.setAttribute('from','-10 0 0' );
+			animateTransform.setAttribute('to',' 0 0 0');
+			animateTransform.setAttribute('dur','0.2s');
+			animateTransform.setAttribute('begin',this.pawn.id+'BuffStart.end');
+			animateTransform.setAttribute('additive','sum');
+			animateTransform.setAttribute('repeatCount','1');
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			characterGroup.appendChild(animateTransform);
+			animateTransform.setAttribute('id',this.pawn.id+'BuffStartJump');
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','translate');
+			animateTransform.setAttribute('from','0 0' );
+			animateTransform.setAttribute('to',' 20 -20');
+			animateTransform.setAttribute('dur','0.2s');
+			animateTransform.setAttribute('begin',this.pawn.id+'BuffStart.begin');
+			animateTransform.setAttribute('additive','sum');
+			animateTransform.setAttribute('repeatCount','1');
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			characterGroup.appendChild(animateTransform);
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','translate');
+			animateTransform.setAttribute('from','20 -20' );
+			animateTransform.setAttribute('to',' 0 0');
+			animateTransform.setAttribute('dur','0.2s');
+			animateTransform.setAttribute('begin',this.pawn.id+'BuffStartJump.end');
+			animateTransform.setAttribute('additive','sum');
+			animateTransform.setAttribute('repeatCount','1');
+		} else {
+			characterGroup.appendChild(characterNodes.buff);
+		};
 
 		// Defeat Animation
 		
-		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		characterGroup.appendChild(animateTransform);
-		animateTransform.setAttribute('id',this.pawn.id+'DefeatStart');
-		animateTransform.setAttribute('attributeName','transform');
-		animateTransform.setAttribute('attributeType','XML');
-		animateTransform.setAttribute('type','translate');
-		animateTransform.setAttribute('from','0 0' );
-		animateTransform.setAttribute('to','-15 -10');
-		animateTransform.setAttribute('dur','0.2s');
-		animateTransform.setAttribute('begin','indefinite');
-		animateTransform.setAttribute('additive','sum');
-		animateTransform.setAttribute('repeatCount','1');
-		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		characterGroup.appendChild(animateTransform);
-		animateTransform.setAttribute('id',this.pawn.id+'Defeat2');
-		animateTransform.setAttribute('attributeName','transform');
-		animateTransform.setAttribute('attributeType','XML');
-		animateTransform.setAttribute('type','translate');
-		animateTransform.setAttribute('from','-15 -10' );
-		animateTransform.setAttribute('to',' -30 0');
-		animateTransform.setAttribute('dur','0.2s');
-		animateTransform.setAttribute('begin',this.pawn.id+'DefeatStart.end');
-		animateTransform.setAttribute('additive','sum');
-		animateTransform.setAttribute('repeatCount','1');
-		animateTransform.setAttribute('fill','freeze');
-		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		characterGroup.appendChild(animateTransform);
-		animateTransform.setAttribute('id',this.pawn.id+'DefeatFall');
-		animateTransform.setAttribute('attributeName','transform');
-		animateTransform.setAttribute('attributeType','XML');
-		animateTransform.setAttribute('type','rotate');
-		animateTransform.setAttribute('by','90');
-		animateTransform.setAttribute('dur','1s');
-		animateTransform.setAttribute('begin',this.pawn.id+'Defeat2.end');
-		animateTransform.setAttribute('additive','sum');
-		animateTransform.setAttribute('repeatCount',1);
-		animateTransform.setAttribute('fill','freeze');
+		if (characterNodes.defeat == undefined) {
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			characterGroup.appendChild(animateTransform);
+			animateTransform.setAttribute('id',this.pawn.id+'DefeatStart');
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','translate');
+			animateTransform.setAttribute('from','0 0' );
+			animateTransform.setAttribute('to','-15 -10');
+			animateTransform.setAttribute('dur','0.2s');
+			animateTransform.setAttribute('begin','indefinite');
+			animateTransform.setAttribute('additive','sum');
+			animateTransform.setAttribute('repeatCount','1');
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			characterGroup.appendChild(animateTransform);
+			animateTransform.setAttribute('id',this.pawn.id+'Defeat2');
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','translate');
+			animateTransform.setAttribute('from','-15 -10' );
+			animateTransform.setAttribute('to',' -30 0');
+			animateTransform.setAttribute('dur','0.2s');
+			animateTransform.setAttribute('begin',this.pawn.id+'DefeatStart.end');
+			animateTransform.setAttribute('additive','sum');
+			animateTransform.setAttribute('repeatCount','1');
+			animateTransform.setAttribute('fill','freeze');
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			characterGroup.appendChild(animateTransform);
+			animateTransform.setAttribute('id',this.pawn.id+'DefeatFall');
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','rotate');
+			animateTransform.setAttribute('by','90');
+			animateTransform.setAttribute('dur','1s');
+			animateTransform.setAttribute('begin',this.pawn.id+'Defeat2.end');
+			animateTransform.setAttribute('additive','sum');
+			animateTransform.setAttribute('repeatCount',1);
+			animateTransform.setAttribute('fill','freeze');
+		} else {
+			characterGroup.appendChild(characterNodes.defeat);
+		};
 
 		// Revive Animation
 		
-		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		characterGroup.appendChild(animateTransform);
-		animateTransform.setAttribute('id',this.pawn.id+'Revive1');
-		animateTransform.setAttribute('attributeName','transform');
-		animateTransform.setAttribute('attributeType','XML');
-		animateTransform.setAttribute('type','translate');
-		animateTransform.setAttribute('from','0 0' );
-		animateTransform.setAttribute('to','15 -10');
-		animateTransform.setAttribute('dur','0.2s');
-		animateTransform.setAttribute('begin',this.pawn.id+'ReviveStart.end');
-		animateTransform.setAttribute('additive','sum');
-		animateTransform.setAttribute('repeatCount','1');
-		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		characterGroup.appendChild(animateTransform);
-		animateTransform.setAttribute('id',this.pawn.id+'Revive2');
-		animateTransform.setAttribute('attributeName','transform');
-		animateTransform.setAttribute('attributeType','XML');
-		animateTransform.setAttribute('type','translate');
-		animateTransform.setAttribute('from','15 -10' );
-		animateTransform.setAttribute('to',' 30 0');
-		animateTransform.setAttribute('dur','0.2s');
-		animateTransform.setAttribute('begin',this.pawn.id+'ReviveStart.end');
-		animateTransform.setAttribute('additive','sum');
-		animateTransform.setAttribute('repeatCount','1');
-		animateTransform.setAttribute('fill','freeze');
-		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
-		characterGroup.appendChild(animateTransform);
-		animateTransform.setAttribute('id',this.pawn.id+'ReviveStart');
-		animateTransform.setAttribute('attributeName','transform');
-		animateTransform.setAttribute('attributeType','XML');
-		animateTransform.setAttribute('type','rotate');
-		animateTransform.setAttribute('by','-90');
-		animateTransform.setAttribute('dur','1s');
-		animateTransform.setAttribute('begin','indefinite');
-		animateTransform.setAttribute('additive','sum');
-		animateTransform.setAttribute('repeatCount',1);
-		animateTransform.setAttribute('fill','freeze');
+		if (characterNodes.revive == undefined) {
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			characterGroup.appendChild(animateTransform);
+			animateTransform.setAttribute('id',this.pawn.id+'Revive1');
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','translate');
+			animateTransform.setAttribute('from','0 0' );
+			animateTransform.setAttribute('to','15 -10');
+			animateTransform.setAttribute('dur','0.2s');
+			animateTransform.setAttribute('begin',this.pawn.id+'ReviveStart.end');
+			animateTransform.setAttribute('additive','sum');
+			animateTransform.setAttribute('repeatCount','1');
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			characterGroup.appendChild(animateTransform);
+			animateTransform.setAttribute('id',this.pawn.id+'Revive2');
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','translate');
+			animateTransform.setAttribute('from','15 -10' );
+			animateTransform.setAttribute('to',' 30 0');
+			animateTransform.setAttribute('dur','0.2s');
+			animateTransform.setAttribute('begin',this.pawn.id+'ReviveStart.end');
+			animateTransform.setAttribute('additive','sum');
+			animateTransform.setAttribute('repeatCount','1');
+			animateTransform.setAttribute('fill','freeze');
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			characterGroup.appendChild(animateTransform);
+			animateTransform.setAttribute('id',this.pawn.id+'ReviveStart');
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','rotate');
+			animateTransform.setAttribute('by','-90');
+			animateTransform.setAttribute('dur','1s');
+			animateTransform.setAttribute('begin','indefinite');
+			animateTransform.setAttribute('additive','sum');
+			animateTransform.setAttribute('repeatCount',1);
+			animateTransform.setAttribute('fill','freeze');
+		} else {
+			characterGroup.appendChild(characterNodes.revive);
+		};
 	
 		return svgNodes;
 	};
@@ -5479,7 +5740,7 @@ function AvatarBeast(pawn,type) {
 			};
 		};
 		
-		return bodyNodes;
+		return {svgNodes:bodyNodes};
 
 	};
 	
@@ -5558,6 +5819,115 @@ function AvatarBeast(pawn,type) {
 			};
 		};
 		
-		return bodyNodes;
+		return {svgNodes:bodyNodes};
 	};
-}
+	
+	this.fire = function() {
+		var fire = document.createElementNS('http://www.w3.org/2000/svg','g');
+		
+		var circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+		fire.appendChild(circle);
+		circle.setAttribute('cx',0);
+		circle.setAttribute('cy',0);
+		circle.setAttribute('r',10);
+		circle.setAttribute('fill','red');
+		circle.setAttribute('stroke','yellow');
+		circle.setAttribute('stroke-width',3);
+
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		animateTransform.setAttribute('id',this.pawn.id+'DefeatStart');
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','scale');
+		animateTransform.setAttribute('from','1' );
+		animateTransform.setAttribute('to','0');
+		animateTransform.setAttribute('dur','1s');
+		animateTransform.setAttribute('begin','indefinite');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('fill','freeze');
+		animateTransform.setAttribute('repeatCount','1');
+		
+		return {svgNodes:fire,defeat:animateTransform};
+	};
+};
+
+function AvatarThing(thing,type) {
+	
+	this.thing = thing;
+	this.type = type;
+
+	this.draw = function() {
+
+		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg','g');
+		svgNodes.id = thing.id;
+		
+		// The Actual Sprite
+		var characterGroup = this[this.type](thing);
+		characterGroup.id = this.thing.id + "CharacterGroup";
+		svgNodes.appendChild(characterGroup);
+		
+		return svgNodes;
+	};
+
+	this.well = function(thing) {
+		var well = document.createElementNS('http://www.w3.org/2000/svg','g');
+		well.setAttribute('stroke','black');
+		well.setAttribute('stroke-width','0.5');
+		well.setAttribute('stroke-linecap','round');
+		well.setAttribute('stroke-linejoin','round');
+		var shapes = [
+			{tag:"path", fill:"#bbbbbb", d:" M-29.265-22.313c0-5.83,12.916-10.557,28.85-10.557c15.937,0,28.853,4.727,28.853,10.557v21.106 c0,5.83-12.916,10.555-28.853,10.555c-15.934,0-28.85-4.725-28.85-10.555V-22.313L-29.265-22.313z"}, 
+			{tag:"ellipse", fill:"#bbbbbb", cx:"-0.415", cy:"-22.313", rx:"28.852", ry:"10.557"}, 
+			{tag:"ellipse", fill:"#353535", cx:"-0.415", cy:"-22.313", rx:"22.118", ry:"8.093"}, 
+			{tag:"polygon", fill:"#A97C50", points:" -24.844,-55.727 -24.844,-26.573 -22.291,-25.446 -19.738,-26.807 -20.204,-54.438"}, 
+			{tag:"polyline", fill:"#A97C50", points:" 19.253,-45.893 19.895,-19.078 22.111,-17.356 24.966,-18.846 24.193,-44.436"}, 
+			{tag:"polygon", fill:"#A97C50", points:" -21.895,-61.347 29.265,-51.979 29.265,-44.042 24.966,-41.482 -27.113,-59.942"}, 
+			{tag:"polygon", fill:"#A97C50", points:" -27.113,-54.087 24.966,-41.482 23.995,-50.224 -27.113,-59.942"},
+		];
+		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			well.appendChild(newShape);
+			for (var tag in shape) {
+				if (tag !== 'tag') {
+					newShape.setAttribute(tag,shape[tag]);
+				};
+			};
+		};
+		return well;
+	};
+
+	this.chest = function(thing) {
+	
+		var chest = document.createElementNS('http://www.w3.org/2000/svg','g');
+		chest.setAttribute('stroke-linecap',"round");
+		chest.setAttribute('stroke-linejoin',"round");
+		chest.setAttribute('stroke-miterlimit',"10");
+		var colors = {
+			wood: '#A97C50',
+			woodStroke: '#3F3D42',
+			metal: "#FBB040",
+			metalStroke: "#564700",
+		};
+		var shapes = [
+			{tag:'path', fill:colors.wood, stroke:colors.woodStroke, d:"M-24.398-11.418c0-5.389,3.378-8.778,8.778-8.778l30.239-3c6.551,0,9.779,4.975,9.779,12.778l-29.24,5L-24.398-11.418 z"},
+			{tag:'path', fill:colors.metal, stroke:colors.metalStroke, d:"M16.086-8.908c0-8.18-3.384-13.394-10.249-13.394l3.969-0.551c6.866,0,10.25,5.214,10.25,13.394L16.086-8.908 z"},
+			{tag:'path', fill:colors.metal, stroke:colors.metalStroke, d:"M-9.922-20.645c7.313,0,11.578,5.8,11.578,14.513l4.182-0.754c0-8.714-3.604-14.268-10.918-14.268L-9.922-20.645 z"},
+			{tag:'polygon', fill:colors.wood, stroke:colors.woodStroke, points:"-4.842,14.139 -24.398,8.139 -24.398,-11.418 -4.842,-5.418 "},
+			{tag:'polygon', fill:colors.wood, stroke:colors.woodStroke, points:"24.398,8.139 -4.842,14.139 -4.842,-5.418 24.398,-10.418 "},
+			{tag:'path', fill:colors.wood, stroke:colors.woodStroke, d:"M-24.398-11.418c0-5.4,3.378-8.778,8.778-8.778c6.925,0,10.778,9.378,10.778,14.778L-24.398-11.418 z"},
+			{tag:'polygon', fill:colors.metal, stroke:colors.metalStroke, points:"20.056,9.408 15.72,10.299 15.72,-8.733 20.056,-9.474 "},
+			{tag:'polygon', fill:colors.metal, stroke:colors.metalStroke, points:"5.991,12.01 1.655,12.9 1.655,-6.132 5.991,-6.873 "},
+			{tag:'polygon', fill:colors.metal, stroke:colors.metalStroke, points:"8.549,-5.782 9.165,-7.813 12.521,-8.387 13.751,-6.873 12.355,-3.828 10.476,-3.615"}
+		];
+		for (var shape of shapes) {
+			var newShape = document.createElementNS('http://www.w3.org/2000/svg',shape.tag);
+			chest.appendChild(newShape);
+			for (var tag in shape) {
+				if (tag !== 'tag') {
+					newShape.setAttribute(tag,shape[tag]);
+				};
+			};
+		};
+		return chest;
+	};
+};

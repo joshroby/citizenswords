@@ -203,26 +203,11 @@ function Map(level) {
 					};
 					heroIndex++;
 				} else if (standee.type == 'pawn') {
-					pawn = new Pawn(standee.id,tile);
+					pawn = new Pawn(standee.id,tile,standee.team,standee.priorities);
 					pawn.compileManeuvers();
-					pawn.team = standee.team;
 					tile.occupants.push(pawn);
 					if (standee.team == 'p1') {
 						game.map.heroes.push(pawn);
-					};
-					if (standee.priorities !== undefined) {
-						if (standee.priorities.freeze == true) {
-							pawn.priorities.freeze = true;
-						};
-						if (standee.priorities.post !== undefined) {
-							pawn.priorities.post = game.map.findTile(standee.priorities.post.x,standee.priorities.post.y);
-						};
-						if (standee.priorities.patrol !== undefined) {
-							pawn.priorities.patrol = [];
-							for (var coords of standee.priorities.patrol) {
-								pawn.priorities.patrol.push(game.map.findTile(coords.x,coords.y));
-							};
-						};
 					};
 					if (standee.events !== undefined) {
 						pawn.events = standee.events;
@@ -235,7 +220,7 @@ function Map(level) {
 					tile.occupants.push(bystander);
 					bystander.team = 'bystanders';
 				} else if (standee.type == 'thing') {
-					thing = new Thing(standee.template,tile);
+					thing = new Thing(standee.key,tile,standee.inventory,standee.lootable,standee.triggers);
 					tile.occupants.push(thing);
 					game.map.things.push(thing);
 				};
@@ -244,6 +229,7 @@ function Map(level) {
 		for (var trigger of level.triggers) {
 			if (trigger.check == 'load') {
 				this.loadEvents.push(level.events[trigger.event]);
+			} else if (trigger.check == 'endTurn') {
 			} else {
 				for (var loc of trigger.locs) {
 					tile = this.findTile(loc.x,loc.y);
@@ -396,6 +382,13 @@ function Map(level) {
 		return result;
 	};
 	
+	this.removePawn = function(pawn) {
+		this.pawns.splice(this.pawns.indexOf(pawn),1);
+		pawn.tile.occupants.splice(pawn.tile.occupants.indexOf(pawn),1);
+		this.removedPawns.push(pawn);
+	};
+	this.removedPawns = [];
+	
 	this.endTurn = function() {
 		for (var pawn of this.pawns) {
 			if (pawn.team !== 'p1') {
@@ -405,6 +398,11 @@ function Map(level) {
 		for (var pawn of this.pawns) {
 			if (pawn.team == 'p1') {
 				pawn.refreshStats();
+			};
+		};
+		for (var trigger of game.currentLevel.triggers) {
+			if (trigger.check == 'endTurn') {
+				game.currentLevel.events[trigger.event]();
 			};
 		};
 	};
@@ -437,7 +435,7 @@ function Landscape(tile,key) {
 	this.cover = data.landscapes[key].cover;
 };
 
-function Pawn(template,tile,ai) {
+function Pawn(template,tile,team,priorities) {
 	var source;
 	
 	this.id = undefined;
@@ -448,6 +446,24 @@ function Pawn(template,tile,ai) {
 	
 	this.name = undefined;
 	
+	this.team = team;
+
+	this.priorities = {};
+	if (priorities !== undefined) {
+		if (priorities.freeze == true) {
+			this.priorities.freeze = true;
+		};
+		if (priorities.post !== undefined) {
+			this.priorities.post = game.map.findTile(priorities.post.x,priorities.post.y);
+		};
+		if (priorities.patrol !== undefined) {
+			this.priorities.patrol = [];
+			for (var coords of priorities.patrol) {
+				this.priorities.patrol.push(game.map.findTile(coords.x,coords.y));
+			};
+		};
+	};
+	
 	this.pronoun = ['Herself','Himself','Herself','Himself','Herself','Himself','Themself','Emself','Cirself','Ferself'][Math.random() * 10 << 0];
 	
 	this.tile = tile;
@@ -456,11 +472,17 @@ function Pawn(template,tile,ai) {
 	this.exclusive = true;
 	this.wounds = {move:[],strength:[],focus:[]};
 	this.morale = 1;
-	this.equipment = {};
+	this.equipment = {
+			left: undefined,
+			right: undefined,
+			neck: undefined,
+			garb: undefined,
+			pouch: undefined,
+		};
 
 	this.randomName = function() {
-		var firstNames = ['Jojo','Sam','Avery','Drumlin','Alex'];
-		var lastNames = ['Cooper','Ankole-Watusi','Stout','Duendi','Guffau'];
+		var firstNames = data.names.first;
+		var lastNames = data.names.last;
 		return firstNames[Math.random() * firstNames.length << 0] + ' ' + lastNames[Math.random() * lastNames.length << 0];
 	};
 
@@ -1124,8 +1146,6 @@ function Pawn(template,tile,ai) {
 		view.updateSheet(this);
 	};
 	
-	this.priorities = {};
-	
 	this.turn = function() {
 		this.refreshStats();
 		if (this.priorities.freeze == true) {
@@ -1250,28 +1270,26 @@ function Pawn(template,tile,ai) {
 	};
 };
 
-function Thing(template,tile,argsArray,id) {
+function Thing(template,tile,inventory,lootable,triggers,id) {
 	
 	if (id == undefined) {id = Math.random().toString(36).slice(2)};
 	this.id = id;
+	this.name = undefined;
 	
 	this.tile = tile;
 	this.selectable = true;
 	
-	if (template == undefined) {
-		this.sprite = 'chest';
-		this.name = 'Wooden Chest';
-		this.cover = 0.1;
-		this.inventory = [new Item('firstAidKit',this)];
-		this.lootable = true;
-	} else {
-		this.sprite = data.things[template].sprite;
-		this.name = data.things[template].name;
-		this.cover = data.things[template].cover;
-		this.inventory = data.things[template].inventory(argsArray);
-		this.triggers = data.things[template].triggers(argsArray);
-	};
-		
+	if (template == undefined) {template = 'chest'};
+	
+	this.sprite = data.things[template].sprite;
+	this.name = data.things[template].name;
+	this.description = data.things[template].description;
+	this.cover = data.things[template].cover;
+	
+	this.inventory = inventory;
+	this.lootable = lootable;
+	this.triggers = triggers;
+	
 	this.textStrings = function(lineLength) {
 		if (this.description == undefined) {
 			description = 'No description of this thing available.';
@@ -1282,6 +1300,8 @@ function Thing(template,tile,argsArray,id) {
 	};
 	
 	this.equipment = {};
+	
+	this.avatar = new AvatarThing(this,template);
 	
 	this.contextualManeuvers = {
 		interact: {
@@ -1355,7 +1375,7 @@ function Thing(template,tile,argsArray,id) {
 
 };
 
-function Item(template,pawn,id) {
+function Item(template,pawn,colors,id) {
 
 	if (id == undefined) {id = Math.random().toString(36).slice(2)};
 	this.id = id;
@@ -1374,6 +1394,9 @@ function Item(template,pawn,id) {
 		} else if (data.items[template].colors[key].fill !== undefined && data.items[template].colors[key].fill.indexOf('match') == 0) {
 			var matchKey = data.items[template].colors[key].fill.split(' ')[1];
 			this.colors[key] = {fill:this.colors[matchKey],stroke:'black'};
+		} else if (data.items[template].colors[key] == 'any') {
+			var fullColorList = ["INDIANRED","LIGHTCORAL","SALMON","DARKSALMON","LIGHTSALMON","CRIMSON","RED","FIREBRICK","DARKRED","PINK","LIGHTPINK","HOTPINK","DEEPPINK","MEDIUMVIOLETRED","PALEVIOLETRED","LIGHTSALMON","CORAL","TOMATO","ORANGERED","DARKORANGE","ORANGE","GOLD","YELLOW","LIGHTYELLOW","LEMONCHIFFON","LIGHTGOLDENRODYELLOW","PAPAYAWHIP","MOCCASIN","PEACHPUFF","PALEGOLDENROD","KHAKI","DARKKHAKI","LAVENDER","THISTLE","PLUM","VIOLET","ORCHID","FUCHSIA","MAGENTA","MEDIUMORCHID","MEDIUMPURPLE","REBECCAPURPLE","BLUEVIOLET","DARKVIOLET","DARKORCHID","DARKMAGENTA","PURPLE","INDIGO","SLATEBLUE","DARKSLATEBLUE","MEDIUMSLATEBLUE","GREENYELLOW","CHARTREUSE","LAWNGREEN","LIME","LIMEGREEN","PALEGREEN","LIGHTGREEN","MEDIUMSPRINGGREEN","SPRINGGREEN","MEDIUMSEAGREEN","SEAGREEN","FORESTGREEN","GREEN","DARKGREEN","YELLOWGREEN","OLIVEDRAB","OLIVE","DARKOLIVEGREEN","MEDIUMAQUAMARINE","DARKSEAGREEN","LIGHTSEAGREEN","DARKCYAN","TEAL","AQUA","CYAN","LIGHTCYAN","PALETURQUOISE","AQUAMARINE","TURQUOISE","MEDIUMTURQUOISE","DARKTURQUOISE","CADETBLUE","STEELBLUE","LIGHTSTEELBLUE","POWDERBLUE","LIGHTBLUE","SKYBLUE","LIGHTSKYBLUE","DEEPSKYBLUE","DODGERBLUE","CORNFLOWERBLUE","MEDIUMSLATEBLUE","ROYALBLUE","BLUE","MEDIUMBLUE","DARKBLUE","NAVY","MIDNIGHTBLUE","CORNSILK","BLANCHEDALMOND","BISQUE","NAVAJOWHITE","WHEAT","BURLYWOOD","TAN","ROSYBROWN","SANDYBROWN","GOLDENROD","DARKGOLDENROD","PERU","CHOCOLATE","SADDLEBROWN","SIENNA","BROWN","MAROON","SNOW","HONEYDEW","MINTCREAM","AZURE","ALICEBLUE","GHOSTWHITE","WHITESMOKE","SEASHELL","BEIGE","OLDLACE","FLORALWHITE","IVORY","ANTIQUEWHITE","LINEN","LAVENDERBLUSH","MISTYROSE","GAINSBORO","LIGHTGRAY","SILVER","DARKGRAY","GRAY","DIMGRAY","LIGHTSLATEGRAY","SLATEGRAY","DARKSLATEGRAY"];
+			this.colors[key] = fullColorList[Math.random() * fullColorList.length << 0];
 		} else {
 			this.colors[key] = data.items[template].colors[key];
 		};
@@ -1546,6 +1569,7 @@ function Maneuver(maneuver,item) {
 				};
 			};
 		};
+		console.log(pawn);
 		return pawn.roll(pawnStat,itemStat,penalty);
 	};
 	

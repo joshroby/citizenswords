@@ -53,8 +53,8 @@ var level_orktown = {
 	],
 	
 	standees: [
-// 		{type:'heroes',locs:[{x:-8.5,y:-3},{x:2.5,y:-7},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
-		{type:'heroes',locs:[{x:0,y:0},{x:1,y:0},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
+		{type:'heroes',locs:[{x:-6,y:-2},{x:11,y:-10},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
+// 		{type:'heroes',locs:[{x:0,y:0},{x:1,y:0},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
 		{type:'landscape',key:'marketBacking',locs:[{x:-10.5,y:-11},{x:-9.5,y:-11}]},
 		{type:'pawn',id:'aaron',team:'watch',priorities:{freeze:true},locs:[{x:-11.5,y:-1}]},
 		{type:'pawn',id:'doti',team:'watch',priorities:{freeze:true},locs:[{x:0.5,y:-3}]},
@@ -135,7 +135,6 @@ var level_orktown = {
 			{x:-11,y:-4},
 		]},
 		{type:'landscape',key:'bushes',locs:[{x:-10.5,y:-1},{x:-11,y:0},{x:0,y:-8},{x:1,y:-8},{x:2,y:-8},{x:3,y:-8}]},
-		{type:'landscape',key:'well',locs:[{x:-7,y:-2},{x:-6,y:-10},{x:6,y:-4}]},
 		{type:'landscape',key:'marketLeft',locs:[{x:-10.5,y:-11}]},
 		{type:'landscape',key:'marketCenter',locs:[{x:-9.5,y:-11}]},
 		{type:'landscape',key:'marketRight',locs:[{x:-8.5,y:-11}]},
@@ -143,7 +142,9 @@ var level_orktown = {
 		{type:'landscape',key:'trees',locs:[{x:-2,y:-12},{x:-1.5,y:-11},{x:3.5,y:-9},{x:4,y:-10},{x:4.5,y:-11},{x:5,y:-12}]},
 		{type:'landscape',key:'block',locs:[{x:0,y:-12},{x:1,y:-12},{x:2,y:-12},{x:3,y:-12}]},
 		{type:'landscape',key:'block',locs:[{x:0,y:-12}]},
-		{type:'thing',key:'chest',locs:[{x:11,y:-10}]},
+		{type:'thing',key:'well',inventory:[new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket')],lootable:true,locs:[{x:-7,y:-2},{x:-6,y:-10},{x:6,y:-4}]},
+		{type:'thing',key:'chest',inventory:[new Item('fineNecklace'),new Item('fineClothes'),new Item('candelabrum')],lootable:true,locs:[{x:11,y:-10}]},
+		{type:'pawn',id:'fire',team:'fire',priorities:{freeze:true},locs:[{x:-8,y:-6},{x:-7,y:-6}]},
 	],
 	
 	teams: {
@@ -175,6 +176,7 @@ var level_orktown = {
 	
 	triggers: [
 		{check:'load',event:'loadEvent'},
+		{check:'endTurn',event:'endTurn'},
 		{check:'talkedToDoti',event:'dotiGate',locs:[{x:0,y:-2}]},
 		{check:'talkedToNosh',event:'noshGreet',locs:[{x:-5.5,y:-3}]},
 		{check:'talkedToSkullgoblet',event:'skullgobletRobbed',locs:[{x:-9.5,y:-7},{x:-8.5,y:-7},{x:-7.5,y:-7}]},
@@ -234,6 +236,36 @@ var level_orktown = {
 			string = "What the what, now?  Hey, Doti's at the gate.  Ey probably knows what's happening, let's ask em.";
 			var passage = new Passage(string,undefined,true,stout.name,stout.avatar.svg('bust'),'right');
 			gamen.displayPassage(passage);
+		},
+		endTurn: function() {
+			if (game.currentLevel.flags.talkedToNosh && !game.currentLevel.flags.firesOut) {
+				var fires = [];
+				var wagons = [{x:-11.5,y:-5},{x:-10.5,y:-5},{x:-9.5,y:-5},{x:-8.5,y:-5},{x:-8,y:-6},{x:-7,y:-6}];
+				for (var wagon of wagons) {
+					var tile = game.map.findTile(wagon.x,wagon.y);
+					wagon.tile = tile;
+					for (var occupant of tile.occupants) {
+						if (occupant.stats !== undefined && occupant.stats.strength > 0) {
+							wagon.onFire = true;
+							wagon.fire = occupant;
+						} else if (occupant.stats !== undefined && occupant.stats.strength <= 0) {
+							game.map.removePawn(occupant);
+						};
+					};
+				};
+				for (var w=0;w<wagons.length;w++) {
+					if (!wagons[w].onFire && wagons[w+1].onFire) {
+						var wagon = wagons[w];
+						wagon.onFire = true;
+						var newFire = new Pawn('fire',wagon.tile,'fire',{freeze:true});
+						newFire.stats.strength = 1;
+						wagon.fire = newFire;
+						wagon.tile.occupants.push(newFire);
+						view.addStandee(newFire,wagon.tile);
+					};
+				};
+				console.log(wagons);
+			};
 		},
 		dotiGate: function(pawn) {
 			console.log('Doti at the Gate');
@@ -665,10 +697,11 @@ var level_orktown = {
 			game.currentLevel.events.endOfContent();
 		},
 		endOfContent: function() {
+			var josh = new Pawn('josh');
 			string = "You've reached the end of current content!<p />Thanks so much for playing.  I'm really looking forward to developing <em>Citizen Swords</em> further.  Next up will be setting up your company headquarters and venturing out on adventures to support the city of Pileas's independence.  I'm hoping to include thrilling heroics, vicious politics, romance, family drama, and a few kitchen sinks.";
 			string += "<p />If you'd like to support the game's development, click on the Patreon button above.";
 			string += "<p />Thanks again for playing!";
-			gamen.displayPassage(new Passage(string,undefined,false));
+			gamen.displayPassage(new Passage(string,undefined,false,undefined,josh.avatar.svg('bust'),'left'));
 		},
 	},
 };

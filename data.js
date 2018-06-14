@@ -98,6 +98,16 @@ var data = {
 			inventory: [],
 		},
 		
+		fire: {
+			name: "Fire!",
+			unique: false,
+			pronoun: "Fireself",
+			description: "",
+			beastType: "fire",
+			stats: {strength:1,move:0,focus:0},
+			inventory: [],
+		},
+		
 		hellpuppy: {
 			name: "Hellpuppy",
 			unique: true,
@@ -118,6 +128,24 @@ var data = {
 				garb: {template:'roughspun'},
 				right: {template: 'bronzeHatchet'},
 				left: {template: 'sovereignIcon'},
+			},
+			inventory: [],
+		},
+		
+		josh: {
+			name: "Josh Roby",
+			unique: true,
+			pronoun: "Themself",
+			description: "The creator of this timesink.",
+			avatarParameters: {"eyeColor":"#69a43d","hairColor":"#b9531b","blackEumelanin":12,"brownEumelanin":19,"pinkPheomelanin":24,"greenKeratin":0,"noseShading":1,"nosePinkness":11,"lipShading":31,"lipPinkness":23,"earShading":27,"earPinkness":40,"templePosition":12,"templeWidth":2,"templeHeight":3,"cheekbonePosition":9,"cheekboneWidth":2,"cheekboneHeight":4,"chinHeight":44,"chinWidth":20,"eyeDistance":13,"eyeSize":6,"browSize":3,"insideEyelidCurve":2,"outsideEyelidCurve":6,"lowerEyelidCurve":6,"noseHeight":39,"noseSize":1,"noseWidth":5,"nostrilHeight":3,"noseBump":-3,"mouthWidth":13,"lipSize":3,"teeth":4,"leftTusk":0,"rightTusk":0,"earSize":15,"earDip":-20,"earTilt":-3,"earWidth":-14,"earLobe":11,"shoulders":35,"belly":21,"hips":19,"feet":13,"hindquarters":0,"leftBrowTilt":1,"rightBrowTilt":1,"smile":3,"mouthOpen":5,"hairLength":64,"hairPart":2,"hairBangs":8,"hairBangsLength":15,"hairSweep":4,"topHairHeight":0,"topHairBase":16,"topHairWidth":12,"hairCurl":11,"horns":0,"bust":15,"heritage":"full-blooded elvish ","skinColor":"#e09f77","noseColor":"#e18e6b","lipColor":"#ea917c","earColor":"#e96f5e"},
+			stats: {
+				move: 1,
+				strength: 1,
+				focus: 1,
+			},
+			equipment: {
+				garb: {template:'guildmasterRobes'},
+				neck: {template:'chainsOfOffice'},
 			},
 			inventory: [],
 		},
@@ -143,7 +171,8 @@ var data = {
 			avatarHeritage: ['centaur'],
 			stats: {move:8,strength:10,focus:4},
 			equipment: {
-				garb: {template:'scrapArmor'},
+				garb: {template:'fineClothes'},
+				left: {template: 'knife'},
 			},
 			inventory: [],
 		},
@@ -461,6 +490,7 @@ var data = {
 		
 		bronzeHatchet: {
 			name: "Bronze Hatchet",
+			description: "A cheap tool for rough woodworking.",
 			slots: ['left','right'],
 			colors: {
 				head: '#6d5d04',
@@ -473,6 +503,7 @@ var data = {
 		
 		candelabrum: {
 			name: "Candelabrum",
+			description: "If you're stressed, it's fine dining we suggest.",
 			slots: ['left','right'],
 			colors: {
 				metal: 'goldenrod',
@@ -484,6 +515,7 @@ var data = {
 		
 		chainsOfOffice: {
 			name: "Chains of Office",
+			description: "This ornate necklace symbolizes the responsibilities of its owner, a guildmaster.",
 			slots: ['neck'],
 			colors: {
 				chain: 'gold',
@@ -498,6 +530,7 @@ var data = {
 		
 		cargoHook: {
 			name: "Cargo Hook",
+			description: "A laborer's tool, used to haul cargo in and out of boats.",
 			slots: ['left','right'],
 			colors: {
 				hook: 'silver',
@@ -514,6 +547,7 @@ var data = {
 		
 		circleMedallion: {
 			name: "Circle Medallion",
+			description: "A simple metal ring suspended on a chain.",
 			slots: ['neck'],
 			colors: {
 				medallion: 'silver',
@@ -525,6 +559,7 @@ var data = {
 		
 		fineBlacks: {
 			name: "Fine Blacks",
+			description: "High-quality fabric, tight-fitting, and inky black.",
 			slots: ['garb'],
 			colors: {
 				shirt: '#272727',
@@ -543,8 +578,31 @@ var data = {
 			svgNodes:function(item) {return item.pawn.avatar.fineBlacks(item)},
 		},
 		
+		fineClothes: {
+			name: 'Fine Clothes',
+			description: "Clothes ill suited to honest labor.",
+			slots: ['garb'],
+			colors: {
+				primary:'any',
+				secondary:'any',
+				shoes: 'any',
+				torso: {fill:'match primary'},
+				upperArms: {fill:'match secondary'},
+				lowerArms: {fill:'match secondary'},
+				legs: {fill:'match secondary'},
+				feet: {fill:'match shoes'},
+			},
+			stats: {
+				aegis: 1,
+				soak: 1,
+				weight: 2,
+			},
+			svgNodes:function(item) {return item.pawn.avatar.fineClothes(item)},
+		},
+		
 		fineNecklace: {
 			name: 'Fine Necklace',
+			description: 'Appropriate to adorn the poshest neck.',
 			slots: ['neck'],
 			colors: {
 				metal: 'gold',
@@ -558,6 +616,7 @@ var data = {
 		
 		firstAidKit: {
 			name: "First Aid Kit",
+			description: 'A pouch of necessary bandages and unguents for treating light wounds.',
 			slots: ['pouch'],
 			stats: {
 				healing: 3,
@@ -568,6 +627,7 @@ var data = {
 		
 		guildmasterRobes: {
 			name: "Guildmaster Robes",
+			description: 'Rich brocade and soft fabric dyed in vibrant colors.',
 			slots: ['garb'],
 			colors: {
 				robe: '#006838',
@@ -992,6 +1052,23 @@ var data = {
 			maneuvers: ['defensiveStance'],
 			svgNodes: function(item) {return item.pawn.avatar.watchArmor(item)},
 		},
+		
+		waterBucket: {
+			name: "Water Bucket",
+			description: "A bucket full of water, useful for dousing flames.",
+			slots: ['left','right'],
+			colors: {
+				primary: 'saddlebrown',
+				secondary: 'peru',
+				handle: 'saddlebrown',
+				contents: 'blue',
+			},
+			stats: {
+				capacity: 3,
+			},
+			maneuvers: ['douse'],
+			svgNodes: function(item) {return item.pawn.avatar.bucket(item)},
+		},
 	},
 	
 	
@@ -1074,6 +1151,28 @@ var data = {
 			},
 			effects: [
 				{type:'refresh', stat:'strength', num:3},
+			],
+		},
+		
+		douse: {
+			name: 'Douse',
+			description: 'Empty the bucket on the target.',
+			targetType: 'pawn',
+			minRange: 1,
+			maxRange: 1,
+			costs: {
+				move: function() {return 1},
+				strength: function() {return 1},
+				focus: function() {return 1},
+			},
+			rollStats: {
+				action: {pawnStat:'strength',itemStat:'capacity'},
+				reaction: {pawnStat:'strength'},
+				power: {pawnStat:1},
+				resist: {pawnStat:'strength'},
+			},
+			effects: [
+				{type:'wound',stat:'strength',name:'water',woundType:'physical'},
 			],
 		},
 	
@@ -1304,10 +1403,21 @@ var data = {
 		// End
 	},
 	
+	names: {
+		first: ['Jojo','Sam','Avery','Drumlin','Alex'],
+		last: ['Cooper','Ankole-Watusi','Stout','Duendi','Guffau'],
+	},
+	
 	things: {
 		chest: {
+			name: "Wooden Chest",
+			description: "A box.  Treasure inside.  Replace this text!",
 			sprite: 'chest',
-			path: undefined,
+		},
+		well: {
+			name: "Well",
+			description: "A well providing water.",
+			sprite: 'well',
 		},
 	},
 	
@@ -1490,15 +1600,6 @@ var data = {
 			exclusive: false,
 			cover: 0,
 		},
-	
-		well: {
-			sprite: 'well',
-			path: 'sprites/well.svg',
-			height: 150,
-			blockView: false,
-			exclusive: true,
-			cover: 0,
-		},
 	},
 	
 	wounds: {
@@ -1514,6 +1615,7 @@ var data = {
 		sting: ["Stung"],
 		torsion: ["Strain","Sprain","Dislocated Joint","Broken Bone"],
 		vertigo: ["Dizzy","Nauseous"],
+		water: ['Moist','Wet','Sopping','Drenched'],
 	},
 
 }

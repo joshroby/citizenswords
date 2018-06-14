@@ -64,8 +64,8 @@ var handlers = {
 	confirmAndPlay: function() {
 		game.confirmCreation(document.getElementById('nameInput').value,document.getElementById('pronounSelect').value);
 		view.hideCreation();
-		game.loadMap(hellhoundCave);
-// 		game.loadMap(level_orktown);
+// 		game.loadMap(hellhoundCave);
+		game.loadMap(level_orktown);
 	},
 	
 	// Map Handlers
@@ -208,9 +208,7 @@ var handlers = {
 			view.panToTile(pawn.tile,true);
 			pawn.select();
 			view.focus.pawn = pawn;
-			if (true) { // if controlled by player
-				view.displaySheet(pawn);
-			};
+			view.displaySheet(pawn);
 		};
 		view.closeTrade();
 		view.refreshAllManeuvers();
@@ -280,9 +278,13 @@ var handlers = {
 	},
 	
 	executeManeuver: function(maneuver,tile) {
-		var targets;
+		var targets = [];
 		if (maneuver.targetType == 'pawn') {
-			targets = [tile.occupants[0]];
+			for (var occupant of tile.occupants) {
+				if (occupant.roll !== undefined) {
+					targets.push(occupant);
+				};
+			};
 		} else if (maneuver.targetType == 'tile') {
 			targets = [tile];
 		};
