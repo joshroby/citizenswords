@@ -1502,7 +1502,7 @@ var view = {
 			} else {
 				view.camera.destinations.shift();
 			};
-			var timedEvent = setTimeout(view.panToTile,2);
+			var timedEvent = setTimeout(view.panToTile,5);
 		};
 	},
 	

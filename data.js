@@ -1557,6 +1557,47 @@ var data = {
 			exclusive: false,
 			cover: 0,
 		},
+	
+		orktownGarden: {
+			sprite: 'orktownGarden',
+			path: 'sprites/orktownGarden.svg',
+			yOffset: -20,
+			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
+	
+		orktownShanty: {
+			sprite: 'orktownShanty',
+			path: 'sprites/orktownShanty.svg',
+			width: 200,
+			yOffset: 0,
+			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
+	
+		orktownTarp: {
+			sprite: 'orktownTarp',
+			path: 'sprites/orktownTarp.svg',
+			height: 150,
+			width:120,
+			yOffset: -25,
+			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
+	
+		orktownTemple: {
+			sprite: 'orktownTemple',
+			path: 'sprites/orktownTemple.svg',
+			height: 300,
+			width:500,
+			yOffset: -110,
+			blockView: true,
+			exclusive: true,
+			cover: 0,
+		},
 		
 		pierBack: {
 			sprite: 'pierBack',
@@ -1609,6 +1650,23 @@ var data = {
 			blockView: true,
 			exclusive: true,
 			cover: 0,
+		},
+		
+		stageBack: {
+			sprite: 'stageBack',
+			path: 'sprites/stageBack.svg',
+			width: 108,
+			blockView: false,
+			exclusive: false,
+		},
+		
+		stageFront: {
+			sprite: 'stageFront',
+			path: 'sprites/stageFront.svg',
+			width: 108,
+			blockView: false,
+			exclusive: false,
+			cover: 0.2,
 		},
 	
 		trees: {
