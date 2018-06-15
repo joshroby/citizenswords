@@ -76,15 +76,18 @@ TO DO LIST CITIZEN SWORDS REDUX
 	- fine clothes
 - AvatarBeast now has separate draw() and svg() functions
 - stocking chests infrastructure
+- Fire Mob
 
 
 
 CORE FUNCTIONALITY
+- closing a character sheet also closes any open trade window
 - the default maneuver animation is always going from the pawn that's focused on, not necessarily the pawn actually attacking.
-- Fire Mob
 - more garb & items
 	- pail
 	- wand
+- landscape
+	- stacks of background-y crates for the wharf?
 - split power/resist rolls for multiple effects
 - switching maps
 - archiving maps

@@ -61,7 +61,7 @@ var view = {
 		var nameInput = document.createElement('input');
 		creationNameDiv.appendChild(nameInput);
 		nameInput.id = 'nameInput';
-		nameInput.value = 'Name your Character Here';
+		nameInput.value = data.names.first[Math.random() * data.names.first.length << 0];
 		nameInput.addEventListener('focus',handlers.focusNameInput);
 		nameInput.addEventListener('blur',handlers.blurNameInput);
 		nameInput.addEventListener('change',handlers.enablePlayButton);
@@ -181,8 +181,7 @@ var view = {
 			};
 		};
 		
-		// Debugging Quick-Start
-		nameInput.value = 'Testy Testtest Testerson';
+		// Debugging Quick-Start TK
 		select.value = 'Themself';
 		playButton.disabled = false;
 		// End Debugging
@@ -659,9 +658,8 @@ var view = {
 		var occupantUse = document.createElementNS('http://www.w3.org/2000/svg','use');
 		tile.standeeGroup.appendChild(occupantUse);
 		for (var node of tile.standeeGroup.childNodes) {
-			console.log(node.className);
 			if (node.className.animVal == 'standee moveCostSphere') {
-				tile.standeeGroup.appendChild(node);
+				tile.standeeGroup.appendChild(node); // bounce move cost spheres in front
 			};
 		};
 		occupant.svg = occupantUse;
@@ -676,10 +674,6 @@ var view = {
 		occupantUse.setAttribute('transform',displayCoords.standeeTransform);
 		occupantUse.setAttribute('fill','inherit');
 		occupantUse.setAttribute('stroke','inherit');
-		if (tile.seen) {
-			occupantUse.setAttribute('visibility','visible');
-			console.log('decloaking');
-		};
 		if (occupant.selectable) {
 			occupantUse.setAttribute('fill',occupant.color);
 			occupantUse.addEventListener('click',handlers.pawnSelect.bind(view,occupant));
@@ -693,18 +687,13 @@ var view = {
 		};
 	},
 	
+	removeStandee: function(standee) {
+		standee.svg.parentNode.removeChild(standee.svg);
+	},
+	
 	redrawPawn: function(pawn) {
 		document.getElementById(pawn.id).remove();
 		document.getElementById('globalDefs').appendChild(pawn.avatar.draw());		
-	},
-	
-	buildCharacterSheets: function() {
-// 		var list = [];
-// 		list = list.concat(game.map.pawns);
-// 		list = list.concat(game.map.things);
-// 		for (var pawn of list) {
-// 			view.buildCharacterSheet(pawn);
-// 		};
 	},
 	
 	buildCharacterSheet: function(pawn) {

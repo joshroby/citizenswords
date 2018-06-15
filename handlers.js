@@ -20,6 +20,8 @@ var handlers = {
 	},
 	
 	randomCharacter: function() {
+		var randomName = data.names.first[Math.random() * data.names.first.length << 0];
+		document.getElementById('nameInput').value = randomName;
 		var randomClass = ['work','fight','pray'][Math.random() * 3 << 0];
 		game.avatar = new Avatar(game.costumes[randomClass]);
 		for (var c of ['work','fight','pray']) {

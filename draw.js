@@ -5464,16 +5464,6 @@ function AvatarBeast(pawn,type) {
 		
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg','g');
 		svgNodes.id = pawn.id;
-
-		// Shadow
-		var shadow = document.createElementNS('http://www.w3.org/2000/svg',"ellipse");
-		shadow.setAttribute("fill",'#000000');
-		shadow.setAttribute("opacity",0.2);
-		shadow.setAttribute("cx",0);
-		shadow.setAttribute("cy",0);
-		shadow.setAttribute("rx",10);
-		shadow.setAttribute("ry",4);
-		svgNodes.appendChild(shadow);
 		
 		// The Actual Sprite
 		var characterNodes = this[this.type]();
@@ -5673,6 +5663,16 @@ function AvatarBeast(pawn,type) {
 		bodyNodes.setAttribute('stroke-width','0.5');
 		bodyNodes.setAttribute('transform','scale(0.5)');
 
+		// Shadow
+		var shadow = document.createElementNS('http://www.w3.org/2000/svg',"ellipse");
+		shadow.setAttribute("fill",'#000000');
+		shadow.setAttribute("opacity",0.2);
+		shadow.setAttribute("cx",0);
+		shadow.setAttribute("cy",0);
+		shadow.setAttribute("rx",10);
+		shadow.setAttribute("ry",4);
+		bodyNodes.appendChild(shadow);
+
 		var shapes = [
 			{tag:'path', fill:"#B8747B", d:"M20.543-21.568 c-0.122-2.553,3.298-3.789,4.89-5.151c1.073-0.919,1.644-2.331,1.388-3.745c-0.108-0.591-2.025-2.286-1.337-2.847 c3.012,0.445,3.884,4.423,2.207,6.624c-1.979,2.594-5.366,4.298-7.228,6.867"},
 			{tag:'path', fill:"#77484E", d:"M30.631-16.724 c-2.117-2.271-9.781-2.249-9.863-5.519c-3.67,5.78,8.351,4.471,8.909,8.299"},
@@ -5755,6 +5755,16 @@ function AvatarBeast(pawn,type) {
 		bodyNodes.appendChild(headGroup);
 		headGroup.id = 'hellpuppyHeadGroup';
 
+		// Shadow
+		var shadow = document.createElementNS('http://www.w3.org/2000/svg',"ellipse");
+		shadow.setAttribute("fill",'#000000');
+		shadow.setAttribute("opacity",0.2);
+		shadow.setAttribute("cx",0);
+		shadow.setAttribute("cy",0);
+		shadow.setAttribute("rx",10);
+		shadow.setAttribute("ry",4);
+		bodyNodes.appendChild(shadow);
+		
 		var shapes = [
 			{tag:"path", group:bodyGroup, fill:"#414042", stroke:"#000000", d:"M9.777-10.65 c2.15,0.059,1.66,2.527,1.028,3.728c-0.69,1.311-1.684,2.375-3.171,2.516c-3.845,0.362-4.383-2.929-4.08-5.943 c0.167-1.674,0.104-3.576-0.839-5.056c-1.229-1.928-4.799-1.708-5.612,0.566c-1.038,2.902,0.602,6.867,1.932,9.336 C0.194-3.35,0.334-1.047,0.738,1.351C0.805,1.749,0.74,3.661,1.012,3.958c0.393,0.429,1.106,3.481,1.403,4.587 c0.549,2.036-3.075,1.521-4.286,1.306c-3.198-0.572-2.216-6.08-2.351-8.547C-4.325-0.577-4.897-2.684-6.063-4.2 c-0.696-0.905-1.761-1.468-2.353-2.42c-0.473-0.761-0.684-1.661-0.818-2.539c-0.336-2.197-0.181-4.402-0.091-6.601 c0.025-0.608,0.164-1.42,0.092-2.001c-0.129-1.033-1.137-1.881-1.56-2.885c-0.547-1.299-0.923-2.635-1.308-4.008 c-0.8-2.86-2.595-6.601-2.183-9.576c0.404-2.921,2.108-3.848,4.604-5.493c1.649-1.087,3.247-1.715,5.239-1.777 c1.997-0.062,3.293,0.555,4.892,1.625c0.847,0.568,1.508,1.117,2.097,1.935c0.491,0.682,0.747,1.404,1.269,2.034 c0.795,0.961,1.477,1.537,1.788,2.796c0.211,0.853,0.577,2.532,0.26,3.354"},
 			{tag:"path", group:bodyGroup, fill:"#58595B", d:"M7.076-18.386c-1.298,0.736-2.414,1.052-2.799,2.609c-0.284,1.154,0.146,2.521,0.381,3.63 c0.22,1.045,0.36,2.768,0.949,3.637c0.792,1.165,3.361,1.242,3.983,0.003"},
@@ -5928,6 +5938,7 @@ function AvatarThing(thing,type) {
 				};
 			};
 		};
+		chest.setAttribute('transform','translate(0,-10)');
 		return chest;
 	};
 };

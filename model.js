@@ -81,7 +81,6 @@ function Game() {
 		var mapSVG = view.buildMapSVG(level);
 		view.displayMap(mapSVG);
 		view.buildStandees();
-		view.buildCharacterSheets();
 		for (var pawn of game.map.pawns) {
 			if (pawn.team == 'p1') {
 				pawn.look();
@@ -1414,6 +1413,8 @@ function Item(template,pawn,colors,id) {
 		};
 	};
 	
+	this.uses = data.items[template].uses;
+	
 	this.stats = {};
 	for (var key in data.items[template].stats) {
 		this.stats[key] = data.items[template].stats[key];
@@ -1469,6 +1470,7 @@ function Maneuver(maneuver,item) {
 	for (var stat in costs) {
 		this.cost[stat] = data.maneuvers[maneuver].costs[stat](item);
 	};
+	this.consumesUses = data.maneuvers[maneuver].consumesUses;
 	
 	this.attack = false;
 	for (var effect of this.effects) {
@@ -1531,6 +1533,20 @@ function Maneuver(maneuver,item) {
 	this.chargeCosts = function() {
 		for (var stat in this.cost) {
 			this.item.pawn.stats[stat] -= this.cost[stat]
+		};
+		if (this.consumesUses) {
+			this.item.uses -= this.consumesUses;
+			if (this.item.uses < 1) {
+				for (var slot in this.item.pawn.equipment) {
+					if (this.item.pawn.equipment[slot] == this.item) {
+						this.item.pawn.equipment[slot] = undefined;
+					};
+				};
+				this.item.pawn.compileManeuvers();		
+				view.refreshItems(this.item.pawn);
+				view.redrawPawn(this.item.pawn);
+				view.refreshManeuvers(this.item.pawn);
+			};
 		};
 		view.updateSheet(this.item.pawn);
 	};

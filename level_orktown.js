@@ -53,14 +53,13 @@ var level_orktown = {
 	],
 	
 	standees: [
-		{type:'heroes',locs:[{x:-6,y:-2},{x:11,y:-10},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
+		{type:'heroes',locs:[{x:8.5,y:-7},{x:-4,y:-4},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
 // 		{type:'heroes',locs:[{x:0,y:0},{x:1,y:0},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
-		{type:'landscape',key:'marketBacking',locs:[{x:-10.5,y:-11},{x:-9.5,y:-11}]},
 		{type:'pawn',id:'aaron',team:'watch',priorities:{freeze:true},locs:[{x:-11.5,y:-1}]},
 		{type:'pawn',id:'doti',team:'watch',priorities:{freeze:true},locs:[{x:0.5,y:-3}]},
 		{type:'pawn',id:'bossNosh',team:'watch',priorities:{freeze:true},locs:[{x:-6.5,y:-3}]},
 		{type:'pawn',id:'motherSkullgoblet',team:'bystander',priorities:{freeze:true},locs:[{x:-10,y:-8}]},
-		{type:'pawn',id:'looter',team:'looter',priorities:{freeze:true},locs:[{x:-11.5,y:-11},{x:-10.5,y:-11}],events:{defeat:'looterDefeat'}},
+		{type:'pawn',id:'looter',team:'looter',priorities:{freeze:true},locs:[{x:-9.5,y:-11},{x:-10.5,y:-11}],events:{defeat:'looterDefeat'}},
 		{type:'pawn',id:'vicarKakkel',team:'bystander',priorities:{freeze:true},locs:[{x:-0.5,y:-9}]},
 		{type:'pawn',id:'iconoclast',team:'iconoclast',priorities:{freeze:true},locs:[{x:3.5,y:-11}],events:{defeat:'iconoclastDefeat'}},
 		{type:'pawn',id:'donRondel',team:'bystander',priorities:{freeze:true},locs:[{x:8,y:-8}]},
@@ -69,6 +68,7 @@ var level_orktown = {
 		{type:'pawn',id:'elderBock',team:'council',priorities:{freeze:true},locs:[{x:5.5,y:-5}]},
 		{type:'pawn',team:'bystander',priorities:{freeze:true},locs:[{x:7,y:-12},{x:12,y:-8},{x:11,y:-6}]},
 		{type:'pawn',id:'circleJerkAssassin',team:'circleJerks',priorities:{freeze:true},locs:[{x:7,y:0},{x:6.5,y:-1}],events:{defeat:'assassinDefeat'}},
+		{type:'landscape',key:'ash',locs:[{x:-13,y:-12}]},
 		{type:'landscape',key:'brickWallTower',locs:[
 			{x:-4,y:-2},{x:-3,y:-2},{x:-2,y:-2},{x:-1,y:-2},{x:1,y:-2},{x:2,y:-2},{x:3,y:-2},{x:4,y:-2},
 			{x:-4.5,y:-1},{x:-3.5,y:-1},{x:3.5,y:-1},{x:4.5,y:-1},
@@ -90,7 +90,7 @@ var level_orktown = {
 			{x:-12,y:0},{x:-12,y:-10},{x:-12,y:-8},{x:-12,y:-4},{x:-12,y:-12},
 			{x:-11,y:-8},{x:-11,y:-12},
 			{x:-11.5,y:-11},{x:-11.5,y:-3},
-			{x:-10,y:0},{x:-10,y:-2},{x:-10,y:-12},
+			{x:-10,y:0},{x:-10,y:-2},
 			{x:-9.5,y:-1},
 			{x:-9,y:0},{x:-9,y:-12},
 			{x:-8,y:0},{x:-8,y:-12},
@@ -125,6 +125,10 @@ var level_orktown = {
 			{x:12,y:0},{x:12,y:-2},{x:12,y:-4},{x:12,y:-6},
 			{x:12.5,y:-1},{x:12.5,y:-3},{x:12.5,y:-5},{x:12.5,y:-7},
 		]},
+// 		{type:'landscape',key:'house',locs:[{"x":-13,"y":0},{"x":-13,"y":-6},{"x":-13,"y":-12},{"x":-12.5,"y":-5},{"x":-12.5,"y":-11},{"x":-12,"y":-8},{"x":-11,"y":-8},{"x":-11.5,"y":-3},{"x":-9.5,"y":-1},{"x":-8,"y":0},{"x":-7,"y":-8},{"x":-6,"y":-8},{"x":-6,"y":-6},{"x":5.5,"y":-1},{"x":-5,"y":-12},{"x":-4,"y":-8},{"x":-3.5,"y":-5},{"x":-2.5,"y":-3},{"x":-2,"y":-6},{"x":0,"y":-6},{"x":1.5,"y":-5},{"x":3.5,"y":-3},{"x":5,"y":-2},{"x":5.5,"y":-11},{"x":6,"y":-12},{"x":9,"y":-6},{"x":11.5,"y":-1},{"x":12,"y":-2},{"x":12.5,"y":-1},{"x":12.5,"y":-7}]},
+// 		{type:'landscape',key:'house',locs:[{"x":-13,"y":-2},{"x":-13,"y":-8},{"x":-12.5,"y":-1},{"x":-12.5,"y":-7},{"x":-12,"y":0},{"x":-12,"y":-4},{"x":11,"y":-12},{"x":-10,"y":0},{"x":-9,"y":0},{"x":-8,"y":-12},{"x":-7,"y":-12},{"x":-6,"y":-12},{"x":-6,"y":-4},{"x":-5,"y":-8},{"x":-4.5,"y":-5},{"x":-4,"y":-12},{"x":-3,"y":-8},{"x":-2.5,"y":-7},{"x":-1.5,"y":-3},{"x":1,"y":-6},{"x":2.5,"y":-3},{"x":3.5,"y":-5},{"x":5,"y":-10},{"x":6,"y":0},{"x":7,"y":-6},{"x":10,"y":-6},{"x":11.5,"y":-5},{"x":12,"y":-4},{"x":12.5,"y":-3}]},
+// 		{type:'landscape',key:'house',locs:[{"x":-13,"y":-4},{"x":-13,"y":-10},{"x":-12.5,"y":-3},{"x":-12.5,"y":-9},{"x":-12,"y":-10},{"x":-12,"y":-12},{"x":-11.5,"y":-11},{"x":-10,"y":-2},{"x":-9,"y":-12},{"x":-7,"y":0},{"x":-6.5,"y":-7},{"x":-6,"y":0},{"x":-5.5,"y":-5},{"x":-5,"y":-2},{"x":-4,"y":-6},{"x":-3.5,"y":-3},{"x":-3,"y":-12},{"x":-2.5,"y":-11},{"x":-1,"y":-6},{"x":1.5,"y":-3},{"x":2.5,"y":-5},{"x":4.5,"y":-9},{"x":5,"y":-6},{"x":6,"y":-6},{"x":8,"y":-6},{"x":11.5,"y":-3},{"x":12,"y":0},{"x":12,"y":-6},{"x":12.5,"y":-5}]},
+		
 		{type:'landscape',key:'silo',locs:[
 			{x:-11.5,y:-7},{x:-11,y:-6},{x:-11.5,y:-5},
 		]},
@@ -135,6 +139,7 @@ var level_orktown = {
 			{x:-11,y:-4},
 		]},
 		{type:'landscape',key:'bushes',locs:[{x:-10.5,y:-1},{x:-11,y:0},{x:0,y:-8},{x:1,y:-8},{x:2,y:-8},{x:3,y:-8}]},
+		{type:'landscape',key:'marketBacking',locs:[{x:-11,y:-12}]},
 		{type:'landscape',key:'marketLeft',locs:[{x:-10.5,y:-11}]},
 		{type:'landscape',key:'marketCenter',locs:[{x:-9.5,y:-11}]},
 		{type:'landscape',key:'marketRight',locs:[{x:-8.5,y:-11}]},
@@ -142,6 +147,9 @@ var level_orktown = {
 		{type:'landscape',key:'trees',locs:[{x:-2,y:-12},{x:-1.5,y:-11},{x:3.5,y:-9},{x:4,y:-10},{x:4.5,y:-11},{x:5,y:-12}]},
 		{type:'landscape',key:'block',locs:[{x:0,y:-12},{x:1,y:-12},{x:2,y:-12},{x:3,y:-12}]},
 		{type:'landscape',key:'block',locs:[{x:0,y:-12}]},
+		{type:'landscape',key:'pierBack',locs:[{x:8.5,y:-11},{x:9.5,y:-11},{x:10.5,y:-11}]},
+		{type:'landscape',key:'pierFront',locs:[{x:9,y:-10},{x:10,y:-10},{x:11,y:-10}]},
+		{type:'landscape',key:'wharfBacking',locs:[{x:6.5,y:-9},{x:8.5,y:-9},{x:9.5,y:-9},{x:10.5,y:-9},{x:10.5,y:-9},{x:11.5,y:-9},{x:12.5,y:-9}]},
 		{type:'thing',key:'well',inventory:[new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket')],lootable:true,locs:[{x:-7,y:-2},{x:-6,y:-10},{x:6,y:-4}]},
 		{type:'thing',key:'chest',inventory:[new Item('fineNecklace'),new Item('fineClothes'),new Item('candelabrum')],lootable:true,locs:[{x:11,y:-10}]},
 		{type:'pawn',id:'fire',team:'fire',priorities:{freeze:true},locs:[{x:-8,y:-6},{x:-7,y:-6}]},
@@ -240,12 +248,13 @@ var level_orktown = {
 		endTurn: function() {
 			if (game.currentLevel.flags.talkedToNosh && !game.currentLevel.flags.firesOut) {
 				var fires = [];
+				var firesOut = true;
 				var wagons = [{x:-11.5,y:-5},{x:-10.5,y:-5},{x:-9.5,y:-5},{x:-8.5,y:-5},{x:-8,y:-6},{x:-7,y:-6}];
 				for (var wagon of wagons) {
 					var tile = game.map.findTile(wagon.x,wagon.y);
 					wagon.tile = tile;
 					for (var occupant of tile.occupants) {
-						if (occupant.stats !== undefined && occupant.stats.strength > 0) {
+						if (occupant.stats !== undefined && occupant.morale > 0) {
 							wagon.onFire = true;
 							wagon.fire = occupant;
 						} else if (occupant.stats !== undefined && occupant.stats.strength <= 0) {
@@ -253,8 +262,8 @@ var level_orktown = {
 						};
 					};
 				};
-				for (var w=0;w<wagons.length;w++) {
-					if (!wagons[w].onFire && wagons[w+1].onFire) {
+				for (var w=0;w<wagons.length-1;w++) {
+					if (!wagons[w].onFire && wagons[w+1].onFire && wagons[w+1].fire.stats.strength > 3) {
 						var wagon = wagons[w];
 						wagon.onFire = true;
 						var newFire = new Pawn('fire',wagon.tile,'fire',{freeze:true});
@@ -263,12 +272,26 @@ var level_orktown = {
 						wagon.tile.occupants.push(newFire);
 						view.addStandee(newFire,wagon.tile);
 					};
+					if (wagons[w].fire !== undefined) {
+						firesOut = false;
+						game.currentLevel.flags['wagon'+w+'Burnt'] = true;
+					};
 				};
-				console.log(wagons);
+				if (firesOut) {
+					game.currentLevel.flags.firesOut = true;
+					game.currentLevel.events.firesOut();
+				} else if (wagons[0].fire !== undefined && wagons[0].fire.stats.strength > 3) {
+					game.currentLevel.events.silosUpInFlames();
+				};
+			};
+			for (var thing of game.map.things) {
+				if (thing.avatar.type == 'well') {
+					thing.inventory = [new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket')];
+					view.refreshItems(thing);
+				};
 			};
 		},
 		dotiGate: function(pawn) {
-			console.log('Doti at the Gate');
 			game.currentLevel.flags.talkedToDoti = true;
 			var p1 = game.map.findMob('p1');
 			var stout = game.map.findMob('mixterStout');
@@ -295,7 +318,6 @@ var level_orktown = {
 			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,doti.name,doti.avatar.svg('bust'),'right'));
 		},
 		noshGreet: function(pawn) {
-			console.log('Nosh: Fire! Fire!');
 			game.currentLevel.flags.talkedToNosh = true;
 			var p1 = game.map.findMob('p1');
 			var stout = game.map.findMob('mixterStout');
@@ -312,14 +334,50 @@ var level_orktown = {
 			gamen.displayPassage(new Passage(string,[new Choice('Will do!',game.currentLevel.events.noshMove)],false,bossNosh.name,bossNosh.avatar.svg('bust'),'right'));
 		},
 		noshMove: function() {
-			console.log('moving Nosh to -9,-2');
 			var destination = game.map.findTile(-9,-2);
 			var bossNosh = game.map.findMob('bossNosh');
 			bossNosh.stats.move += 9;
 			bossNosh.moveTo(destination);
+			game.currentLevel.flags.wagon5Burnt = true;
+		},
+		firesOut: function() {
+			var p1 = game.map.findMob('p1');
+			var stout = game.map.findMob('mixterStout');
+			var bossNosh = game.map.findMob('bossNosh');
+			var string = "Thank all the gods you two were on hand!  I never could have got help before everything went up!  The city owes you a debt of gratitude.";
+			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,bossNosh.name,bossNosh.avatar.svg('bust'),'right'));
+			string = "Not a debt that it will be paying off in cash."	
+			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,stout.name,stout.avatar.svg('bust'),'left'));
+			string = "Of course not, the rest of the city wants to forget Orktown exists, let alone the people like us who live here.  Haw, haw.  Cash, that's rich.  Oh haw, <strong>'rich!'</strong> That's funny!  Haw haw haw.<p />Phew.  I think I'm going to go sit down.";
+			gamen.displayPassage(new Passage(string,[new Choice('Continue',game.currentLevel.events.clearWagons)],false,bossNosh.name,bossNosh.avatar.svg('bust'),'right'));
+		},
+		clearWagons: function() {
+			gamen.displayPassage(new Passage('With a soft crunch, the burnt carts collapse into ash.'));
+			var wagons = [{x:-11.5,y:-5},{x:-10.5,y:-5},{x:-9.5,y:-5},{x:-8.5,y:-5},{x:-8,y:-6},{x:-7,y:-6}];
+			for (var w=0;w<wagons.length;w++) {
+				if (game.currentLevel.flags['wagon'+w+'Burnt']) {
+					var tile = game.map.findTile(wagons[w].x,wagons[w].y);
+					for (var occupant of tile.occupants) {
+						view.removeStandee(occupant);
+					}
+					var ash = new Landscape(tile,'ash')
+					tile.occupants = [ash];
+					view.addStandee(ash,tile);
+				};
+			};
+		},
+		silosUpInFlames: function() {
+			var stout = game.map.findMob('mixterStout');
+			gamen.displayPassage(new Passage("The flames encircle the silos, and your opportunity to avert tragedy goes up in flames.  Soon the heat bakes and then burns the grain inside, and the whole thing goes up like a candle.  Neighboring thatch roofs catch flame from all the excess heat, and wildfire streaks across the city."));
+			gamen.displayPassage(new Passage("Well shit.",[new Choice('Continue')],true,stout.name,stout.avatar.svg('bust'),'left'));
+			gamen.displayPassage(new Passage("You, your city, and the revolution have all failed.",[new Choice('Try Again',game.currentLevel.events.tryAgain)],false));
+		},
+		tryAgain: function() {
+			console.log('try again');
+			game.currentLevel.flags = {};
+			game.switchMaps(level_orktown);
 		},
 		skullgobletRobbed: function(pawn) {
-			console.log('Skullgoblet: Robbers!');
 			game.currentLevel.flags.talkedToSkullgoblet = true;
 			var p1 = game.map.findMob('p1');
 			var stout = game.map.findMob('mixterStout');
@@ -397,7 +455,6 @@ var level_orktown = {
 
 		},
 		kakkelIconoclast: function(pawn) {
-			console.log('Kakkel: Iconoclast!');
 			game.currentLevel.flags.talkedToKakkel = true;
 			var p1 = game.map.findMob('p1');
 			var stout = game.map.findMob('mixterStout');
@@ -481,7 +538,6 @@ var level_orktown = {
 			gamen.displayPassage(new Passage(string,undefined,true,vicarKakkel.name,vicarKakkel.avatar.svg('bust'),'right'));
 		},
 		rondelOffer: function(pawn) {
-			console.log('Rondel: Give to the Poor!');
 			game.currentLevel.flags.talkedToRondel = true;
 			var p1 = game.map.findMob('p1');
 			var stout = game.map.findMob('mixterStout');
@@ -559,7 +615,6 @@ var level_orktown = {
 			gamen.displayPassage(new Passage(string,undefined,true,heckler2.name,heckler2.avatar.svg('bust'),'right'));
 		},
 		firstMoucau: function(pawn) {
-			console.log('first Moucau encounter');
 			game.currentLevel.flags.talkedToMoucau = true;
 			var p1 = game.map.findMob('p1');
 			var stout = game.map.findMob('mixterStout');
@@ -619,7 +674,6 @@ var level_orktown = {
 			gamen.displayPassage(new Passage(string,undefined,true,pawn.name,pawn.avatar.svg('bust'),'right'));
 		},
 		squareEntrance: function(pawn) {
-			console.log('Enter the Square');
 			game.currentLevel.flags.enteredSquare = true;
 			handlers.revealMap();
 			var guildmasterMoucau = game.map.findMob('guildmasterMoucau');

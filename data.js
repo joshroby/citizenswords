@@ -104,7 +104,7 @@ var data = {
 			pronoun: "Fireself",
 			description: "",
 			beastType: "fire",
-			stats: {strength:1,move:0,focus:0},
+			stats: {strength:5,move:0,focus:0},
 			inventory: [],
 		},
 		
@@ -1066,6 +1066,7 @@ var data = {
 			stats: {
 				capacity: 3,
 			},
+			uses: 1,
 			maneuvers: ['douse'],
 			svgNodes: function(item) {return item.pawn.avatar.bucket(item)},
 		},
@@ -1162,9 +1163,8 @@ var data = {
 			maxRange: 1,
 			costs: {
 				move: function() {return 1},
-				strength: function() {return 1},
-				focus: function() {return 1},
 			},
+			consumesUses: 1,
 			rollStats: {
 				action: {pawnStat:'strength',itemStat:'capacity'},
 				reaction: {pawnStat:'strength'},
@@ -1404,7 +1404,7 @@ var data = {
 	},
 	
 	names: {
-		first: ['Jojo','Sam','Avery','Drumlin','Alex'],
+		first: ['Addison','Adrian','Aiden','Ainsley','Alex','Amari','Andy','Ari','Ash','Aspen','Aubrey','August','Avery','Bailey','Bay','Blaine','Blake','Bobbie','Brett','Brook','Brooklyn','Caelan','Cameron','Campbell','Carroll','Carson','Casey','Charlie','Chris','Clay','Corey','Dana','Dakota','Dale','Daryl','Delta','Devin','Dorian','Drew','Dylan','Easton','Elliott','Emerson','Emery','Finley','Frances','Frankie','Gabriel','Glenn','Gray','Harley','Harper','Hayden','Hudson','Hunter','James','Jamie','Jayden','Jean','Jesse','Jordan','Jules','Julian','Kaden','Kai','Karter','Kelly','Kelsey','Kendall','Kennedy','Kyle','Lake','Landry','Logan','Lou','Mackenzie','Max','Maxwell','Monroe','Morgan','Parker','Pat','Peyton','Phoenix','Quinn','Ray','Reed','Reese','Remy','Riley','River','Roan','Rory','Rowan','Rudy','Ryan','Sage','Sam','Sawyer','Shawn','Sean','Skylar','Spencer','Stevie','Sydney','Tanner','Tatum','Taylor','Toby','Tyler','Val','West','Winter'],
 		last: ['Cooper','Ankole-Watusi','Stout','Duendi','Guffau'],
 	},
 	
@@ -1429,6 +1429,14 @@ var data = {
 			blockView: true,
 			exclusive: false,
 			cover: 0,
+		},
+		
+		ash: {
+			sprite: 'ash',
+			path: 'sprites/ash.svg',
+			blockView: false,
+			exclusive: false,
+			cover: 0.1,
 		},
 				
 		block: {
@@ -1511,6 +1519,7 @@ var data = {
 		marketLeft: {
 			sprite: 'marketLeft',
 			path: 'sprites/marketLeft.svg',
+			yOffset: -25,
 			blockView: false,
 			exclusive: false,
 			cover: 0.9,
@@ -1519,6 +1528,9 @@ var data = {
 		marketCenter: {
 			sprite: 'marketCenter',
 			path: 'sprites/marketCenter.svg',
+			width: 200,
+			height: 150,
+			yOffset: -25,
 			blockView: false,
 			exclusive: false,
 			cover: 0.9,
@@ -1527,6 +1539,9 @@ var data = {
 		marketRight: {
 			sprite: 'marketRight',
 			path: 'sprites/marketRight.svg',
+			height: 150,
+			width: 120,
+			yOffset: -25,
 			blockView: false,
 			exclusive: true,
 			cover: 0.9,
@@ -1535,13 +1550,26 @@ var data = {
 		marketBacking: {
 			sprite: 'marketBacking',
 			path: 'sprites/marketBacking.svg',
+			width: 300,
+			height: 150,
+			yOffset: -10,
 			blockView: false,
 			exclusive: false,
 			cover: 0,
 		},
 		
+		pierBack: {
+			sprite: 'pierBack',
+			path: 'sprites/pierBack.svg',
+			width: 104,
+			blockView: false,
+			exclusive: false,
+		},
+		
 		pierFront: {
 			sprite: 'pierFront',
+			path: 'sprites/pierFront.svg',
+			width: 104,
 			blockView: false,
 			exclusive: false,
 			cover: 0.2,
@@ -1577,7 +1605,7 @@ var data = {
 			sprite: 'silo',
 			path: 'sprites/silo.svg',
 			height: 300,
-			yOffset: -50,
+			width: 110,
 			blockView: true,
 			exclusive: true,
 			cover: 0,
@@ -1599,6 +1627,14 @@ var data = {
 			blockView: false,
 			exclusive: false,
 			cover: 0,
+		},
+		
+		wharfBacking: {
+			sprite: 'wharfBacking',
+			path: 'sprites/wharfBacking.svg',
+			width: 104,
+			blockView: false,
+			exclusive: false,
 		},
 	},
 	
