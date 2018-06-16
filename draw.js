@@ -3911,6 +3911,83 @@ function Avatar(pawn,heritages) {
 		circle.setAttribute('stroke-width','1.5');
 		return svgNodes;
 	};
+
+	this.eleanorDress = function(item) {
+		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
+		
+		var dress = this.sundress(item);
+		svgNodes.appendChild(dress);
+		
+		var star = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		star.setAttribute('fill',item.colors.starOne);
+		star.setAttribute("stroke","#000000");
+		star.setAttribute("stroke-width","1");
+		star.setAttribute("stroke-linecap","round");
+		var y = this.bodyConstants.neck + 18;
+		path = 'm 0,'+y;
+		path += ' l -2,4 l -5,0 l 4,3 l -1,4 l 4,-3';
+		path += ' l 4,3 l -1,-4 l 4,-3 l -5,0 l -2,-4';
+		star.setAttributeNS(null,'d',path);
+		svgNodes.appendChild(star);
+		
+		var star = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		star.setAttribute('fill',item.colors.starTwo);
+		star.setAttribute("stroke","#000000");
+		star.setAttribute("stroke-width","1");
+		star.setAttribute("stroke-linecap","round");
+		var y = this.bodyConstants.neck + 33;
+		path = 'm 0,'+y;
+		path += ' l -3,6 l -7.5,0 l 6,4.5 l -1.5,6 l 6,-4.5';
+		path += ' l 6,4.5 l -1.5,-6 l 6,-4.5 l -7.5,0 l -3,-6';
+		star.setAttributeNS(null,'d',path);
+		svgNodes.appendChild(star);
+		
+		var heart = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		heart.setAttribute('fill',item.colors.heartOne);
+		heart.setAttribute("stroke","#000000");
+		heart.setAttribute("stroke-width","1");
+		heart.setAttribute("stroke-linecap","round");
+		
+		var heart2 = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		heart2.setAttribute('fill',item.colors.heartTwo);
+		heart2.setAttribute("stroke","#000000");
+		heart2.setAttribute("stroke-width","1");
+		heart2.setAttribute("stroke-linecap","round");
+		
+		path = 'm -10,'+(this.bodyConstants.neck+65)+' ';
+		otherPath = 'm 10,'+(this.bodyConstants.neck+65)+' ';
+		x = -4;
+		y = 10;
+		c1x = 20;
+		c1y = -8;
+		c2x = x;
+		c2y = y;
+		path += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+		x *= -1;
+		c1x *= -1;
+		c2x *= -1;
+		otherPath += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+		
+		x = 4;
+		y = -10;
+		c1x = 0;
+		c1y = 0;
+		c2x = x-15;
+		c2y = y-10;
+		path += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+		x *= -1;
+		c1x *= -1;
+		c2x *= -1;
+		otherPath += ' c '+c1x+','+c1y+' '+c2x+','+c2y+' '+x+','+y;
+		
+		heart.setAttributeNS(null,'d',path);
+		svgNodes.appendChild(heart);
+		
+		heart2.setAttributeNS(null,'d',otherPath);
+		svgNodes.appendChild(heart2);
+				
+		return svgNodes;
+	};
 	
 	this.fineBlacks = function(item) {
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
@@ -5835,14 +5912,100 @@ function AvatarBeast(pawn,type) {
 	this.fire = function() {
 		var fire = document.createElementNS('http://www.w3.org/2000/svg','g');
 		
-		var circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
-		fire.appendChild(circle);
-		circle.setAttribute('cx',0);
-		circle.setAttribute('cy',0);
-		circle.setAttribute('r',10);
-		circle.setAttribute('fill','red');
-		circle.setAttribute('stroke','yellow');
-		circle.setAttribute('stroke-width',3);
+		var flameClipPath = document.createElementNS('http://www.w3.org/2000/svg','clipPath');
+		flameClipPath.id = this.id+'FlameClipPath';
+		fire.appendChild(flameClipPath);
+		fire.setAttribute('clip-path','url(#'+this.id+'FlameClipPath)');
+		fire.setAttribute('transform','translate(0 -10)');
+		
+		var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+		flameClipPath.appendChild(path);
+		path.setAttribute('stroke','black');
+		path.setAttribute('fill','none');
+		var d = 'M -20,-50 ';
+		d += 'Q -50,20 0,20 ';
+		d += 'Q 50,20 20,-50 ';
+		d += 'z';
+		path.setAttribute('d',d);
+		
+		for (var i=0;i<12;i++) {
+		
+			var bitOfFire = document.createElementNS('http://www.w3.org/2000/svg','path');
+			fire.appendChild(bitOfFire);
+			bitOfFire.setAttribute('opacity',0.5);
+			bitOfFire.setAttribute('fill',['red','orange','yellow'][i % 3]);
+			if (i % 2 == 1) {
+				bitOfFire.setAttribute('d',"M-10.141,0 c0-3.475-6.594,2.762-3.984,13.606C-19.407,7.93-19.761-9.622-0.519-9.622c3.475,0-2.762-6.594-13.606-3.984 C-8.449-18.887,9.103-19.243,9.103,0H9.102c0,3.475,6.594-2.762,3.984-13.606C18.368-7.93,18.723,9.622-0.519,9.622 c-3.475,0,2.762,6.594,13.606,3.984C7.411,18.887-10.141,19.243-10.141,0z");
+			} else {
+				bitOfFire.setAttribute('d',"M9.622,0 c0-3.475,6.594,2.762,3.984,13.606C18.888,7.93,19.241-9.622-0.001-9.622c-3.475,0,2.762-6.594,13.607-3.984 C7.929-18.887-9.622-19.243-9.622,0l0,0c0,3.475-6.594-2.762-3.984-13.606C-18.888-7.93-19.243,9.622-0.001,9.622 c3.475,0-2.762,6.594-13.605,3.984C-7.931,18.887,9.622,19.243,9.622,0z");
+			};
+			
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			bitOfFire.appendChild(animateTransform);
+			animateTransform.setAttribute('id','up'+i);
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','translate');
+			animateTransform.setAttribute('from','0 0');
+			animateTransform.setAttribute('to','0 -10');
+			animateTransform.setAttribute('dur','2s');
+			animateTransform.setAttribute('begin',(i*0.2)+'s; down'+i+'.end');
+			animateTransform.setAttribute('additive','sum');
+			
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			bitOfFire.appendChild(animateTransform);
+			animateTransform.setAttribute('id','down'+i);
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','translate');
+			animateTransform.setAttribute('from','0 -10');
+			animateTransform.setAttribute('to','0 0');
+			animateTransform.setAttribute('dur','2s');
+			animateTransform.setAttribute('begin','up'+i+'.end');
+			animateTransform.setAttribute('additive','sum');
+
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			bitOfFire.appendChild(animateTransform);
+			animateTransform.setAttribute('id','grow'+i);
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','scale');
+			animateTransform.setAttribute('from','0.5');
+			animateTransform.setAttribute('to','2');
+			animateTransform.setAttribute('dur','3s');
+			animateTransform.setAttribute('begin',(i*0.2)+'s; shrink'+i+'.end');
+			animateTransform.setAttribute('additive','sum');
+			
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			bitOfFire.appendChild(animateTransform);
+			animateTransform.setAttribute('id','shrink'+i);
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','scale');
+			animateTransform.setAttribute('from','2');
+			animateTransform.setAttribute('to','0.5');
+			animateTransform.setAttribute('dur','3s');
+			animateTransform.setAttribute('begin','grow'+i+'.end');
+			animateTransform.setAttribute('additive','sum');
+			
+			var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+			bitOfFire.appendChild(animateTransform);
+			animateTransform.setAttribute('id','spin'+i);
+			animateTransform.setAttribute('attributeName','transform');
+			animateTransform.setAttribute('attributeType','XML');
+			animateTransform.setAttribute('type','rotate');
+			animateTransform.setAttribute('dur','4s');
+			animateTransform.setAttribute('begin',(i*0.2)+'s');
+			animateTransform.setAttribute('additive','sum');
+			animateTransform.setAttribute('repeatCount','indefinite');
+			if (i % 2 == 0) {
+				animateTransform.setAttribute('from','360');
+				animateTransform.setAttribute('to','0');
+			} else {
+				animateTransform.setAttribute('from','0');
+				animateTransform.setAttribute('to','360');
+			};
+		};
 
 		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
 		animateTransform.setAttribute('id',this.pawn.id+'DefeatStart');

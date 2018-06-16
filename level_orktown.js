@@ -113,8 +113,8 @@ var level_orktown = {
 		{type:'landscape',key:'pierBack',locs:[{x:8.5,y:-11},{x:9.5,y:-11},{x:10.5,y:-11}]},
 		{type:'landscape',key:'pierFront',locs:[{x:9,y:-10},{x:10,y:-10},{x:11,y:-10}]},
 		{type:'landscape',key:'wharfBacking',locs:[{x:6.5,y:-9},{x:8.5,y:-9},{x:9.5,y:-9},{x:10.5,y:-9},{x:10.5,y:-9},{x:11.5,y:-9},{x:12.5,y:-9}]},
-		{type:'thing',key:'well',inventory:[new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket')],lootable:true,locs:[{x:-7,y:-2},{x:-6,y:-10},{x:6,y:-4}]},
-		{type:'thing',key:'chest',inventory:[new Item('fineNecklace'),new Item('fineClothes'),new Item('candelabrum')],lootable:true,locs:[{x:11,y:-10}]},
+		{type:'thing',key:'well',inventory:[new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket')],lootable:true,locs:[{x:-7,y:-2},{x:-6,y:-10},{x:6,y:-4}]},
+		{type:'thing',key:'chest',inventory:[new Item('fineNecklace'),new Item('fineClothes'),new Item('candelabrum'),new Item('eleanorDress')],lootable:true,locs:[{x:11,y:-10}]},
 		{type:'pawn',id:'fire',team:'fire',priorities:{freeze:true},locs:[{x:-8,y:-6},{x:-7,y:-6}]},
 		{type:'landscape',key:'stageBack',locs:[{x:8,y:-4},{x:9,y:-4}]},
 		{type:'landscape',key:'stageFront',locs:[{x:7.5,y:-1},{x:8.5,y:-1},{x:9.5,y:-1}]},
@@ -251,7 +251,7 @@ var level_orktown = {
 			};
 			for (var thing of game.map.things) {
 				if (thing.avatar.type == 'well') {
-					thing.inventory = [new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket')];
+					thing.inventory = [new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket'),new Item('waterBucket')];
 					view.refreshItems(thing);
 				};
 			};
@@ -313,7 +313,7 @@ var level_orktown = {
 			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,bossNosh.name,bossNosh.avatar.svg('bust'),'right'));
 			string = "Not a debt that it will be paying off in cash."	
 			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,stout.name,stout.avatar.svg('bust'),'left'));
-			string = "Of course not, the rest of the city wants to forget Orktown exists, let alone the people like us who live here.  Haw, haw.  Cash, that's rich.  Oh haw, <strong>'rich!'</strong> That's funny!  Haw haw haw.<p />Phew.  I think I'm going to go sit down.";
+			string = "Of course not, the rest of the city wants to forget Orktown exists, let alone the people like us who live here.<p />Haw, haw.  Cash, that's rich.  Oh haw, <strong>'rich!'</strong> I'm funny!  Haw haw haw.<p />Phew.  I think I'm going to go sit down.";
 			gamen.displayPassage(new Passage(string,[new Choice('Continue',game.currentLevel.events.clearWagons)],false,bossNosh.name,bossNosh.avatar.svg('bust'),'right'));
 		},
 		clearWagons: function() {
@@ -519,21 +519,21 @@ var level_orktown = {
 			};
 			if (p1.stats.moveMax == 11) {
 				string = "Well if it isn't my favorite enforcer.  How you doing on this momentous evening, "+p1.name+"?";
-				gamen.displayPassage(new Passage(string,undefined,true,donRondel.name,donRondel.avatar.svg('bust'),'right'));
+				gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,donRondel.name,donRondel.avatar.svg('bust'),'right'));
 				string = "Doing well, Don, thank you for asking.  Listen.  You've been very generous with me over the years, and I think I've served you well.";
-				gamen.displayPassage(new Passage(string,undefined,true,p1.name,p1.avatar.svg('bust'),'left'));
+				gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,p1.name,p1.avatar.svg('bust'),'left'));
 				string = "Did I not just say you're my favorite enforcer?  Haw.  You know I say that to all my footpads, right?  But yeah, you've done well for yourself, and you've done well for me.";
-				gamen.displayPassage(new Passage(string,undefined,true,donRondel.name,donRondel.avatar.svg('bust'),'right'));
+				gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,donRondel.name,donRondel.avatar.svg('bust'),'right'));
 				string = "Thing is, there's this opportunity, and I'd like to chase it, and that means leaving your employ.<p />I don't ask lightly, as I know how much you value loyalty.  But this is my dream, Don.  So I gotta at least ask.";
-				gamen.displayPassage(new Passage(string,undefined,true,p1.name,p1.avatar.svg('bust'),'left'));
+				gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,p1.name,p1.avatar.svg('bust'),'left'));
 				string = "You know what?  This is one of those times when you've got to roll with the punches.  Like I taught you in the ring, right?  I taught you good!  And you learned well.  But now I've lost my train of thought.";
 				gamen.displayPassage(new Passage(string,undefined,true,donRondel.name,donRondel.avatar.svg('bust'),'right'));
 				string = "Roll with the punches.";
-				gamen.displayPassage(new Passage(string,undefined,true,stout.name,stout.avatar.svg('bust'),'right'));
+				gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,stout.name,stout.avatar.svg('bust'),'right'));
 				string = "Right, right.  Thank you, Mixter Stout, you've always had good ears.  Anyway.  Things are going to be all topsy-turvy around here for the foreseeable future.  If I try to hold on to everything and everyone that I've got, I'm going to lose half of it and crush the other half.  I gotta roll with the punches.  So sure, "+p1.name+", you go with my blessing.  You follow your dreams.  You just remember where you came from, yeah?";
-				gamen.displayPassage(new Passage(string,undefined,true,donRondel.name,donRondel.avatar.svg('bust'),'right'));
+				gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,donRondel.name,donRondel.avatar.svg('bust'),'right'));
 				string = "Thank you, Don.  Your blessing means a lot to me.";
-				gamen.displayPassage(new Passage(string,undefined,true,p1.name,p1.avatar.svg('bust'),'left'));
+				gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,p1.name,p1.avatar.svg('bust'),'left'));
 				string = "Before you go, though, I got one last opportunity for you.";
 			} else if (familiarity > 9) {
 				var sibling = "Sib";
@@ -548,17 +548,17 @@ var level_orktown = {
 			} else {
 				string = "Greetings, fellow citizen.  I think I recognize you from the neighborhood, yeah?  I've got an opportunity for people from the neighborhood.";
 			};
-			gamen.displayPassage(new Passage(string,undefined,true,donRondel.name,donRondel.avatar.svg('bust'),'right'));
+			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,donRondel.name,donRondel.avatar.svg('bust'),'right'));
 			string = "Okay, this is getting ridiculous.  Who or what do <em>you</em> need us to take care of?";
-			gamen.displayPassage(new Passage(string,undefined,true,stout.name,stout.avatar.svg('bust'),'left'));
+			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,stout.name,stout.avatar.svg('bust'),'left'));
 			string = "Nothing like that.  See, some of my associates recently came across a few valuables under the royal seal.  Specifically a tax shipment bound to the capital and the king's coffers.  And since we are upstanding citizens of Pileas, and we don't like the king any more, we <em>liberated</em> said shipment.";
-			gamen.displayPassage(new Passage(string,undefined,true,donRondel.name,donRondel.avatar.svg('bust'),'right'));
+			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,donRondel.name,donRondel.avatar.svg('bust'),'right'));
 			string = "'Liberated' is such a nice word for stealing.";
-			gamen.displayPassage(new Passage(string,undefined,true,stout.name,stout.avatar.svg('bust'),'left'));
+			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,stout.name,stout.avatar.svg('bust'),'left'));
 			string = "This stuff represents the wealth of this city, the hard work of our fellow citizens, unjustly taken from our pockets in the form of excessive taxes.<p />And because we are, as I think I mentioned before, <em>upstanding citizens of Pileas</em>, we decided the best thing to do was redistribute these valuables to the citizenry.";
-			gamen.displayPassage(new Passage(string,undefined,true,donRondel.name,donRondel.avatar.svg('bust'),'right'));
+			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,donRondel.name,donRondel.avatar.svg('bust'),'right'));
 			string = "You're just... giving stuff away?";
-			gamen.displayPassage(new Passage(string,undefined,true,p1.name,p1.avatar.svg('bust'),'left'));
+			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,p1.name,p1.avatar.svg('bust'),'left'));
 			string = "I'm just giving stuff away.  It's all in that chest at the end of the dock.  Go help yourselves.  Just leave some for the rest of Orktown.";
 			gamen.displayPassage(new Passage(string,undefined,true,donRondel.name,donRondel.avatar.svg('bust'),'right'));
 		},
