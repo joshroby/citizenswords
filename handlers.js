@@ -310,6 +310,7 @@ var handlers = {
 	},
 	
 	hideSheets: function() {
+		console.log('hide');
 		view.clearMoveOptions();
 		view.clearRangeOptions();
 		view.hideSheets();

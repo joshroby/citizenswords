@@ -279,7 +279,7 @@ var level_orktown = {
 			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,p1.name,p1.avatar.svg('bust'),'left'));
 			string = "And I'll <em>never</em> have to complete my training!";
 			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,stout.name,stout.avatar.svg('bust'),'left'));
-			string = "Yeah, you're going to get yourselves killed.  But Master Moucau is in Orktown right now, you can talk to him about a charter.";
+			string = "Yeah, you're going to get yourselves killed.  But Master Moucau is in Orktown right now, getting ready to speechify in Gibbet Square.  You can talk to him about a charter.";
 			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,doti.name,doti.avatar.svg('bust'),'right'));
 		},
 		noshGreet: function(pawn) {
@@ -690,7 +690,6 @@ var level_orktown = {
 				assassin2.priorities.freeze = true;
 				game.currentLevel.events.moucauThanks();
 			};
-			console.log(assassin1,assassin2);
 		},
 		moucauThanks: function() {
 			var p1 = game.map.findMob('p1');

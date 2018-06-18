@@ -92,17 +92,32 @@ var gamen = {
 		gamenModalBacksplash.appendChild(gamenModalDiv);
 		gamenModalDiv.id = 'gamenModalDiv';
 		
-		var gamenModalBustDiv = document.createElement('div');
-		gamenModalDiv.appendChild(gamenModalBustDiv);
-		gamenModalBustDiv.id = 'gamenModalBustDiv';
+		var gamenModalBustRightDiv = document.createElement('div');
+		gamenModalDiv.appendChild(gamenModalBustRightDiv);
+		gamenModalBustRightDiv.id = 'gamenModalBustRightDiv';
+		gamenModalBustRightDiv.className = 'gamenModalBustDiv';
+		
+		var gamenModalBustLeftDiv = document.createElement('div');
+		gamenModalDiv.appendChild(gamenModalBustLeftDiv);
+		gamenModalBustLeftDiv.id = 'gamenModalBustLeftDiv';
+		gamenModalBustLeftDiv.className = 'gamenModalBustDiv';
+		
+		var gamenModalWrapperDiv = document.createElement('div');
+		gamenModalDiv.appendChild(gamenModalWrapperDiv);
+		gamenModalWrapperDiv.id = 'gamenModalWrapperDiv';
 		
 		var gamenModalTextDiv = document.createElement('div');
-		gamenModalDiv.appendChild(gamenModalTextDiv);
+		gamenModalWrapperDiv.appendChild(gamenModalTextDiv);
 		gamenModalTextDiv.id = 'gamenModalTextDiv';
 		
+		var gamenModalChoicesDiv = document.createElement('div');
+		gamenModalWrapperDiv.appendChild(gamenModalChoicesDiv);
+		gamenModalChoicesDiv.id = 'gamenModalChoicesDiv';
+		
 		if (view.colors !== undefined && view.colors.passagesModal !== undefined) {
-			gamenModalTextDiv.style.borderColor = view.colors.passagesModal;
-			gamenModalBustDiv.style.borderColor = view.colors.passagesModal;
+			gamenModalWrapperDiv.style.borderColor = view.colors.passagesModal;
+			gamenModalBustLeftDiv.style.borderColor = view.colors.passagesModal;
+			gamenModalBustRightDiv.style.borderColor = view.colors.passagesModal;
 		};
 		
 		gamen.windowResize();
@@ -306,14 +321,8 @@ var gamen = {
 			};
 		
 			gamenModalTextDiv.innerHTML += passage.text;
-			
-			if (passage.bust !== undefined) {
-				document.getElementById('gamenModalBustDiv').appendChild(passage.bust);
-			};
-		
-			var gamenModalChoicesDiv = document.createElement('div');
-			gamenModalChoicesDiv.id = 'gamenModalChoicesDiv';
-			gamenModalTextDiv.appendChild(gamenModalChoicesDiv);
+					
+			var gamenModalChoicesDiv = document.getElementById('gamenModalChoicesDiv');
 			for (var choice of passage.choiceArray) {
 				var choiceBtn = document.createElement('button');
 				choiceBtn.innerHTML = choice.label;
@@ -322,17 +331,20 @@ var gamen = {
 				gamenModalChoicesDiv.appendChild(choiceBtn);
 			};
 			
-			if (passage.bust == undefined) {
-				document.getElementById('gamenModalBustDiv').style.display = 'none';
-			} else {
-				document.getElementById('gamenModalBustDiv').style.display = 'block';
-				var gamenModalBustDiv = document.getElementById('gamenModalBustDiv');
-				gamenModalBustDiv.appendChild(passage.bust);
+			for (var div of ['gamenModalBustLeftDiv','gamenModalBustRightDiv']) {
+				var div = document.getElementById(div);
+				div.style.backgroundColor = 'rgba(50,50,50,0)';
+				div.style.borderColor = 'rgba(50,50,50,0)';
+			};
+			
+			if (passage.bust !== undefined) {
+				var gamenModalBustDiv = document.getElementById('gamenModalBustLeftDiv');
 				if (passage.bustPosition == 'right') {
-					gamenModalBustDiv.className = 'gamenModalBustRight';
-				} else {
-					gamenModalBustDiv.className = 'gamenModalBustLeft';
+					gamenModalBustDiv = document.getElementById('gamenModalBustRightDiv');
 				};
+				gamenModalBustDiv.appendChild(passage.bust);
+				gamenModalBustDiv.style.backgroundColor = 'white';
+				gamenModalBustDiv.style.borderColor = view.colors.passagesModal;
 			};
 		
 			document.getElementById('gamenModalBacksplash').style.display = 'block';
@@ -354,8 +366,10 @@ var gamen = {
 			};
 		
 
-			document.getElementById('gamenModalBustDiv').innerHTML = '';
+			document.getElementById('gamenModalBustRightDiv').innerHTML = '';
+			document.getElementById('gamenModalBustLeftDiv').innerHTML = '';
 			document.getElementById('gamenModalTextDiv').innerHTML = '';
+			document.getElementById('gamenModalChoicesDiv').innerHTML = '';
 		
 			document.getElementById('gamenModalBacksplash').style.display = 'none';
 		

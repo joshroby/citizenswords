@@ -5,8 +5,9 @@ var view = {
 		y: 100,
 		z: 10,
 		offsetY: 3,
-		distCameraToScreen: 20,
+		distCameraToScreen: 17,
 		destinations: [],
+		panSpeed: 0.16,
 	},
 	
 	itemDrag: {
@@ -1491,16 +1492,23 @@ var view = {
 		};
 		if (view.camera.destinations.length !== 0) {
 			var destination = view.camera.destinations[0];
+			var destinationWeight = view.camera.panSpeed;
+			var cameraWeight = 1 - destinationWeight;
 			if (view.camera.x !== destination.x || view.camera.y !== destination.y + view.camera.offsetY) {
-				view.camera.x = (view.camera.x*5 + destination.x) / 6;
-				view.camera.y = (view.camera.y*5 + destination.y + view.camera.offsetY) / 6;
+				view.camera.x = view.camera.x*cameraWeight + destination.x*destinationWeight;
+				view.camera.y = view.camera.y*cameraWeight + (destination.y + view.camera.offsetY) * destinationWeight;
 				if (Math.abs(view.camera.y - (destination.y + view.camera.offsetY) ) < 0.1 && Math.abs(view.camera.x - destination.x ) < 0.1) {
+					// close enough to destination that we bounce there, avoiding Xeno's Paradox
 					view.camera.y = destination.y + view.camera.offsetY;
 					view.camera.x = destination.x;
 				};
 				view.updateMap();
+				if (view.camera.panSpeed < 0.2) {
+					view.camera.panSpeed *= 3;
+				};
 			} else {
 				view.camera.destinations.shift();
+				view.camera.panSpeed = 0.01;
 			};
 			var timedEvent = setTimeout(view.panToTile,5);
 		};
@@ -1539,6 +1547,7 @@ var view = {
 		view.moveInventory(view.focus.pawn,0,100);
 		view.focus.pawn = undefined;
 		document.getElementById('tipLayer').innerHTML = '';
+		view.closeTrade();
 	},
 	
 	updateSheet: function(pawn) {

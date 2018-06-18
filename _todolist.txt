@@ -55,7 +55,7 @@ TO DO LIST CITIZEN SWORDS REDUX
 	- hide it in invisible text in exported SVG?
 - heroes loaded in startLoc and its adjacent tiles
 - sliders in Coloring hit the updateColoring() function
-
+- switching maps
 - trigger events on pawn defeat
 	- incorporate that into level archives somehow
 - head buttons for entire party along bottom of viewbox
@@ -74,24 +74,27 @@ TO DO LIST CITIZEN SWORDS REDUX
 	- candelabrum
 	- knife
 	- fine clothes
+	- pail
 - AvatarBeast now has separate draw() and svg() functions
 - stocking chests infrastructure
 - Fire Mob
+- pan speed builds, less jerky
+- closing a character sheet also closes any open trade window
+- gamen.displayPassage no longer flips the buttons around 
 
 
 
 CORE FUNCTIONALITY
-- closing a character sheet also closes any open trade window
+- pawns that join the p1 team get a swap button on inventory (or everyone does and joining reveals it)
 - the default maneuver animation is always going from the pawn that's focused on, not necessarily the pawn actually attacking.
 - more garb & items
-	- pail
 	- wand
 - landscape
 	- stacks of background-y crates for the wharf?
 - split power/resist rolls for multiple effects
-- switching maps
-- archiving maps
+- archiving maps on switch
 - ai heals and rallies
+- ai pawns re-arm once disarmed
 - envision trade/shop/loot interface
 	- trading items between your own pawns
 	- how is shop different from loot?
