@@ -98,6 +98,14 @@ function Game() {
 		console.log('archive old map here');
 		game.loadMap(newLevel);
 	};
+	
+	this.heroJoins = function(pawn) {
+		pawn.team = 'p1';
+		game.map.heroes.push(pawn);
+		view.refreshPawnButtons();
+		document.getElementById(pawn.id+"SwapButton").setAttribute('visibility','visible');
+		gamen.displayPassage(new Passage(pawn.name + " has joined the party!"));
+	};
 };
 
 function Player() {
@@ -471,13 +479,6 @@ function Pawn(template,tile,team,priorities) {
 	this.exclusive = true;
 	this.wounds = {move:[],strength:[],focus:[]};
 	this.morale = 1;
-	this.equipment = {
-			left: undefined,
-			right: undefined,
-			neck: undefined,
-			garb: undefined,
-			pouch: undefined,
-		};
 
 	this.randomName = function() {
 		var firstNames = data.names.first;
@@ -500,6 +501,7 @@ function Pawn(template,tile,team,priorities) {
 			focus: 5,
 			// luck: 1,
 		};
+		this.human = true;
 		var statList = Object.keys(this.stats);
 		for (var i=0;i<statList.length*5;i++) {
 			var stat = statList[Math.random() * statList.length << 0];
@@ -540,10 +542,12 @@ function Pawn(template,tile,team,priorities) {
 		};
 		if (source.avatarHeritage !== undefined) {
 			this.avatar = new Avatar(this,source.avatarHeritage);
+			this.human = true;
 		} else if (source.beastType !== undefined) {
 			this.avatar = new AvatarBeast(this,source.beastType);
 		} else {
 			this.avatar = new Avatar(this);
+			this.human = true;
 		};
 		if (source.avatarParameters !== undefined) {
 			this.avatar.parameters = source.avatarParameters;
@@ -559,9 +563,18 @@ function Pawn(template,tile,team,priorities) {
 			this.stats[stat] = source.stats[stat];
 			this.stats[stat+"Max"] = source.stats[stat];
 		};
-		if (source.beastType == undefined) {
-			for (var slot of ['left','right','garb','pouch','belt']) {
+		if (source.slots !== undefined) {
+			this.equipment = {};
+			for (var slot of source.slots) {
 				this.equipment[slot] = undefined;
+			};
+		} else {
+			this.equipment = {
+					left: undefined,
+					right: undefined,
+					neck: undefined,
+					garb: undefined,
+					pouch: undefined,
 			};
 		};
 		for (var slot in source.equipment) {
@@ -583,8 +596,12 @@ function Pawn(template,tile,team,priorities) {
 		this.inventory = [];
 		for (var item of source.inventory) {
 			var newItem = new Item(item.template,this);
-			newItem.colors = item.colors;
-			newItem.stats = item.stats;
+			if (item.colors !== undefined) {
+				newItem.colors = item.colors;
+			};
+			if (item.stats !== undefined) {
+				newItem.stats = item.stats;
+			};
 			this.inventory.push(newItem);
 		};	
 	};
@@ -890,6 +907,14 @@ function Pawn(template,tile,team,priorities) {
 		return rangeOptions;
 	};
 	
+	this.swapItems = function(moveCost) {
+		if (this.stats.move >= moveCost) {
+			this.stats.move -= moveCost;
+			view.updateSheet(this);
+			handlers.swapItems(this);
+		};
+	};
+	
 	this.roll = function(statOrNum,bonus,penalty) {
 		var num;
 		var statNames = Object.keys(this.stats);
@@ -1089,7 +1114,14 @@ function Pawn(template,tile,team,priorities) {
 			cost: {move:1},
 			item: {pawn:this},
 			textStrings: function(lineLength) {return lineWrap('Strike up a chat with this charming character.',lineLength)},
-			execute: function() {this.item.pawn.talk()},
+			execute: function(targets,pawn) {this.item.pawn.talk(pawn)},
+		},
+		loot: {
+			name: "Loot",
+			cost: {move:3},
+			item: {pawn:this},
+			textStrings: function(lineLength) {return lineWrap('Take their stuff.',lineLength)},
+			execute: function(targets,pawn) {this.item.pawn.loot(pawn)},
 		},
 		trade: {
 			name: "Trade",
@@ -1100,16 +1132,31 @@ function Pawn(template,tile,team,priorities) {
 		},
 	};
 	
+	this.talk = function(pawn) {
+		view.focus.lastPawn.stats.move--;
+		view.updateSheet(view.focus.lastPawn);
+		game.currentLevel.events[this.events.dialogue]();
+	};
+	
 	this.kill = function() {
-		console.log('killed!');
+		view.openTrade(this,view.focus.lastPawn);
+		for (var stat in this.stats) {
+			this.stats[stat] = 0;
+		};
+		view.updateSheet(this);
+		this.dead = true;
 	};
 	
 	this.bind = function() {
-		console.log('bind!');
+		view.focus.lastPawn.stats.move -= 2;
+		this.wounds.move.push({name:'restraints',stat:'move',strength:-1*this.stats.moveMax,type:'restraints',woundType:'restraints'});
+		this.stats.move = 0;
+		view.updateSheet(this);
 	};
 	
-	this.talk = function() {
-		console.log('talk!');
+	this.loot = function() {
+		view.focus.lastPawn.stats.move -= 3;
+		view.openTrade(this,view.focus.lastPawn);
 	};
 	
 	this.trade = function() {
@@ -1146,64 +1193,82 @@ function Pawn(template,tile,team,priorities) {
 	};
 	
 	this.turn = function() {
-		this.refreshStats();
-		if (this.priorities.freeze == true) {
-			console.log(this.id+' frozen');
-		} else if (this.morale <= 0) {
-			this.wander();
-		} else if (this.priorities.target !== undefined && this.priorities.target.morale > 0 && this.inLOS(this.priorities.target.tile)) {
-			console.log(this.id+' target: '+this.priorities.target.id);
-			this.attack(this.priorities.target);
-			this.approach(this.priorities.target.tile);
-			this.attack(this.priorities.target);
-			if (this.priorities.target.morale <= 0) {
-				this.priorities.target = undefined;
-				this.priorities.destination = undefined;
+		if (this.dead) {
+			var itemCount = 0;
+			for (var slot in this.equipment) {
+				if (this.equipment[slot] !== undefined) {
+					itemCount++;
+				};
 			};
-		} else if (this.priorities.follow !== undefined) {
-			console.log(this.id+' follow');
-			this.approach(this.priorities.follow.tile);
-			if (this.inLOS(this.priorities.follow.tile)) {
-				this.priorities.destination = this.priorities.follow.tile;
+			itemCount += this.inventory.length;
+			if (itemCount == 0 && this.tile !== undefined) {
+				view.removeStandee(this);
+				this.tile = undefined;
 			};
-		} else if (this.priorities.destination !== undefined) {
-			console.log(this.id+' destination: '+this.priorities.destination.x+','+this.priorities.destination.y);
-			this.approach(this.priorities.destination);
-			if (this.tile == this.priorities.destination) {
-				this.priorities.destination = undefined;
-			};
-		} else if (this.priorities.patrol !== undefined) {
-			console.log(this.id+' patrol');
-			this.approach(this.priorities.patrol[0]);
-			if (this.tile == this.priorities.patrol[0]) {
-				this.priorities.patrol = this.priorities.patrol.concat(this.priorities.patrol.shift());
-			};
-		} else if (this.priorities.post !== undefined) {
-			console.log(this.id+' returning to post ',this.priorities.post);
-			this.approach(this.priorities.post);
 		} else {
-			this.wander();
-		};
-		if (this.priorities.freeze !== true) {
-			var closestTarget = this.findClosestTarget();
-			if (closestTarget !== undefined) {
-				this.acquireTarget(closestTarget);
+			this.refreshStats();
+			if (this.priorities.freeze == true) {
+				console.log(this.id+' frozen');
+			} else if (this.morale <= 0) {
+				this.wander();
+			} else if (this.priorities.target !== undefined && this.priorities.target.morale > 0 && this.inLOS(this.priorities.target.tile)) {
+				console.log(this.id+' target: '+this.priorities.target.id);
+				this.attack(this.priorities.target);
+				this.approach(this.priorities.target.tile);
+				this.attack(this.priorities.target);
+				if (this.priorities.target.morale <= 0) {
+					this.priorities.target = undefined;
+					this.priorities.destination = undefined;
+				};
+			} else if (this.priorities.follow !== undefined) {
+				console.log(this.id+' follow');
+				this.approach(this.priorities.follow.tile);
+				if (this.inLOS(this.priorities.follow.tile)) {
+					this.priorities.destination = this.priorities.follow.tile;
+				};
+			} else if (this.priorities.destination !== undefined) {
+				console.log(this.id+' destination: '+this.priorities.destination.x+','+this.priorities.destination.y);
+				this.approach(this.priorities.destination);
+				if (this.tile == this.priorities.destination) {
+					this.priorities.destination = undefined;
+				};
+			} else if (this.priorities.patrol !== undefined) {
+				console.log(this.id+' patrol');
+				this.approach(this.priorities.patrol[0]);
+				if (this.tile == this.priorities.patrol[0]) {
+					this.priorities.patrol = this.priorities.patrol.concat(this.priorities.patrol.shift());
+				};
+			} else if (this.priorities.post !== undefined) {
+				console.log(this.id+' returning to post ',this.priorities.post);
+				this.approach(this.priorities.post);
+			} else {
+				this.wander();
 			};
-// 			should also check for heal/rally targets'
+			if (this.priorities.freeze !== true) {
+				var closestTarget = this.findClosestTarget();
+				if (closestTarget !== undefined) {
+					this.acquireTarget(closestTarget);
+				};
+	// 			should also check for heal/rally targets'
+			};
 		};
+	};
+	
+	this.canAfford = function(cost) {
+		var canAfford = true;
+		for (var stat in cost) {
+			if (cost[stat] > this.stats[stat]) {
+				canAfford = false;
+			};
+		};
+		return canAfford;
 	};
 	
 	this.attack = function(target) {
 		console.log(this.id + ' attacking ' + target.id);
 		var distance = Math.pow(Math.pow(this.tile.x - target.tile.x,2) + Math.pow(this.tile.y - target.tile.y,2),0.5);
 		for (var maneuver of this.maneuvers) {
-			var canAfford = true;
-			for (var stat in maneuver.cost) {
-				if (maneuver.cost[stat] > this.stats[stat]) {
-					canAfford = false;
-				};
-			};
-			if (maneuver.maxRange >= distance && canAfford) {
+			if (maneuver.maxRange >= distance && this.canAfford(maneuver.cost)) {
 				maneuver.execute([target]);
 			};
 		};
@@ -1324,7 +1389,7 @@ function Thing(template,tile,inventory,lootable,triggers,id) {
 	this.interact = function() {};
 	
 	this.loot = function() {
-		view.openTrade(this,view.focus.lastPawn,'loot');
+		view.openTrade(this,view.focus.lastPawn);
 	};
 
 	this.equip = function(item,slot) {
@@ -1355,7 +1420,6 @@ function Thing(template,tile,inventory,lootable,triggers,id) {
 		item.pawn = this;
 		
 		view.refreshItems(this);
-// 		view.redrawPawn(this);
 	};
 	
 	this.unequip = function(item) {
@@ -1585,7 +1649,6 @@ function Maneuver(maneuver,item) {
 				};
 			};
 		};
-		console.log(pawn);
 		return pawn.roll(pawnStat,itemStat,penalty);
 	};
 	

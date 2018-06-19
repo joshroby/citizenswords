@@ -68,6 +68,12 @@ var hellhoundCave = {
 		{type:'pawn',id:'hellpuppy',team:'hell',priorities:{freeze:true},locs:[{x:10,y:2}]},
 	],
 	
+	teams: {
+		p1: {},
+		rats: {hostile:['p1']},
+		hell: {},
+	},
+	
 	moveCosts: [
 		{moveCost:2,locs:[{x:0.5,y:1}]},
 		{moveCost:5,locs:[{x:3,y:2}]},

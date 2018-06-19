@@ -694,7 +694,11 @@ var view = {
 	
 	redrawPawn: function(pawn) {
 		document.getElementById(pawn.id).remove();
-		document.getElementById('globalDefs').appendChild(pawn.avatar.draw());		
+		document.getElementById('globalDefs').appendChild(pawn.avatar.draw());
+		if (pawn.morale <= 0 || pawn.dead) {
+			document.getElementById(pawn.id).setAttribute('transform','rotate(90)');
+// 			console.log('defeated pawn rotated on redraw');
+		};	
 	},
 	
 	buildCharacterSheet: function(pawn) {
@@ -728,27 +732,27 @@ var view = {
 		sheet.setAttribute('fill','white');
 		sheet.setAttribute('stroke','black');
 		sheet.setAttribute('stroke-width',0.25);
-		if (pawn.morale !== undefined) {
-			var moraleBarGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-			sheetGroup.appendChild(moraleBarGroup);
-			moraleBarGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,'morale'));
-			moraleBarGroup.addEventListener('mouseleave',view.clearToolTip);
-			var moraleBarBacking = document.createElementNS('http://www.w3.org/2000/svg','rect');
-			moraleBarGroup.appendChild(moraleBarBacking);
-			moraleBarBacking.setAttribute('x',-85);
-			moraleBarBacking.setAttribute('y',159);
-			moraleBarBacking.setAttribute('width',20);
-			moraleBarBacking.setAttribute('height',2);
-			moraleBarBacking.setAttribute('fill',view.colors.moraleSecondary);
-			var moraleBar = document.createElementNS('http://www.w3.org/2000/svg','rect');
-			moraleBarGroup.appendChild(moraleBar);
-			moraleBar.id = pawn.id + 'MoraleBar';
-			moraleBar.setAttribute('x',-85);
-			moraleBar.setAttribute('y',159);
-			moraleBar.setAttribute('width',20);
-			moraleBar.setAttribute('height',2);
-			moraleBar.setAttribute('fill',view.colors.moralePrimary);
-		};
+// 		if (pawn.morale !== undefined) {
+// 			var moraleBarGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+// 			sheetGroup.appendChild(moraleBarGroup);
+// 			moraleBarGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,'morale'));
+// 			moraleBarGroup.addEventListener('mouseleave',view.clearToolTip);
+// 			var moraleBarBacking = document.createElementNS('http://www.w3.org/2000/svg','rect');
+// 			moraleBarGroup.appendChild(moraleBarBacking);
+// 			moraleBarBacking.setAttribute('x',-85);
+// 			moraleBarBacking.setAttribute('y',159);
+// 			moraleBarBacking.setAttribute('width',20);
+// 			moraleBarBacking.setAttribute('height',2);
+// 			moraleBarBacking.setAttribute('fill',view.colors.moraleSecondary);
+// 			var moraleBar = document.createElementNS('http://www.w3.org/2000/svg','rect');
+// 			moraleBarGroup.appendChild(moraleBar);
+// 			moraleBar.id = pawn.id + 'MoraleBar';
+// 			moraleBar.setAttribute('x',-85);
+// 			moraleBar.setAttribute('y',159);
+// 			moraleBar.setAttribute('width',20);
+// 			moraleBar.setAttribute('height',2);
+// 			moraleBar.setAttribute('fill',view.colors.moralePrimary);
+// 		};
 		if (pawn.stats !== undefined) {
 			var statNames = ['move','strength','focus'];
 			for (var i in statNames) {
@@ -815,6 +819,27 @@ var view = {
 		portrait.addEventListener('click',view.toggleInventoryPane);
 		if (pawn.stats == undefined) {
 			portrait.setAttribute('transform','translate(-27.5 70) scale(0.5)');
+		};
+		if (pawn.morale !== undefined) {
+			var moraleBarGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+			sheetGroup.appendChild(moraleBarGroup);
+			moraleBarGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,'morale'));
+			moraleBarGroup.addEventListener('mouseleave',view.clearToolTip);
+			var moraleBarBacking = document.createElementNS('http://www.w3.org/2000/svg','rect');
+			moraleBarGroup.appendChild(moraleBarBacking);
+			moraleBarBacking.setAttribute('x',-85);
+			moraleBarBacking.setAttribute('y',159);
+			moraleBarBacking.setAttribute('width',20);
+			moraleBarBacking.setAttribute('height',2);
+			moraleBarBacking.setAttribute('fill',view.colors.moraleSecondary);
+			var moraleBar = document.createElementNS('http://www.w3.org/2000/svg','rect');
+			moraleBarGroup.appendChild(moraleBar);
+			moraleBar.id = pawn.id + 'MoraleBar';
+			moraleBar.setAttribute('x',-85);
+			moraleBar.setAttribute('y',159);
+			moraleBar.setAttribute('width',20);
+			moraleBar.setAttribute('height',2);
+			moraleBar.setAttribute('fill',view.colors.moralePrimary);
 		};
 
 		var maneuversGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -1008,53 +1033,54 @@ var view = {
 			text.innerHTML = slots[i];
 		};
 		
-		if (pawn.team == 'p1') {
-			var swapItemsButton = document.createElementNS('http://www.w3.org/2000/svg','g');
-			inventoryBack.appendChild(swapItemsButton);
-			swapItemsButton.id = pawn.id + "SwapButton";
-			swapItemsButton.setAttribute('stroke','grey');
-			swapItemsButton.addEventListener('click',handlers.swapItems.bind(this,pawn));
-			swapItemsButton.addEventListener('mouseenter',view.displayToolTip.bind(this,'swap'));
-			swapItemsButton.addEventListener('mouseleave',view.clearToolTip);
-			var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
-			swapItemsButton.appendChild(rect);
-			rect.setAttribute('x',-65);
-			rect.setAttribute('y',200);
-			rect.setAttribute('width',10);
-			rect.setAttribute('height',9);
-			rect.setAttribute('fill','darkgrey');
-			rect.setAttribute('stroke','inherit');
-			var text = document.createElementNS('http://www.w3.org/2000/svg','text');
-			swapItemsButton.appendChild(text);
-			text.setAttribute('x',-65+5);
-			text.setAttribute('y',200+3.5);
-			text.setAttribute('font-size',2);
-			text.setAttribute('fill','black');
-			text.setAttribute('stroke','none');
-			text.setAttribute('text-anchor','middle');
-			text.innerHTML = 'Swap';
-			var costSphere = document.createElementNS('http://www.w3.org/2000/svg','use');
-			swapItemsButton.appendChild(costSphere);
-			view.setHref(costSphere,'costSphere');
-			costSphere.setAttribute('x',-65+5);
-			costSphere.setAttribute('y',200+6);
-			costSphere.setAttribute('fill',view.colors.movePrimary);
-			var costText = document.createElementNS('http://www.w3.org/2000/svg','text');
-			swapItemsButton.appendChild(costText);
-			costText.setAttribute('x',42);
-			costText.setAttribute('x',-65+5);
-			costText.setAttribute('y',200 + 6 + 0.75);
-			costText.setAttribute('text-anchor','middle');
-			costText.setAttribute('font-size',2);
-			costText.setAttribute('class','bold');
-			costText.setAttribute('stroke','black');
-			costText.setAttribute('fill',view.colors.moveSecondary);
-			costText.setAttribute('stroke-width','0.25');
-			costText.setAttribute('paint-order','stroke');
-			costText.innerHTML = 5;
-			if (view.focus.swapping == pawn) {
-				view.selectManeuver('swap');
-			};
+		var swapItemsButton = document.createElementNS('http://www.w3.org/2000/svg','g');
+		inventoryBack.appendChild(swapItemsButton);
+		swapItemsButton.id = pawn.id + "SwapButton";
+		swapItemsButton.setAttribute('stroke','grey');
+		swapItemsButton.addEventListener('click',pawn.swapItems.bind(pawn,5));
+		swapItemsButton.addEventListener('mouseenter',view.displayToolTip.bind(this,'swap'));
+		swapItemsButton.addEventListener('mouseleave',view.clearToolTip);
+		var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+		swapItemsButton.appendChild(rect);
+		rect.setAttribute('x',-65);
+		rect.setAttribute('y',200);
+		rect.setAttribute('width',10);
+		rect.setAttribute('height',9);
+		rect.setAttribute('fill','darkgrey');
+		rect.setAttribute('stroke','inherit');
+		var text = document.createElementNS('http://www.w3.org/2000/svg','text');
+		swapItemsButton.appendChild(text);
+		text.setAttribute('x',-65+5);
+		text.setAttribute('y',200+3.5);
+		text.setAttribute('font-size',2);
+		text.setAttribute('fill','black');
+		text.setAttribute('stroke','none');
+		text.setAttribute('text-anchor','middle');
+		text.innerHTML = 'Swap';
+		var costSphere = document.createElementNS('http://www.w3.org/2000/svg','use');
+		swapItemsButton.appendChild(costSphere);
+		view.setHref(costSphere,'costSphere');
+		costSphere.setAttribute('x',-65+5);
+		costSphere.setAttribute('y',200+6);
+		costSphere.setAttribute('fill',view.colors.movePrimary);
+		var costText = document.createElementNS('http://www.w3.org/2000/svg','text');
+		swapItemsButton.appendChild(costText);
+		costText.setAttribute('x',42);
+		costText.setAttribute('x',-65+5);
+		costText.setAttribute('y',200 + 6 + 0.75);
+		costText.setAttribute('text-anchor','middle');
+		costText.setAttribute('font-size',2);
+		costText.setAttribute('class','bold');
+		costText.setAttribute('stroke','black');
+		costText.setAttribute('fill',view.colors.moveSecondary);
+		costText.setAttribute('stroke-width','0.25');
+		costText.setAttribute('paint-order','stroke');
+		costText.innerHTML = 5;
+		if (view.focus.swapping == pawn) {
+			view.selectManeuver('swap');
+		};
+		if (pawn.team !== 'p1') {
+			swapItemsButton.setAttribute('visibility','hidden');
 		};	
 		view.refreshItems(pawn);
 	},
@@ -1135,6 +1161,7 @@ var view = {
 	refreshManeuvers: function(pawn) {
 		var x, y, maneuverButton;
 		var maneuversPane = document.getElementById(pawn.id + "ManeuversPane");
+		console.log(pawn,pawn.id)
 		maneuversPane.innerHTML = '';
 		
 		if (pawn.team == 'p1') {
@@ -1188,13 +1215,14 @@ var view = {
 			if (pawn.morale <= 0 && pawn.human) {
 				maneuverList.push(pawn.contextualManeuvers.murder);
 				maneuverList.push(pawn.contextualManeuvers.bind);
+					maneuverList.push(pawn.contextualManeuvers.loot);
 			} else if (pawn.morale <= 0) {
 				maneuverList.push(pawn.contextualManeuvers.slaughter);
 			} else {
 				if (pawn.vendor) {
 					maneuverList.push(pawn.contextualManeuvers.trade);
 				};
-				if (pawn.dialogue) {
+				if (pawn.events !== undefined && pawn.events.dialogue !== undefined) {
 					maneuverList.push(pawn.contextualManeuvers.talk);
 				};
 				if (pawn.lootable !== undefined) {
@@ -1202,13 +1230,17 @@ var view = {
 				};
 			};
 			x = 7, y = 155, i = 0;
-			var enabled = false;
+			var proximity = false;
 			for (var neighbor of pawn.tile.adjacent) {
 				if (view.focus.lastPawn !== undefined && view.focus.lastPawn.tile == neighbor) {
-					enabled = true;
+					proximity = true;
 				};
 			};
 			for (var maneuver of maneuverList) {
+				var enabled = false;
+				if (proximity && view.focus.lastPawn.canAfford(maneuver.cost)) {
+					enabled = true;
+				};
 				maneuverButton = view.buildManeuverGroup(maneuver,x,y,maneuver.key,enabled);
 				maneuversPane.appendChild(maneuverButton);
 				i++;
@@ -1773,7 +1805,7 @@ var view = {
 		element.remove();
 	},
 	
-	openTrade: function(rightTrader,leftTrader,commerce) {
+	openTrade: function(rightTrader,leftTrader,vendor) {
 		handlers.pawnSelect(leftTrader);
 		handlers.swapItems(leftTrader);
 		view.focus.rightTrader = rightTrader;
@@ -1782,6 +1814,18 @@ var view = {
 		var leftTraderPane = document.getElementById(leftTrader.id + "InventoryPane");
 		view.toggleInventoryPane();
 		view.moveInventory(rightTrader,110,-188);
+		
+		if (vendor == true) {
+			var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+			document.getElementById('uiLayer').appendChild(rect);
+			rect.id = 'vendorEquipmentShield';
+			rect.setAttribute('fill','white');
+			rect.setAttribute('stroke','none');
+			rect.setAttribute('x',22);
+			rect.setAttribute('y',-50);
+			rect.setAttribute('width',35);
+			rect.setAttribute('height',70);
+		};
 
 		// Trade Close Button
 		var x = 89, y = -52;

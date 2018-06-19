@@ -106,6 +106,7 @@ var data = {
 			beastType: "fire",
 			stats: {strength:5,move:0,focus:0},
 			inventory: [],
+			slots: [],
 		},
 		
 		hellpuppy: {
@@ -118,6 +119,7 @@ var data = {
 			equipment: {
 			},
 			inventory: [],
+			slots: [],
 		},
 		
 		iconoclast: {
@@ -185,8 +187,8 @@ var data = {
 			stats: {move:8,strength:9,focus:12},
 			equipment: {
 				left: {template:'initiatesTome'},
+				right: {template:'bronzeHatchet'},
 				garb: {template:'initiatesRobes'},
-				right: undefined,
 			},
 			inventory: [{template:'firstAidKit'}],
 		},
@@ -217,6 +219,7 @@ var data = {
 				hide: {template: 'ratHide'},
 			},
 			inventory: [],
+			slots: [],
 		},
 		
 		vicarKakkel: {
@@ -497,7 +500,7 @@ var data = {
 				shaft: 'saddlebrown',
 			},
 			stats: {},
-			maneuvers: [],
+			maneuvers: ['hack'],
 			svgNodes: function(item) {return item.pawn.avatar.simpleAxe(item)},
 		},
 		
@@ -828,6 +831,7 @@ var data = {
 	
 		ratHide: {
 			name: "Rat Hide",
+			description: "The pelt of a giant rat can be tanned and used in leatherworking.",
 			slots: ['hide'],
 			stats: {
 				deflection: 1,
@@ -839,6 +843,7 @@ var data = {
 		
 		ratTeeth: {
 			name: "Rat Teeth",
+			description: "Teeth pried from the maw of a giant rat must be valuable to someone, right?",
 			slots: ['teeth'],
 			colors: {
 			},
@@ -1174,6 +1179,28 @@ var data = {
 				{type:'refresh', stat:'strength', num:3},
 			],
 		},
+	
+		disengage: {
+			name: "Disengage",
+			description: "A flourish that may sting or disarm",
+			targetType: 'pawn',
+			minRange: 1,
+			maxRange: 1,
+			costs: {
+				move: function() {return 2},
+				focus: function(item) {return item.stats.weight || 1}
+			},
+			rollStats: {
+				action: {pawnStat: 'strength',itemStat: 'balance'},
+				reaction: {pawnStat: 'move',itemStat: 'deflection'},
+				power: {pawnStat: 'strength',itemStat: 'weight'},
+				resist: {pawnStat: 'strength',itemStat: 'soak'},
+			},
+			effects: [
+				{type:'wound',stat:'strength',name:'sharp',woundType:'physical'},
+				{type:'disarm'},
+			],
+		},
 		
 		douse: {
 			name: 'Douse',
@@ -1248,6 +1275,27 @@ var data = {
 			},
 			effects: [
 				{type:'refresh', stat:'move', num:1},
+			],
+		},
+	
+		hack: {
+			name: "Hack",
+			description: "A basic, close attack",
+			targetType: 'pawn',
+			minRange: 1,
+			maxRange: 1,
+			costs: {
+				move: function() {return 1},
+				strength: function(item) {return item.stats.weight || 1}
+			},
+			rollStats: {
+				action: {pawnStat: 'strength',itemStat: 'balance'},
+				reaction: {pawnStat: 'move',itemStat: 'deflection'},
+				power: {pawnStat: 'strength',itemStat: 'weight'},
+				resist: {pawnStat: 'strength',itemStat: 'soak'},
+			},
+			effects: [
+				{type:'wound',stat:'strength',name:'sharp',woundType:'physical'},
 			],
 		},
 		
@@ -1392,8 +1440,28 @@ var data = {
 			},
 			effects: [
 				{type:'wound',stat:'strength',name:'sharp',woundType:'physical'},
+			],
+		},
+	
+		stab: {
+			name: "Stab",
+			description: "A basic, close attack, made deadly with poison.",
+			targetType: 'pawn',
+			minRange: 1,
+			maxRange: 1,
+			costs: {
+				move: function() {return 1},
+				strength: function(item) {return item.stats.weight || 1}
+			},
+			rollStats: {
+				action: {pawnStat: 'strength',itemStat: 'balance'},
+				reaction: {pawnStat: 'move',itemStat: 'deflection'},
+				power: {pawnStat: 'strength',itemStat: 'weight'},
+				resist: {pawnStat: 'strength',itemStat: 'soak'},
+			},
+			effects: [
+				{type:'wound',stat:'strength',name:'sharp',woundType:'physical'},
 				{type:'poison',stat:'strength',name:'Poisoned',woundType:'poison',potence:2},
-				{type:'disarm'},
 			],
 		},
 	

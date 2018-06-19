@@ -66,8 +66,8 @@ var handlers = {
 	confirmAndPlay: function() {
 		game.confirmCreation(document.getElementById('nameInput').value,document.getElementById('pronounSelect').value);
 		view.hideCreation();
-// 		game.loadMap(hellhoundCave);
-		game.loadMap(level_orktown);
+		game.loadMap(hellhoundCave);
+// 		game.loadMap(level_orktown);
 	},
 	
 	// Map Handlers
@@ -290,7 +290,7 @@ var handlers = {
 		} else if (maneuver.targetType == 'tile') {
 			targets = [tile];
 		};
-		maneuver.execute(targets);
+		maneuver.execute(targets,maneuver.item.pawn);
 	},
 
 	manyPans: function() {
@@ -301,11 +301,9 @@ var handlers = {
 	},
 	
 	swapItems: function(pawn) {
-		if (view.focus.swapping !== pawn && pawn.stats.move >= 5) {
+		if (view.focus.swapping !== pawn) {
 			view.focus.swapping = pawn;
 			view.selectManeuver('swap');
-			pawn.stats.move -= 5;
-			view.updateSheet(pawn);
 		};
 	},
 	

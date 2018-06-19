@@ -82,11 +82,19 @@ TO DO LIST CITIZEN SWORDS REDUX
 - closing a character sheet also closes any open trade window
 - gamen.displayPassage no longer flips the buttons around 
 
+- morale bar on character sheet placed over character portrait
+- items in inventory properly loads its stats
+- dialogue charges 1 move
+- all character sheets have a swap button that is hidden for non-p1 pawns
+- slaughter
+- slaughter triggers the ability to swap items
+- when unequipping a defeated mob, the redraw also applies defeat transform.
+- pawns that shouldn't have default equip slots don't get default equip slots
+- murder, bind, and loot defeated human pawns
+- bronze hatchet has maneuvers
 
 
 CORE FUNCTIONALITY
-- pawns that join the p1 team get a swap button on inventory (or everyone does and joining reveals it)
-- the default maneuver animation is always going from the pawn that's focused on, not necessarily the pawn actually attacking.
 - more garb & items
 	- wand
 - landscape

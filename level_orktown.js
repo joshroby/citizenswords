@@ -58,9 +58,9 @@ var level_orktown = {
 	],
 	
 	standees: [
-// 		{type:'heroes',locs:[{x:1.5,y:-11},{x:-4,y:-4},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
-		{type:'heroes',locs:[{x:0,y:0},{x:1,y:0},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
-		{type:'pawn',id:'aaron',team:'watch',priorities:{freeze:true},locs:[{x:-11.5,y:-1}]},
+		{type:'heroes',locs:[{x:-11,y:-2},{x:-4,y:-4},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
+// 		{type:'heroes',locs:[{x:0,y:0},{x:1,y:0},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
+		{type:'pawn',id:'aaron',team:'watch',priorities:{freeze:true},locs:[{x:-11.5,y:-1}],events:{dialogue:'aaronTalk'}},
 		{type:'pawn',id:'doti',team:'watch',priorities:{freeze:true},locs:[{x:0.5,y:-3}]},
 		{type:'pawn',id:'bossNosh',team:'watch',priorities:{freeze:true},locs:[{x:-6.5,y:-3}]},
 		{type:'pawn',id:'motherSkullgoblet',team:'bystander',priorities:{freeze:true},locs:[{x:-10,y:-8}]},
@@ -341,6 +341,13 @@ var level_orktown = {
 			console.log('try again');
 			game.currentLevel.flags = {};
 			game.switchMaps(level_orktown);
+		},
+		aaronTalk: function(pawn) {
+			var aaron = game.map.findMob('aaron');
+			var pawn = game.map.findMob('mixterStout');
+			gamen.displayPassage(new Passage("Lovely day for it, isn't it?",[new Choice('Continue')],true,aaron.name,aaron.avatar.svg('bust'),'right'));
+			gamen.displayPassage(new Passage("Lovely day for what, now?",[new Choice('Continue')],true,pawn.name,pawn.avatar.svg('bust'),'left'));
+			gamen.displayPassage(new Passage("Why, revolution, of course.<p /> Best day of the whole year, if those gorgeous cumulonimbus are any indication, and I do believe they are!<p />Do hurry along, however.  You mustn't be late to the square.",undefined,true,aaron.name,aaron.avatar.svg('bust'),'right'));
 		},
 		skullgobletRobbed: function(pawn) {
 			game.currentLevel.flags.talkedToSkullgoblet = true;
@@ -671,10 +678,7 @@ var level_orktown = {
 			var daisy = game.map.findMob('daisy');
 			view.panToTile(daisy.tile);
 			gamen.displayPassage(new Passage("Keep your filthy loyalist hands off my father!",[new Choice('Continue')],true,daisy.name,daisy.avatar.svg('bust'),"right"));
-			gamen.displayPassage(new Passage("Daisy has joined the party!"));
-			daisy.team = 'p1';
-			game.map.heroes.push(daisy);
-			view.refreshPawnButtons();
+			game.heroJoins(daisy);
 		},
 		assassinDefeat: function() {
 			var assassin1, assassin2;
