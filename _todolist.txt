@@ -92,20 +92,18 @@ TO DO LIST CITIZEN SWORDS REDUX
 - pawns that shouldn't have default equip slots don't get default equip slots
 - murder, bind, and loot defeated human pawns
 - bronze hatchet has maneuvers
+- vendors
 
 
 CORE FUNCTIONALITY
+- split power/resist rolls for multiple effects
+- archiving maps on switch
+- ai pawns re-arm once disarmed
 - more garb & items
 	- wand
 - landscape
 	- stacks of background-y crates for the wharf?
-- split power/resist rolls for multiple effects
-- archiving maps on switch
 - ai heals and rallies
-- ai pawns re-arm once disarmed
-- envision trade/shop/loot interface
-	- trading items between your own pawns
-	- how is shop different from loot?
 
 OPTIONAL DISPLAY UPGRADES
 - wounds display as little fading pop-ups

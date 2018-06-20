@@ -183,9 +183,15 @@ var handlers = {
 					};
 				};
 				targetPawn.equip(view.itemDrag.item,view.itemDrag.selectedSlot);
+				game.updateTrade();
 			};
 			view.redrawPawn(view.focus.pawn);
 		};
+	},
+	
+	closeTrade: function() {
+		game.finalizeTrade();
+		view.closeTrade();
 	},
 
 	pawnSelect: function(pawn) {
@@ -312,6 +318,7 @@ var handlers = {
 		view.clearMoveOptions();
 		view.clearRangeOptions();
 		view.hideSheets();
+		handlers.closeTrade();
 	},
 	
 	endLevel: function() {

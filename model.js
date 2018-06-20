@@ -106,10 +106,62 @@ function Game() {
 		document.getElementById(pawn.id+"SwapButton").setAttribute('visibility','visible');
 		gamen.displayPassage(new Passage(pawn.name + " has joined the party!"));
 	};
+	
+	this.updateTrade = function(initialize) {
+		var leftBalance = 0,rightBalance = 0, value;
+		for (var slot in game.currentTrade.leftTrader.equipment) {
+			if (game.currentTrade.leftTrader.equipment[slot] !== undefined) {
+				value = data.items[game.currentTrade.leftTrader.equipment[slot].template].value;
+			} else {
+				value = 0;
+			};
+			leftBalance += value;
+		};
+		for (var i=0;i<game.currentTrade.leftTrader.inventory.length;i++) {
+			value = data.items[game.currentTrade.leftTrader.inventory[i].template].value;
+			leftBalance += value;
+		};
+		for (var slot in game.currentTrade.rightTrader.equipment) {
+			if (game.currentTrade.rightTrader.equipment[slot] !== undefined) {
+				value = data.items[game.currentTrade.rightTrader.equipment[slot].template].value;
+			} else {
+				value = 0;
+			};
+			rightBalance += value;
+		};
+		for (var i=0;i<game.currentTrade.rightTrader.inventory.length;i++) {
+			value = data.items[game.currentTrade.rightTrader.inventory[i].template].value;
+			rightBalance += value;
+		};
+		if (initialize) {
+			game.currentTrade.startBalance = leftBalance - rightBalance;
+			game.currentTrade.currentBalance = leftBalance - rightBalance;
+		} else {
+			game.currentTrade.currentBalance = leftBalance - rightBalance;
+		};
+		view.updateTrade();
+	};
+	
+	this.finalizeTrade = function() {
+		console.log('finalizing');
+		if (game.currentTrade !== undefined) {
+			var traderID = game.currentTrade.leftTrader.id;
+			if (game.players[0].debts[traderID] == undefined) {
+				game.players[0].debts[traderID] = 0;
+			};
+			game.players[0].debts[traderID] += (game.currentTrade.currentBalance - game.currentTrade.startBalance) / -2;
+			if (game.currentTrade.leftTrader.debts.p1 == undefined) {
+				game.currentTrade.leftTrader.debts.p1 = 0;
+			};
+			game.currentTrade.leftTrader.debts.p1 += (game.currentTrade.startBalance - game.currentTrade.currentBalance) / -2;
+			game.currentTrade = undefined;
+		};
+	};
 };
 
 function Player() {
 	this.plotkeys = {};
+	this.debts = {};
 };
 
 function Map(level) {
@@ -479,6 +531,8 @@ function Pawn(template,tile,team,priorities) {
 	this.exclusive = true;
 	this.wounds = {move:[],strength:[],focus:[]};
 	this.morale = 1;
+	
+	this.debts = {};
 
 	this.randomName = function() {
 		var firstNames = data.names.first;
@@ -581,7 +635,9 @@ function Pawn(template,tile,team,priorities) {
 			if (source.equipment[slot] !== undefined) {
 				this.equipment[slot] = new Item(source.equipment[slot].template,this);
 				if (source.equipment[slot].colors !== undefined) {
-					this.equipment[slot].colors = source.equipment[slot].colors;
+					for (var area in source.equipment[slot].colors) {
+						this.equipment[slot].colors[area] = source.equipment[slot].colors[area];
+					};
 				};
 				if (source.equipment[slot].stats !== undefined) {
 					this.equipment[slot].stats = source.equipment[slot].stats;
@@ -1128,7 +1184,7 @@ function Pawn(template,tile,team,priorities) {
 			cost: {move:5},
 			item: {pawn:this},
 			textStrings: function(lineLength) {return lineWrap('Buy stuff!  Sell stuff!  Engage in the capitalist drive that powers most RPGs!',lineLength)},
-			execute: function() {console.log(this);this.item.pawn.trade()},
+			execute: function() {this.item.pawn.trade()},
 		},
 	};
 	
@@ -1161,6 +1217,15 @@ function Pawn(template,tile,team,priorities) {
 	
 	this.trade = function() {
 		console.log('trade!');
+		view.focus.lastPawn.stats.move -= 5;
+		game.currentTrade = {
+			leftTrader: this,
+			rightTrader: view.focus.lastPawn,
+			leftBalance: 0,
+			rightBalance: 0,
+		};
+		view.openTrade(this,view.focus.lastPawn,true);
+		game.updateTrade(true);
 	};
 	
 	this.refreshStats = function() {
@@ -1353,6 +1418,8 @@ function Thing(template,tile,inventory,lootable,triggers,id) {
 	this.inventory = inventory;
 	this.lootable = lootable;
 	this.triggers = triggers;
+	
+	this.swapItems = function() {return true};
 	
 	this.textStrings = function(lineLength) {
 		if (this.description == undefined) {

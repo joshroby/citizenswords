@@ -63,7 +63,7 @@ var hellhoundCave = {
 			{x:7,y:6},{x:11,y:6},{x:12,y:6},{x:16,y:6},
 			]},
 		{type:'landscape',key:'riverStones',locs:[{x:3,y:2}]},
-		{type:'thing',locs:[{x:13,y:2}]},
+		{type:'thing',key:'chest',inventory:[new Item('candelabrum')],locs:[{x:13,y:2}]},
 		{type:'pawn',id:'rat',team:'rats',priorities:{freeze:true},locs:[{x:10,y:4},{x:10,y:6},{x:12,y:4},{x:11.5,y:5},{x:7.5,y:3},{x:10.5,y:-1}]},
 		{type:'pawn',id:'hellpuppy',team:'hell',priorities:{freeze:true},locs:[{x:10,y:2}]},
 	],
@@ -75,8 +75,8 @@ var hellhoundCave = {
 	},
 	
 	moveCosts: [
-		{moveCost:2,locs:[{x:0.5,y:1}]},
 		{moveCost:5,locs:[{x:3,y:2}]},
+		{moveCost:2,locs:[{x:-1,y:0},{x:0,y:0},{x:1,y:0},{x:1.5,y:1},{x:2.5,y:1}]},
 		{moveCost:Infinity,locs:[
 		{x:4,y:-2},{x:4.5,y:-1},{x:4,y:0},{x:3.5,y:1},{x:2,y:2},{x:1.5,y:3},{x:2.5,y:3},{x:1,y:4},{x:0.5,y:5},{x:-0.5,y:5},{x:-1,y:6},{x:0,y:6},{x:3.5,y:5},{x:3,y:6},
 		{x:13,y:-2},{x:14,y:-2},{x:15,y:-2},{x:16,y:-2},{x:12.5,y:-1},{x:13.5,y:-1},{x:14.5,y:-1},{x:15.5,y:-1},{x:16.5,y:-1},{x:13,y:0},{x:14,y:0},{x:15,y:0},{x:16,y:0},{x:13.5,y:1},{x:14.5,y:1},{x:15.5,y:1},{x:14,y:2},{x:15,y:2},{x:13.5,y:3},{x:14.5,y:3},{x:14,y:4},{x:14.5,y:5},{x:15,y:6}

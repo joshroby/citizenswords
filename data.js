@@ -16,6 +16,20 @@ var data = {
 			inventory: [],
 		},
 		
+		alfie: {
+			name: "Alfie Ratsnatcher",
+			unique: true,
+			description: "A colorful mainstay of Orktown, Alfie specializes in 'alternative food sources' which is a pretty way of saying 'rat meat from the sewers.'  No one is quite sure how old Alfie is, nor the provenance of the ratmonger's curious accent.",
+			avatarHeritage: ['orcish','goblin','gnomish','gnomish'],
+			stats: {move:6,strength:10,focus:2},
+			equipment: {
+				left: {template: 'knife'},
+				garb: {template: 'roughspun', colors:{shirt:'tan',upperArms:undefined}},
+			},
+			inventory: [{template:'sewerSkewers'},{template:'sewerSkewers'},{template:'sewerSkewers'}],
+			vendor: true,
+		},
+		
 		bossNosh: {
 			name: "Boss Nosh",
 			unique: true,
@@ -463,6 +477,7 @@ var data = {
 				chain: ['silver','darkgoldenrod','#6d5d04'],
 				pendant: 'any',
 			},
+			value: 1,
 			stats: {},
 			svgNodes: function(item) {return item.pawn.avatar.simpleNecklace(item)},
 		},
@@ -482,6 +497,7 @@ var data = {
 				legs: {fill:'tan'},
 				feet: {fill:'darkgrey',stroke:'#000000'},
 			},
+			value: 50,
 			stats: {
 				deflection: 3,
 				soak: 3,
@@ -499,6 +515,7 @@ var data = {
 				head: '#6d5d04',
 				shaft: 'saddlebrown',
 			},
+			value: 20,
 			stats: {},
 			maneuvers: ['hack'],
 			svgNodes: function(item) {return item.pawn.avatar.simpleAxe(item)},
@@ -513,6 +530,7 @@ var data = {
 				candles: 'ivory',
 				flame: 'orange',
 			},
+			value: 100,
 			svgNodes: function(item) {return item.pawn.avatar.candelabrum(item)},
 		},
 		
@@ -524,6 +542,7 @@ var data = {
 				chain: 'gold',
 				medallion: 'green',
 			},
+			value: 100,
 			stats: {
 				aegis: 5,
 				weight: 2,
@@ -539,6 +558,7 @@ var data = {
 				hook: 'silver',
 				handle: 'saddlebrown',
 			},
+			value: 5,
 			stats: {
 				balance: 1,
 				reach: 1,
@@ -556,6 +576,7 @@ var data = {
 				medallion: 'silver',
 				chain: 'silver',
 			},
+			value: 1,
 			stats: {},
 			svgNodes: function(item) {return item.pawn.avatar.circleMedallion(item)},
 		},
@@ -574,6 +595,7 @@ var data = {
 				legs: 'black',
 				feet: 'black',
 			},
+			value: 75,
 			stats: {
 			},
 			maneuvers: [],
@@ -592,6 +614,7 @@ var data = {
 				legs: {fill:'#272727'},
 				feet: {fill:'#272727',stroke:'#000000'},
 			},
+			value: 50,
 			stats: {
 				deflection: 3,
 				soak: 1,
@@ -615,6 +638,7 @@ var data = {
 				legs: {fill:'match secondary'},
 				feet: {fill:'match shoes'},
 			},
+			value: 100,
 			stats: {
 				aegis: 1,
 				soak: 1,
@@ -631,6 +655,7 @@ var data = {
 				metal: 'gold',
 				jewels: 'darkred',
 			},
+			value: 200,
 			stats: {
 				aegis: 3,
 			},
@@ -645,6 +670,7 @@ var data = {
 				healing: 3,
 				weight: 2,
 			},
+			value: 20,
 			maneuvers: ['heal'],
 		},
 		
@@ -662,6 +688,7 @@ var data = {
 				lowerArms: {fill:'#006838'},
 				legs: {fill:'#006838'},
 			},
+			value: 50,
 			stats: {
 				deflection: 3,
 				soak: 3,
@@ -679,6 +706,7 @@ var data = {
 				shaft: 'saddlebrown',
 				bindings: 'ivory',
 			},
+			value: 40,
 			stats: {
 				balance: 1,
 				reach: 2,
@@ -701,6 +729,7 @@ var data = {
 				lowerArms: {fill:'beige'},
 				legs: {fill:'beige'},
 			},
+			value: 20,
 			stats: {
 				deflection: 1,
 				soak: 1,
@@ -717,6 +746,7 @@ var data = {
 				cover: 'blue',
 				pages: 'ivory',
 			},
+			value: 40,
 			stats: {
 				aegis: 2,
 				arcane: 3,
@@ -735,6 +765,7 @@ var data = {
 				hilt: 'silver',
 				pommel: 'silver',
 			},
+			value: 5,
 			stats: {
 				reach: 1,
 				sharp: 5,
@@ -755,6 +786,7 @@ var data = {
 				hilt: 'gold',
 				pommel: 'gold',
 			},
+			value: 0,
 			stats: {
 				balance: 1,
 				reach: 2,
@@ -782,6 +814,7 @@ var data = {
 				legs: {fill:'#5F5F5F'},
 				feet: {fill:'#272727',stroke:'#000000'},
 			},
+			value: 100,
 			stats: {
 				deflection: 6,
 				soak: 6,
@@ -804,6 +837,7 @@ var data = {
 				lowerArms: {fill:'steelblue'},
 				legs: {fill:'steelblue'},
 			},
+			value: 500,
 			stats: {
 				deflection: 3,
 				soak: 3,
@@ -820,6 +854,7 @@ var data = {
 				cover: 'indigo',
 				pages: 'aliceblue',
 			},
+			value: 500,
 			stats: {
 				aegis: 3,
 				arcane: 5,
@@ -833,6 +868,7 @@ var data = {
 			name: "Rat Hide",
 			description: "The pelt of a giant rat can be tanned and used in leatherworking.",
 			slots: ['hide'],
+			value: 2,
 			stats: {
 				deflection: 1,
 				soak: 1,
@@ -847,6 +883,7 @@ var data = {
 			slots: ['teeth'],
 			colors: {
 			},
+			value: 0.5,
 			stats: {
 				sharp: 4,
 				weight: 1,
@@ -864,6 +901,7 @@ var data = {
 				upperArms: {fill:'match shirt'},
 				feet: {fill:'saddlebrown',stroke:'#000000'},
 			},
+			value: 1,
 			stats: {
 				deflection: 1,
 				soak: 1,
@@ -871,6 +909,13 @@ var data = {
 			},
 			maneuvers: ['exhort'],
 			svgNodes: function(item) {return item.pawn.avatar.roughspun(item);},
+		},
+		
+		sewerSkewers: {
+			name: "Sewer Skewers",
+			description: "Gobs of stringy meat, little onions, and mushrooms on a crooked skewer, roasted to a steaming crisp.",
+			slots: [],
+			value: 1.5,
 		},
 		
 		sundress: {
@@ -881,6 +926,7 @@ var data = {
 				dress: 'any',
 				sash: 'any',
 			},
+			value: 5,
 			stats: {
 			},
 			maneuvers: [],
@@ -900,6 +946,7 @@ var data = {
 				legs: {fill:'tan'},
 				feet: {fill:'darkgrey',stroke:'#000000'},
 			},
+			value: 25,
 			stats: {
 				deflection: 2,
 				soak: 2,
@@ -917,6 +964,7 @@ var data = {
 				backing: 'silver',
 				front: 'saddlebrown',
 			},
+			value: 20,
 			stats: {
 				deflection: 1,
 				soak: 1,
@@ -934,6 +982,7 @@ var data = {
 				shaft: 'saddlebrown',
 				bindings: 'forestgreen',
 			},
+			value: 30,
 			stats: {
 				balance: 1,
 				reach: 4,
@@ -954,6 +1003,7 @@ var data = {
 				hilt: 'gold',
 				pommel: 'gold',
 			},
+			value: 100,
 			stats: {
 				balance: 1,
 				reach: 2,
@@ -982,6 +1032,7 @@ var data = {
 				feet: {fill:'darkgrey',stroke:'#000000'},
 				bust: {fill:'none',stroke:'none'},
 			},
+			value: 100,
 			stats: {
 				deflection: 3,
 				soak: 3,
@@ -1001,6 +1052,7 @@ var data = {
 				figure: 'indigo',
 				crown: 'yellow',
 			},
+			value: 0,
 			stats: {},
 			maneuvers: [],
 			svgNodes: function(item) {return item.pawn.avatar.sovereignIcon(item)},
@@ -1012,6 +1064,7 @@ var data = {
 			colors: {
 				staff: 'saddlebrown',
 			},
+			value: 10,
 			stats: {
 			},
 			maneuvers: [],
@@ -1031,6 +1084,7 @@ var data = {
 				lowerArms: {fill:'ivory'},
 				legs: {fill:'ivory'},
 			},
+			value: 100,
 			stats: {
 				deflection: 2,
 				soak: 2,
@@ -1043,6 +1097,7 @@ var data = {
 		wand: {
 			name: "Wand",
 			slots: ['left','right'],
+			value: 50,
 			stats: {
 				arcane: 1,
 				healing: 1,
@@ -1069,6 +1124,7 @@ var data = {
 				legs: {fill:'forestgreen'},
 				feet: {fill:'darkgrey',stroke:'#000000'},
 			},
+			value: 50,
 			stats: {
 				deflection: 3,
 				soak: 3,
@@ -1088,6 +1144,7 @@ var data = {
 				handle: 'saddlebrown',
 				contents: 'blue',
 			},
+			value: 1,
 			stats: {
 				capacity: 3,
 			},
@@ -1718,6 +1775,15 @@ var data = {
 			width: 110,
 			blockView: true,
 			exclusive: true,
+			cover: 0,
+		},
+		
+		sewerGrate: {
+			sprite: 'sewerGrate',
+			path: 'sprites/sewerGrate.svg',
+			width: 100,
+			blockView: false,
+			exclusive: false,
 			cover: 0,
 		},
 		

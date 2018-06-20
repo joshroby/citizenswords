@@ -1161,7 +1161,7 @@ var view = {
 	refreshManeuvers: function(pawn) {
 		var x, y, maneuverButton;
 		var maneuversPane = document.getElementById(pawn.id + "ManeuversPane");
-		console.log(pawn,pawn.id)
+		view.error1164 = [pawn,pawn.id];
 		maneuversPane.innerHTML = '';
 		
 		if (pawn.team == 'p1') {
@@ -1219,11 +1219,11 @@ var view = {
 			} else if (pawn.morale <= 0) {
 				maneuverList.push(pawn.contextualManeuvers.slaughter);
 			} else {
-				if (pawn.vendor) {
-					maneuverList.push(pawn.contextualManeuvers.trade);
-				};
 				if (pawn.events !== undefined && pawn.events.dialogue !== undefined) {
 					maneuverList.push(pawn.contextualManeuvers.talk);
+				};
+				if (pawn.vendor) {
+					maneuverList.push(pawn.contextualManeuvers.trade);
 				};
 				if (pawn.lootable !== undefined) {
 					maneuverList.push(pawn.contextualManeuvers.loot);
@@ -1476,7 +1476,7 @@ var view = {
 			tile.hover = true;
 			view.strokeTile(tile);
 		};
-		console.log('tile',tile.x,tile.y);
+// 		console.log('tile',tile.x,tile.y);
 	},
 	
 	unhoverTile: function(tile) {
@@ -1579,7 +1579,6 @@ var view = {
 		view.moveInventory(view.focus.pawn,0,100);
 		view.focus.pawn = undefined;
 		document.getElementById('tipLayer').innerHTML = '';
-		view.closeTrade();
 	},
 	
 	updateSheet: function(pawn) {
@@ -1816,8 +1815,12 @@ var view = {
 		view.moveInventory(rightTrader,110,-188);
 		
 		if (vendor == true) {
+			var vendorGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+			document.getElementById('uiLayer').appendChild(vendorGroup);
+			vendorGroup.id = 'vendorGroup';
+			
 			var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
-			document.getElementById('uiLayer').appendChild(rect);
+			vendorGroup.appendChild(rect);
 			rect.id = 'vendorEquipmentShield';
 			rect.setAttribute('fill','white');
 			rect.setAttribute('stroke','none');
@@ -1825,6 +1828,37 @@ var view = {
 			rect.setAttribute('y',-50);
 			rect.setAttribute('width',35);
 			rect.setAttribute('height',70);
+			
+			var traderFace = document.createElementNS('http://www.w3.org/2000/svg','use');
+			vendorGroup.appendChild(traderFace);
+			traderFace.id = 'traderFace';
+			traderFace.setAttribute('x',0);
+			traderFace.setAttribute('y',0);
+			traderFace.setAttribute('transform','translate(35 30) scale(0.7)');
+			
+			var traderText = document.createElementNS('http://www.w3.org/2000/svg','text');
+			vendorGroup.appendChild(traderText);
+			traderText.id = 'traderText';
+			traderText.setAttribute('x',40);
+			traderText.setAttribute('y',-30);
+			traderText.setAttribute('font-size',4);
+			traderText.setAttribute('text-anchor','middle');
+			
+			var balanceText = document.createElementNS('http://www.w3.org/2000/svg','text');
+			vendorGroup.appendChild(balanceText);
+			balanceText.id = 'balanceText';
+			balanceText.setAttribute('x',40);
+			balanceText.setAttribute('y',-20);
+			balanceText.setAttribute('font-size',8);
+			balanceText.setAttribute('text-anchor','middle');
+			
+			var marksText = document.createElementNS('http://www.w3.org/2000/svg','text');
+			vendorGroup.appendChild(marksText);
+			marksText.id = 'marksText';
+			marksText.setAttribute('x',40);
+			marksText.setAttribute('y',-13);
+			marksText.setAttribute('font-size',4);
+			marksText.setAttribute('text-anchor','middle');
 		};
 
 		// Trade Close Button
@@ -1832,7 +1866,7 @@ var view = {
 		var closeButton = document.createElementNS('http://www.w3.org/2000/svg','g');
 		closeButton.id = 'tradeCloseButton';
 		document.getElementById('uiLayer').appendChild(closeButton);
-		closeButton.addEventListener('click',view.closeTrade);
+		closeButton.addEventListener('click',handlers.closeTrade);
 		var closeButtonBack = document.createElementNS('http://www.w3.org/2000/svg','circle');
 		closeButton.appendChild(closeButtonBack);
 		closeButtonBack.setAttribute('cx',x);
@@ -1870,6 +1904,36 @@ var view = {
 			view.focus.leftTrader = undefined;
 			document.getElementById('tradeCloseButton').remove();
 		};
+		var vendorGroup = document.getElementById('vendorGroup');
+		if (vendorGroup !== null) {
+			vendorGroup.remove();
+		};
+	},
+	
+	updateTrade: function() {
+		console.log('boo');
+		var traderFace = document.getElementById('traderFace');
+		var trader = game.currentTrade.leftTrader;
+		view.setHref(traderFace,trader.id);
+		
+		
+		var imbalance = (game.currentTrade.startBalance - game.currentTrade.currentBalance)/2;
+		if (imbalance > 0) {
+			string = "You'll owe me";
+		} else if (imbalance < 0) {
+			string = "I'll owe you";
+		} else {
+			string = "Let's trade!";
+		};
+		document.getElementById('traderText').innerHTML = string;
+		if (imbalance == 0) {
+			document.getElementById('balanceText').innerHTML = '';
+			document.getElementById('marksText').innerHTML = '';
+		} else {
+			document.getElementById('balanceText').innerHTML = Math.abs(imbalance);
+			document.getElementById('marksText').innerHTML = 'credit marks.';
+		};
+		
 	},
 	
 	passageDisplaying: function() {

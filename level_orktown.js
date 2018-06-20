@@ -58,8 +58,10 @@ var level_orktown = {
 	],
 	
 	standees: [
-		{type:'heroes',locs:[{x:-11,y:-2},{x:-4,y:-4},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
-// 		{type:'heroes',locs:[{x:0,y:0},{x:1,y:0},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
+// 		{type:'heroes',locs:[{x:-5,y:-6},{x:-4,y:-4},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
+		{type:'heroes',locs:[{x:0,y:0},{x:1,y:0},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
+		{type:'pawn',id:'alfie',team:'bystander',priorities:{freeze:true},locs:[{x:-5.5,y:-7}],events:{dialogue:'alfieTalk'}},
+		{type:'landscape',key:'sewerGrate',locs:[{x:-5,y:-6}]},
 		{type:'pawn',id:'aaron',team:'watch',priorities:{freeze:true},locs:[{x:-11.5,y:-1}],events:{dialogue:'aaronTalk'}},
 		{type:'pawn',id:'doti',team:'watch',priorities:{freeze:true},locs:[{x:0.5,y:-3}]},
 		{type:'pawn',id:'bossNosh',team:'watch',priorities:{freeze:true},locs:[{x:-6.5,y:-3}]},
@@ -281,6 +283,30 @@ var level_orktown = {
 			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,stout.name,stout.avatar.svg('bust'),'left'));
 			string = "Yeah, you're going to get yourselves killed.  But Master Moucau is in Orktown right now, getting ready to speechify in Gibbet Square.  You can talk to him about a charter.";
 			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,doti.name,doti.avatar.svg('bust'),'right'));
+		},
+		alfieTalk: function(pawn) {
+			var p1 = game.map.findMob('p1');
+			var stout = game.map.findMob('mixterStout');
+			var alfie = game.map.findMob('alfie');
+			var hasRatCarcasses = false;
+			for (var item of p1.inventory) {
+				if (item.template == 'ratTeeth' || item.template == 'ratHide') {
+					hasRatCarcasses = true;
+				};
+			};
+			for (var item of stout.inventory) {
+				if (item.template == 'ratTeeth' || item.template == 'ratHide') {
+					hasRatCarcasses = true;
+				};
+			};
+			if (hasRatCarcasses) {
+				gamen.displayPassage(new Passage("Whuzzat I smell?  Izzat rat?  I buy it off ya, me credit's good, I swears.",[new Choice('Continue')],true,alfie.name,alfie.avatar.svg('bust'),'right'));
+				gamen.displayPassage(new Passage("Now that you mention it, we <em>do</em> have a heap of bloody carcasses that we would like to <em>not</em> be carrying around any more.",[new Choice('Continue')],true,stout.name,stout.avatar.svg('bust'),'left'));
+				gamen.displayPassage(new Passage("Trades you'n me, yah?  I take yer smelly carcass, I owes ya.  I pays up soon, I swears.",undefined,true,alfie.name,alfie.avatar.svg('bust'),'right'));
+			} else {
+				gamen.displayPassage(new Passage("I smell <em>sewer skewers!</em><p />Alfie, I would very much like one, and I would very much like you to not tell me what's in it.",[new Choice('Continue')],true,stout.name,stout.avatar.svg('bust'),'left'));
+				gamen.displayPassage(new Passage("I gots good skewers.  Fresh!  An yer credit's good wit me, "+p1.name+".  Trades me.  You pays up whens ya can.",undefined,true,alfie.name,alfie.avatar.svg('bust'),'right'));
+			};
 		},
 		noshGreet: function(pawn) {
 			game.currentLevel.flags.talkedToNosh = true;
