@@ -2,6 +2,9 @@ var data = {
 
 	cast: {
 	
+		p1: {
+		},
+	
 		aaron: {
 			name: "Aaron Pegomancer",
 			unique: true,
@@ -478,7 +481,10 @@ var data = {
 				pendant: 'any',
 			},
 			value: 1,
-			stats: {},
+			stats: {
+				aegis: 1,
+				fashion: 1,
+			},
 			svgNodes: function(item) {return item.pawn.avatar.simpleNecklace(item)},
 		},
 		
@@ -545,6 +551,7 @@ var data = {
 			value: 100,
 			stats: {
 				aegis: 5,
+				fashion: 10,
 				weight: 2,
 			},
 			svgNodes: function(item) {return item.pawn.avatar.chainsOfOffice(item)},
@@ -597,6 +604,7 @@ var data = {
 			},
 			value: 75,
 			stats: {
+				fashion: 10,
 			},
 			maneuvers: [],
 			svgNodes: function(item) {return item.pawn.avatar.eleanorDress(item);},
@@ -616,10 +624,11 @@ var data = {
 			},
 			value: 50,
 			stats: {
+				aegis: 1,
 				deflection: 3,
+				fashion: 2,
 				soak: 1,
 				weight: 2,
-				aegis: 1,
 			},
 			svgNodes:function(item) {return item.pawn.avatar.fineBlacks(item)},
 		},
@@ -641,6 +650,7 @@ var data = {
 			value: 100,
 			stats: {
 				aegis: 1,
+				fashion: 4,
 				soak: 1,
 				weight: 2,
 			},
@@ -658,6 +668,7 @@ var data = {
 			value: 200,
 			stats: {
 				aegis: 3,
+				fashion: 5,
 			},
 			svgNodes:function(item) {return item.pawn.avatar.fineNecklace(item)},
 		},
@@ -671,7 +682,7 @@ var data = {
 				weight: 2,
 			},
 			value: 20,
-			maneuvers: ['heal'],
+			maneuvers: ['bandage'],
 		},
 		
 		guildmasterRobes: {
@@ -690,10 +701,11 @@ var data = {
 			},
 			value: 50,
 			stats: {
+				aegis: 3,
 				deflection: 3,
+				fashion: 10,
 				soak: 3,
 				weight: 3,
-				aegis: 3,
 			},
 			svgNodes: function(item) {return item.pawn.avatar.simpleRobe(item)},
 		},
@@ -767,6 +779,7 @@ var data = {
 			},
 			value: 5,
 			stats: {
+				balance: 4,
 				reach: 1,
 				sharp: 5,
 				sharpBase: 1,
@@ -817,6 +830,7 @@ var data = {
 			value: 100,
 			stats: {
 				deflection: 6,
+				fashion: 2,
 				soak: 6,
 				weight: 10,
 			},
@@ -839,10 +853,11 @@ var data = {
 			},
 			value: 500,
 			stats: {
+				aegis: 5,
 				deflection: 3,
+				fashion: 4,
 				soak: 3,
 				weight: 5,
-				aegis: 5,
 			},
 			svgNodes: function(item) {return item.pawn.avatar.simpleRobe(item)},
 		},
@@ -928,6 +943,7 @@ var data = {
 			},
 			value: 5,
 			stats: {
+				fashion: 2,
 			},
 			maneuvers: [],
 			svgNodes: function(item) {return item.pawn.avatar.sundress(item);},
@@ -951,7 +967,6 @@ var data = {
 				deflection: 2,
 				soak: 2,
 				weight: 10,
-				healing: 3,
 			},
 			maneuvers: ['defensiveStance'],
 			svgNodes: function(item) {return item.pawn.avatar.scrapArmor(item)},
@@ -1087,9 +1102,10 @@ var data = {
 			value: 100,
 			stats: {
 				deflection: 2,
+				fashion: 3,
+				healing: 5,
 				soak: 2,
 				weight: 3,
-				healing: 5,
 			},
 			svgNodes: function(item) {return item.pawn.avatar.simpleRobe(item)},
 		},
@@ -1148,7 +1164,6 @@ var data = {
 			stats: {
 				capacity: 3,
 			},
-			uses: 1,
 			maneuvers: ['douse'],
 			svgNodes: function(item) {return item.pawn.avatar.bucket(item)},
 		},
@@ -1156,6 +1171,27 @@ var data = {
 	
 	
 	maneuvers: {
+		
+		bandage: {
+			name: "Bandage",
+			description: "Removes physical wounds on your target.  Limited uses.",
+			targetType: 'pawn',
+			minRange: 1,
+			maxRange: 1,
+			costs: {
+				move: function() {return 1},
+				focus: function(item) {return item.stats.healing || 1;},
+			},
+			consumesCondition: function() {return Math.random() * 10 << 0},
+			rollStats: {
+				action: {pawnStat: 1},
+				power: {pawnStat: 'focus',itemStat: 'healing'},
+			},
+			effects: [
+				{type: 'heal', woundTypes:['physical']},
+				{type: 'rally'},
+			],
+		},
 	
 		batter: {
 			name: "Batter",
@@ -1218,7 +1254,7 @@ var data = {
 			},
 			effects: [
 				{type:'wound',stat:'strength',name:'fire',woundType:'physical'},
-				{type:'wound',stat:'focus',name:'fear',woundType:'physical'},
+				{type:'wound',stat:'focus',name:'fear',woundType:'emotional'},
 			],
 		},
 	
@@ -1268,7 +1304,7 @@ var data = {
 			costs: {
 				move: function() {return 1},
 			},
-			consumesUses: 1,
+			consumesCondition: function() {return 200},
 			rollStats: {
 				action: {pawnStat:'strength',itemStat:'capacity'},
 				reaction: {pawnStat:'strength'},
@@ -1294,6 +1330,7 @@ var data = {
 				power: {pawnStat: 'focus',itemStat: 'prestige'},
 			},
 			effects: [
+				{type: 'heal', woundTypes:['emotional']},
 				{type:'rally'},
 			],
 		},
@@ -1837,7 +1874,7 @@ var data = {
 			width: 110,
 			height: 150,
 			blockView: false,
-			exclusive: false,
+			exclusive: true,
 			cover: 0,
 		},
 		

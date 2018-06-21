@@ -63,7 +63,7 @@ var hellhoundCave = {
 			{x:7,y:6},{x:11,y:6},{x:12,y:6},{x:16,y:6},
 			]},
 		{type:'landscape',key:'riverStones',locs:[{x:3,y:2}]},
-		{type:'thing',key:'chest',inventory:[new Item('candelabrum')],locs:[{x:13,y:2}]},
+		{type:'thing',key:'chest',inventory:[new Item('candelabrum')],lootable:true,locs:[{x:13,y:2}]},
 		{type:'pawn',id:'rat',team:'rats',priorities:{freeze:true},locs:[{x:10,y:4},{x:10,y:6},{x:12,y:4},{x:11.5,y:5},{x:7.5,y:3},{x:10.5,y:-1}]},
 		{type:'pawn',id:'hellpuppy',team:'hell',priorities:{freeze:true},locs:[{x:10,y:2}]},
 	],
@@ -91,6 +91,7 @@ var hellhoundCave = {
 		{check:'chestSpotted',event:'chestSpotted',locs:[{x:9.5,y:-1},{x:10.5,y:-1},{x:11,y:0}]},
 		{check:'whatElse',event:'whatElse',locs:[{x:12,y:0}]},
 		{check:'hellpuppy',event:'hellpuppy',locs:[{x:12.5,y:1}]},
+		{check:'ratNest',event:'ratNest',locs:[{x:12,y:4}]},
 	],
 	
 	checks: {
@@ -109,6 +110,9 @@ var hellhoundCave = {
 		},
 		hellpuppy: function(pawn) {
 			return !game.currentLevel.flags.hellpuppy && pawn.team == 'p1';
+		},
+		ratNest: function(pawn) {
+			return !game.currentLevel.flags.ratNest && pawn.team == 'p1';
 		},
 	},
 	
@@ -148,6 +152,13 @@ var hellhoundCave = {
 				};
 			};
 		},
+		ratNest: function(pawn) {
+			gamen.displayPassage(new Passage("Eugh, looks like their nest.  Gross.  Oh, but what's this?",undefined,true,pawn.name,pawn.avatar.svg('bust'),'left'));
+			var bauble = new Item('bauble');
+			pawn.inventory.push(bauble);
+			gamen.displayPassage(new Passage("You found a "+bauble.name+"!"));
+			view.refreshItems(pawn);
+		},
 		undergroundRiver: function(pawn,tile) {
 			var passage = new Passage("Wow, look at all that water!  Fast-flowing, too.  Do you think it's an underground river?" ,undefined,undefined,pawn.name,pawn.avatar.svg('bust'),'left');
 			gamen.displayPassage(passage);
@@ -180,7 +191,7 @@ var hellhoundCave = {
 			};
 			hellpuppy.moveTo(game.map.findTile(12,2));
 			gamen.displayPassage(new Passage("Growl? >snurfle< Woof.",undefined,true,"Terrifying Hellhound... Whelp",hellpuppy.avatar.svg(),'left'));
-			gamen.displayPassage(new Passage("Gasp!  Aren't you just the cutest little puppy?  Yes you are!  YES YOU ARE!!!<br />That's it, I'm taking you home!",undefined,true,pawn.name,pawn.avatar.svg('bust'),'right'));
+			gamen.displayPassage(new Passage(">Gasp!<  Aren't you just the cutest little puppy?  Yes you are!  YES YOU ARE!!!<p />That's it, I'm taking you home!",undefined,true,pawn.name,pawn.avatar.svg('bust'),'right'));
 			gamen.displayPassage(new Passage("Hellpuppy has joined the party!",undefined,true,undefined,hellpuppy.avatar.svg(),'left'));
 			hellpuppy.team = 'p1';
 			game.map.heroes.push(hellpuppy);

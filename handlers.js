@@ -314,7 +314,6 @@ var handlers = {
 	},
 	
 	hideSheets: function() {
-		console.log('hide');
 		view.clearMoveOptions();
 		view.clearRangeOptions();
 		view.hideSheets();
@@ -343,7 +342,7 @@ document.addEventListener('keydown',function(event) {
 	if (Number.isInteger(parseInt(event.key)) && view.focus.pawn !== undefined) {
 		if (true) { // check that pawn is player-controlled
 			var maneuver = view.focus.pawn.maneuvers[event.key - 1];
-			if (maneuver !== undefined) {
+			if (maneuver !== undefined && view.focus.pawn.canAfford(maneuver.cost)) {
 				handlers.maneuverSelect(maneuver);
 			};
 		};

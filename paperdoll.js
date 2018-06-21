@@ -8,9 +8,10 @@ var paperdoll = {
 		game = new Game();
 		
 		pawn = new Pawn();
-		pawn.equipment.right = new Item('waterBucket',pawn);
-		pawn.equipment.left = new Item('waterBucket',pawn);
-		pawn.equipment.garb = new Item('eleanorDress',pawn);
+		pawn.avatar.parameters.feet = 5;
+		pawn.equipment.right = new Item('knife',pawn);
+		pawn.equipment.left = new Item('knife',pawn);
+		pawn.equipment.garb = new Item('fineClothes',pawn);
 		pawn.equipment.neck = new Item('bauble',pawn);
 		var svg = pawn.avatar.svg();
 		svg.id = 'paperdoll';

@@ -195,6 +195,38 @@ function Avatar(pawn,heritages) {
 		return diffs
 	};
 	
+	this.apparentRace = function() {
+		var pointness = this.parameters.earDip * -1 - 11;
+		var apparentEthnicities = this.apparentEthnicities();
+		for (var i=0;i<3;i++) {
+			if (this.parameters.hindquarters > 0 ) {
+				pointness -= 3;
+			};
+			if (['centaur','dwarven','gigantic','gnomish','minotaur','ogrish'].indexOf(apparentEthnicities[i].ethnicity) !== -1) {
+				pointness -= 3;
+			} else if (['elvish','gnollish','goblin','orcish','trollish'].indexOf(apparentEthnicities[i].ethnicity) !== -1) {
+				pointness += 3;
+			} else if (['kobold'].indexOf(apparentEthnicities[i].ethnicity) !== -1) {
+				pointness += 8;
+			};
+		};
+		var raceString = "";
+		if (Math.abs(pointness) > 5) {
+			raceString += 'reliably';
+		} else if (Math.abs(pointness) > 2) {
+			raceString += 'usually';
+		} else {
+			raceString += 'mostly';
+		};
+		raceString += ' assumed to be a ';
+		if (pointness >= 0) {
+			raceString += 'point';
+		} else {
+			raceString += 'round';
+		};
+		return {index:pointness,string:raceString};
+	};
+	
 	
 	
 	// The Monster
@@ -203,8 +235,10 @@ function Avatar(pawn,heritages) {
 		var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
 		if (shot == undefined || shot == 'fullBody') {
 			svg.setAttribute('viewBox','-25 -50 50 50');
-		} else if (shot == 'bust') {
+		} else if (shot == 'bust' && this.pawn.morale > 0) {
 			svg.setAttribute('viewBox','-12.5 -50 25 25');
+		} else if (shot == 'bust') {
+			svg.setAttribute('viewBox','-50 -50 100 100');
 		};
 		svg.appendChild(this.draw());
 		return svg;
@@ -213,7 +247,6 @@ function Avatar(pawn,heritages) {
 	
 	this.draw = function() {
 
-// 		this.bodyConstants = {eyeline:33,neck:90};
 		this.bodyConstants = {eyeline:-172,neck:-115};
 		var muzzle = false;
 		var noseStroke = false;
@@ -221,7 +254,11 @@ function Avatar(pawn,heritages) {
 		this.updateColoring();
 		
 		var svg = document.createElementNS('http://www.w3.org/2000/svg','g');
-		svg.setAttribute('transform','scale(0.25)');
+		var transformString = 'scale(0.25)';
+		if (this.pawn.morale <= 0) {
+			transformString += ' rotate(90)';
+		};
+		svg.setAttribute('transform',transformString);
 		svg.setAttribute('id',this.pawn.id);
 				
 		var defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
@@ -317,6 +354,11 @@ function Avatar(pawn,heritages) {
 		interactionGroup.id = this.pawn.id + 'InteractionGroup';
 		interactionGroup.setAttributeNS('null','z-index',101);
 		characterGroup.appendChild(interactionGroup);
+
+		var effectsGroup = document.createElementNS('http://www.w3.org/2000/svg',"g");
+		effectsGroup.id = this.pawn.id + 'EffectsGroup';
+		effectsGroup.setAttributeNS('null','z-index',102);
+		svg.appendChild(effectsGroup);
 		
 		// Hair in Back
 		
@@ -2624,85 +2666,6 @@ function Avatar(pawn,heritages) {
 		animateTransform.setAttribute('additive','sum');
 		animateTransform.setAttribute('repeatCount',1);
 		animateTransform.setAttribute('fill','freeze');
-
-		
-		// Test Loop
-// 		var animationLoop = document.createElementNS('http://www.w3.org/2000/svg',"animateTransform");
-// 		var animationTopLoop = document.createElementNS('http://www.w3.org/2000/svg',"animateTransform");
-// 		var animationData = [
-// 			{attribute:'attributeName',value:'transform'},
-// 			{attribute:'attributeType',value:'xml'},
-// 			{attribute:'type',value:'rotate'},
-// 			{attribute:'from',value:'25 '+rightShoulderPivot.cx.animVal.value+" "+rightShoulderPivot.cy.animVal.value},
-// 			{attribute:'to',value:'35 '+rightShoulderPivot.cx.animVal.value+" "+rightShoulderPivot.cy.animVal.value},
-// 			{attribute:'dur',value:'1s'},
-// 			{attribute:'begin',value:'0s;inAnimation.end'},
-// 			];
-// 		for (i in animationData) {
-// 			animationLoop.setAttribute(animationData[i].attribute,animationData[i].value);
-// 			animationTopLoop.setAttribute(animationData[i].attribute,animationData[i].value);
-// 		};
-// 		animationLoop.id = 'outAnimation';
-// 		rightArmGroup.appendChild(animationLoop);
-// 		rightArmTopGroup.appendChild(animationTopLoop);
-// 		
-// 		animationLoop = document.createElementNS('http://www.w3.org/2000/svg',"animateTransform");
-// 		animationTopLoop = document.createElementNS('http://www.w3.org/2000/svg',"animateTransform");
-// 		animationData = [
-// 			{attribute:'attributeName',value:'transform'},
-// 			{attribute:'attributeType',value:'xml'},
-// 			{attribute:'type',value:'rotate'},
-// 			{attribute:'from',value:'35 '+rightShoulderPivot.cx.animVal.value+" "+rightShoulderPivot.cy.animVal.value},
-// 			{attribute:'to',value:'25 '+rightShoulderPivot.cx.animVal.value+" "+rightShoulderPivot.cy.animVal.value},
-// 			{attribute:'dur',value:'1s'},
-// 			{attribute:'begin',value:'outAnimation.end'},
-// 			];
-// 		for (i in animationData) {
-// 			animationLoop.setAttribute(animationData[i].attribute,animationData[i].value);
-// 			animationTopLoop.setAttribute(animationData[i].attribute,animationData[i].value);
-// 		};
-// 		animationLoop.id = 'inAnimation';
-// 		rightArmGroup.appendChild(animationLoop);
-// 		rightArmTopGroup.appendChild(animationTopLoop);
-// 		
-// 		animationLoop = document.createElementNS('http://www.w3.org/2000/svg',"animateTransform");
-// 		animationTopLoop = document.createElementNS('http://www.w3.org/2000/svg',"animateTransform");
-// 		animationData = [
-// 			{attribute:'attributeName',value:'transform'},
-// 			{attribute:'attributeType',value:'xml'},
-// 			{attribute:'type',value:'rotate'},
-// 			{attribute:'from',value:'-45 '+rightElbowPivot.cx.animVal.value+" "+rightElbowPivot.cy.animVal.value},
-// 			{attribute:'to',value:'-65 '+rightElbowPivot.cx.animVal.value+" "+rightElbowPivot.cy.animVal.value},
-// 			{attribute:'dur',value:'1s'},
-// 			{attribute:'begin',value:'0s;inAnimationForearm.end'},
-// 			];
-// 		for (i in animationData) {
-// 			animationLoop.setAttribute(animationData[i].attribute,animationData[i].value);
-// 			animationTopLoop.setAttribute(animationData[i].attribute,animationData[i].value);
-// 		};
-// 		animationLoop.id = 'outAnimationForearm';
-// 		rightForearmGroup.appendChild(animationLoop);
-// 		rightForearmTopGroup.appendChild(animationTopLoop);
-// 		
-// 		animationLoop = document.createElementNS('http://www.w3.org/2000/svg',"animateTransform");
-// 		animationTopLoop = document.createElementNS('http://www.w3.org/2000/svg',"animateTransform");
-// 		animationData = [
-// 			{attribute:'attributeName',value:'transform'},
-// 			{attribute:'attributeType',value:'xml'},
-// 			{attribute:'type',value:'rotate'},
-// 			{attribute:'from',value:'-65 '+rightElbowPivot.cx.animVal.value+" "+rightElbowPivot.cy.animVal.value},
-// 			{attribute:'to',value:'-45 '+rightElbowPivot.cx.animVal.value+" "+rightElbowPivot.cy.animVal.value},
-// 			{attribute:'dur',value:'1s'},
-// 			{attribute:'begin',value:'outAnimationForearm.end'},
-// 			];
-// 		for (i in animationData) {
-// 			animationLoop.setAttribute(animationData[i].attribute,animationData[i].value);
-// 			animationTopLoop.setAttribute(animationData[i].attribute,animationData[i].value);
-// 		};
-// 		animationLoop.id = 'inAnimationForearm';
-// 		rightForearmGroup.appendChild(animationLoop);
-// 		rightForearmTopGroup.appendChild(animationTopLoop);
-		
 				
 		// End Draw Mob
 		
@@ -4007,29 +3970,11 @@ function Avatar(pawn,heritages) {
 		clipPath.id = item.id+'TorsoClipPath';
 		defs.appendChild(clipPath);
 		clipPath.appendChild(this.torso().svgNodes.firstChild);
-
-		var bustline = document.createElementNS('http://www.w3.org/2000/svg',"path");
-		bustline.setAttribute("fill",item.colors.primary);
-		bustline.setAttribute("stroke",'none');
-		bustline.setAttribute("stroke-width","1");
-		bustline.setAttribute("stroke-linecap","round");
-		x = 0 - this.parameters.bust / 2;
-		y = this.bodyConstants.neck;
-		var depth = this.parameters.bust / 2 + 23.5;
-		var path = 'm '+x+','+y+' v'+depth+' h'+this.parameters.bust+' v-'+depth;
-		bustline.setAttributeNS(null,"d",path);
-		svgNodes.appendChild(bustline);
-		
-		var line = document.createElementNS('http://www.w3.org/2000/svg','line');
-		svgNodes.appendChild(line);
-		line.setAttribute('stroke','black');
-		line.setAttribute('x1',0);
-		line.setAttribute('y1',this.bodyConstants.neck);
-		line.setAttribute('x2',0);
-		line.setAttribute('y2',this.bodyConstants.neck+65);
-		
+		var clipPath = document.createElementNS('http://www.w3.org/2000/svg','clipPath');
+		clipPath.id = item.id+'DoubletClipPath';
+		defs.appendChild(clipPath);
 		var doubletBottom = document.createElementNS('http://www.w3.org/2000/svg','path');
-		svgNodes.appendChild(doubletBottom);
+		clipPath.appendChild(doubletBottom);
 		doubletBottom.setAttribute('fill',item.colors.secondary);
 		doubletBottom.setAttribute('stroke','black');
 		d = 'M 0,'+(this.bodyConstants.neck+62)+' ';
@@ -4037,13 +3982,21 @@ function Avatar(pawn,heritages) {
 		d += 'h5 v30 h-10 h'+(this.parameters.hips*-2.5)+'v-30 h5';
 		d += 'q '+(this.parameters.hips*0.1)+',15 '+(this.parameters.hips*1.25)+',20 ';
 		doubletBottom.setAttribute('d',d);
-		doubletBottom.setAttribute('clip-path','url(#'+item.id+'TorsoClipPath)');
 		
-		var torsoStroke = this.torso().svgNodes;
-		torsoStroke.setAttribute('fill','none');
-		torsoStroke.setAttribute('stroke','black');
-		svgNodes.appendChild(torsoStroke);
+		var torsoObject = this.torso();
 		
+		var shirt = torsoObject.svgNodes;
+		shirt.setAttribute("fill",item.colors.secondary);
+		svgNodes.appendChild(shirt);
+		shirt.setAttribute('clip-path','url(#'+item.id+'DoubletClipPath)');
+		
+		var hem = document.createElementNS('http://www.w3.org/2000/svg','path');
+		svgNodes.appendChild(hem);
+		hem.setAttribute('d',d);
+		hem.setAttribute('stroke','black');
+		hem.setAttribute('fill','none');
+		hem.setAttribute('clip-path','url(#'+item.id+'TorsoClipPath)');
+				
 		var leftShoulder = document.createElementNS('http://www.w3.org/2000/svg','path');
 		svgNodes.appendChild(leftShoulder);
 		leftShoulder.setAttribute('fill',item.colors.primary);
@@ -4063,8 +4016,32 @@ function Avatar(pawn,heritages) {
 		d += 'q 0,11 8,22';
 		d += 'q 0,-7 4,-14';
 		rightShoulder.setAttribute('d',d);
+
+		var bustline = document.createElementNS('http://www.w3.org/2000/svg',"g");
+		bustline.setAttribute("fill",item.colors.primary);
+		bustline.setAttribute("stroke",'none');
+		bustline.setAttribute("stroke-width","1");
+		bustline.setAttribute("stroke-linecap","round");
+		bustline.appendChild(torsoObject.leftBreastPath);
+		bustline.appendChild(torsoObject.rightBreastPath);
+		var bustPanel = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		bustline.appendChild(bustPanel);
+		x = 0 - this.parameters.bust / 2;
+		y = this.bodyConstants.neck;
+		var depth = this.parameters.bust / 2 + 23.5;
+		var path = 'm '+x+','+y+' v'+depth+' h'+this.parameters.bust+' v-'+depth;
+		bustPanel.setAttributeNS(null,"d",path);
+		svgNodes.appendChild(bustline);
 		
-		if (item.pawn.avatar.parameters.feet > 6) {
+		var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+		svgNodes.appendChild(line);
+		line.setAttribute('stroke','black');
+		line.setAttribute('x1',0);
+		line.setAttribute('y1',this.bodyConstants.neck);
+		line.setAttribute('x2',0);
+		line.setAttribute('y2',this.bodyConstants.neck+62);
+		
+		if (item.pawn.avatar.parameters.feet > 4) {
 			svgNodes.appendChild(this.simpleBoots(item));
 		};
 		return svgNodes;
@@ -5220,11 +5197,13 @@ function Avatar(pawn,heritages) {
 		return svgNodes;
 	};
 	
-	this.sovereignIcon = function(item) {
+	this.sovereignIcon = function(item,hands) {
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
 		svgNodes.setAttribute('stroke-linejoin','round');
 		
-		svgNodes.appendChild(this.palm());
+		if (hands !== 'noHands') {
+			svgNodes.appendChild(this.palm());
+		};
 		
 		if (this.bodyConstants.wrist.id === 'rightWristPivot') {var reflect = 1} else {var reflect = -1};
 		var wrist = {
@@ -5302,7 +5281,9 @@ function Avatar(pawn,heritages) {
 		head.setAttribute('stroke','black');
 		head.setAttribute('fill',item.colors.figure);
 		
-		svgNodes.appendChild(this.straightThumb());
+		if (hands !== 'noHands') {
+			svgNodes.appendChild(this.straightThumb());
+		};
 		
 		return svgNodes;
 	};
@@ -5541,12 +5522,23 @@ function AvatarBeast(pawn,type) {
 		
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg','g');
 		svgNodes.id = pawn.id;
+
+		// Defeat turn
+		if (this.pawn.morale <= 0) {
+			svgNodes.setAttribute('transform','rotate(90)');
+		};
 		
 		// The Actual Sprite
 		var characterNodes = this[this.type]();
 		var characterGroup = characterNodes.svgNodes;
 		characterGroup.id = pawn.id + "CharacterGroup";
 		svgNodes.appendChild(characterGroup);
+
+		// Effects Scroll
+		var effectsGroup = document.createElementNS('http://www.w3.org/2000/svg',"g");
+		effectsGroup.id = this.pawn.id + 'EffectsGroup';
+		effectsGroup.setAttributeNS('null','z-index',102);
+		svgNodes.appendChild(effectsGroup);
 
 		// Nerf Animation
 		

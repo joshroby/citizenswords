@@ -8,6 +8,7 @@ var view = {
 		distCameraToScreen: 17,
 		destinations: [],
 		panSpeed: 0.16,
+		lastEffectAngle: 0,
 	},
 	
 	itemDrag: {
@@ -33,7 +34,7 @@ var view = {
 	
 		var introDiv = document.createElement('div');
 		introDiv.id = 'introDiv';
-		introDiv.innerHTML = "<p>In this very under-construction game, you take on the role of citizens of a beautiful, cosmopolitain fantasy city who rise up against the tyranny of the despotic Ogre King. It's a tactical roleplaying game, which means you mostly move little characters around on a map to stage little battles.</p><p>There isn't much here yet.  I'm revamping the whole thing with a fun hex-map-perspetive display, and making it as easy as possible for me to make future levels.</p>";
+		introDiv.innerHTML = "<h2>Citizen Swords Against the Ogre King</h2><p>Defend your beautiful, cosmopolitain fantasy city of Pileas from the tyranny of the despotic Ogre King.</p><p>Have adventures!  Recruit colorful characters!  Indulge in politics and skullduggery!  Romance!  Theological discussions!  This game has everything, and possibly too much!</p><p><em>Citizen Swords</em> is a tactical, 'digital minis' roleplaying game, which means you mostly move little characters around on a map to stage little battles.</p>";
 		var newGameButton = document.createElement('button');
 		introDiv.appendChild(newGameButton);
 		newGameButton.addEventListener('click',handlers.newGame);
@@ -192,6 +193,10 @@ var view = {
 		
 		return [introDiv,creationDiv,svgDiv];
 	},
+
+	capitalize: function(string) {
+    	return string.charAt(0).toUpperCase() + string.slice(1);
+	},
 	
 	clearMap: function() {
 		document.getElementById('svgDiv').innerHTML = '';
@@ -218,23 +223,13 @@ var view = {
 		creationSVG.innerHTML = '';
 		creationSVG.appendChild(game.avatar.draw());
 		saveSVG(creationSVG,'Citizen Swords Avatar');
-		var pointness = game.avatar.parameters.earDip * -1 - 11;
+		var apparentRace = game.avatar.apparentRace();
 		var apparentEthnicities = game.avatar.apparentEthnicities();
 		var apparentString = 'Your features best fit the ';
 		for (var i=0;i<3;i++) {
 			if (i == 2) {apparentString += 'or '};
 			apparentString += apparentEthnicities[i].ethnicity + " (" + Math.round((1-apparentEthnicities[i].num)*100) + "%)";
 			if (i < 2) {apparentString += ', '};
-			if (game.avatar.parameters.hindquarters > 0 ) {
-				pointness -= 3;
-			};
-			if (['centaur','dwarven','gigantic','gnomish','minotaur','ogrish'].indexOf(apparentEthnicities[i].ethnicity) !== -1) {
-				pointness -= 3;
-			} else if (['elvish','gnollish','goblin','orcish','trollish'].indexOf(apparentEthnicities[i].ethnicity) !== -1) {
-				pointness += 3;
-			} else if (['kobold'].indexOf(apparentEthnicities[i].ethnicity) !== -1) {
-				pointness += 8;
-			};
 		};
 		apparentString += ' stereotypes.';
 		if (apparentEthnicities[0].num > 0.3) {
@@ -247,22 +242,7 @@ var view = {
 		ethnicityP.innerHTML  = apparentString;
 		var raceP = document.createElement('p');
 		socialCategoryDiv.appendChild(raceP);
-		var raceString = "You are ";
-		if (Math.abs(pointness) > 5) {
-			raceString += 'reliably';
-		} else if (Math.abs(pointness) > 2) {
-			raceString += 'usually';
-		} else {
-			raceString += 'mostly';
-		};
-		raceString += ' assumed to be a ';
-		if (pointness >= 0) {
-			raceString += 'point.';
-		} else {
-			raceString += 'round.';
-		};
-		game.avatar.pointness = pointness;
-		raceP.innerHTML = raceString;
+		raceP.innerHTML = "You are " + apparentRace.string + ".";
 	},	
 	
 	toggleCreationCategory: function(category) {
@@ -695,10 +675,6 @@ var view = {
 	redrawPawn: function(pawn) {
 		document.getElementById(pawn.id).remove();
 		document.getElementById('globalDefs').appendChild(pawn.avatar.draw());
-		if (pawn.morale <= 0 || pawn.dead) {
-			document.getElementById(pawn.id).setAttribute('transform','rotate(90)');
-// 			console.log('defeated pawn rotated on redraw');
-		};	
 	},
 	
 	buildCharacterSheet: function(pawn) {
@@ -732,27 +708,6 @@ var view = {
 		sheet.setAttribute('fill','white');
 		sheet.setAttribute('stroke','black');
 		sheet.setAttribute('stroke-width',0.25);
-// 		if (pawn.morale !== undefined) {
-// 			var moraleBarGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-// 			sheetGroup.appendChild(moraleBarGroup);
-// 			moraleBarGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,'morale'));
-// 			moraleBarGroup.addEventListener('mouseleave',view.clearToolTip);
-// 			var moraleBarBacking = document.createElementNS('http://www.w3.org/2000/svg','rect');
-// 			moraleBarGroup.appendChild(moraleBarBacking);
-// 			moraleBarBacking.setAttribute('x',-85);
-// 			moraleBarBacking.setAttribute('y',159);
-// 			moraleBarBacking.setAttribute('width',20);
-// 			moraleBarBacking.setAttribute('height',2);
-// 			moraleBarBacking.setAttribute('fill',view.colors.moraleSecondary);
-// 			var moraleBar = document.createElementNS('http://www.w3.org/2000/svg','rect');
-// 			moraleBarGroup.appendChild(moraleBar);
-// 			moraleBar.id = pawn.id + 'MoraleBar';
-// 			moraleBar.setAttribute('x',-85);
-// 			moraleBar.setAttribute('y',159);
-// 			moraleBar.setAttribute('width',20);
-// 			moraleBar.setAttribute('height',2);
-// 			moraleBar.setAttribute('fill',view.colors.moralePrimary);
-// 		};
 		if (pawn.stats !== undefined) {
 			var statNames = ['move','strength','focus'];
 			for (var i in statNames) {
@@ -813,12 +768,16 @@ var view = {
 		};
 		var portrait = document.createElementNS('http://www.w3.org/2000/svg','use');
 		sheetGroup.appendChild(portrait);
-		view.setHref(portrait,pawn.sprite);
+		view.setHref(portrait,pawn.id + 'CharacterGroup');
 		portrait.setAttribute('x',-75);
 		portrait.setAttribute('y',160);
-		portrait.addEventListener('click',view.toggleInventoryPane);
+		portrait.addEventListener('click',handlers.inventory);
 		if (pawn.stats == undefined) {
 			portrait.setAttribute('transform','translate(-27.5 70) scale(0.5)');
+		} else if (pawn.avatar.parameters !== undefined) {
+			portrait.setAttribute('transform','translate(-56 122) scale(0.25)');
+		} else {
+			portrait.setAttribute('transform','translate(0 -3)');
 		};
 		if (pawn.morale !== undefined) {
 			var moraleBarGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -994,14 +953,12 @@ var view = {
 		var looseInventoryBacking = document.createElementNS('http://www.w3.org/2000/svg','rect');
 		inventoryBack.appendChild(looseInventoryBacking);
 		view.itemDrag.dropTargets.push(looseInventoryBacking);
-// 		looseInventoryBacking.setAttribute('class','looseInventory');
 		looseInventoryBacking.id = pawn.id + '_' + 'looseInventory_Slot';
 		looseInventoryBacking.setAttribute('x',-53);
 		looseInventoryBacking.setAttribute('y',140);
 		looseInventoryBacking.setAttribute('width',30);
 		looseInventoryBacking.setAttribute('height',73);
 		looseInventoryBacking.setAttribute('fill','none');
-// 		looseInventoryBacking.setAttribute('stroke','gainsboro');
 		
 		var inventoryItemsGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
 		inventoryItems.appendChild(inventoryItemsGroup);
@@ -1012,7 +969,6 @@ var view = {
 			var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
 			inventoryBack.appendChild(rect);
 			view.itemDrag.dropTargets.push(rect);
-// 			rect.setAttribute('class',slots[i]);
 			rect.id = pawn.id + '_' + slots[i] + '_Slot';
 			rect.setAttribute('x',-85);
 			rect.setAttribute('y',140 + i * 10);
@@ -1032,6 +988,29 @@ var view = {
 			text.setAttribute('paint-order','stroke');
 			text.innerHTML = slots[i];
 		};
+		
+		var sigmaGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+		inventoryBack.appendChild(sigmaGroup);
+		sigmaGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,'sigma'));
+		sigmaGroup.addEventListener('mouseleave',view.clearToolTip);
+		var sigmaY = 151 + i * 10;
+		var circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+		sigmaGroup.appendChild(circle);
+		circle.setAttribute('cx',-83);
+		circle.setAttribute('cy',sigmaY);
+		circle.setAttribute('r',1.5);
+		circle.setAttribute('fill','gainsboro');
+		circle.setAttribute('stroke','grey');
+		circle.setAttribute('stroke-width',0.5);
+		var text = document.createElementNS('http://www.w3.org/2000/svg','text');
+		sigmaGroup.appendChild(text);
+		text.setAttribute('x',-83);
+		text.setAttribute('y',sigmaY + 0.8);
+		text.setAttribute('font-size',2);
+		text.setAttribute('fill','grey');
+		text.setAttribute('stroke','none');
+		text.setAttribute('text-anchor','middle');
+		text.innerHTML = '&#931;';
 		
 		var swapItemsButton = document.createElementNS('http://www.w3.org/2000/svg','g');
 		inventoryBack.appendChild(swapItemsButton);
@@ -1189,6 +1168,7 @@ var view = {
 					x += 27;
 					y -= 22.5;
 				};
+				if (pawn.morale <= 0) {canPerform = false};
 				
 				maneuverButton = view.buildManeuverGroup(pawn.maneuvers[i],x,y,i,canPerform);
 				maneuversPane.appendChild(maneuverButton);
@@ -1231,14 +1211,19 @@ var view = {
 			};
 			x = 7, y = 155, i = 0;
 			var proximity = false;
-			for (var neighbor of pawn.tile.adjacent) {
-				if (view.focus.lastPawn !== undefined && view.focus.lastPawn.tile == neighbor) {
+			if (pawn.tile !== undefined) {
+				for (var neighbor of pawn.tile.adjacent) {
+					if (view.focus.lastPawn !== undefined && view.focus.lastPawn.tile == neighbor) {
+						proximity = true;
+					};
+				};
+				if (view.focus.lastPawn !== undefined && view.focus.lastPawn.tile == pawn.tile) {
 					proximity = true;
 				};
 			};
 			for (var maneuver of maneuverList) {
 				var enabled = false;
-				if (proximity && view.focus.lastPawn.canAfford(maneuver.cost)) {
+				if (proximity && view.focus.lastPawn.canAfford !== undefined && view.focus.lastPawn.canAfford(maneuver.cost)) {
 					enabled = true;
 				};
 				maneuverButton = view.buildManeuverGroup(maneuver,x,y,maneuver.key,enabled);
@@ -1638,11 +1623,24 @@ var view = {
 	},
 	
 	displayToolTip: function(button) {
-		var headString; textStrings = [], italicBottom=false, lineLength = 37;
+		var headString, textStrings = [], item, total, italicBottom=false, lineLength = 37;
 		
 		if (button == 'swap') {
 			headString = 'Swap Items';
 			textStrings = lineWrap('Take a moment to swap items around.  Changing what items you have equipped will give you different maneuvers to use in your adventure.  Costs 5 move.',lineLength);
+		} else if (button == 'sigma') {
+			headString = 'Equipment Stat Totals';
+			textStrings = [];
+			for (var stat of ['aegis','deflection','fashion','healing','soak']) {
+				total = 0;
+				for (var slot in view.focus.pawn.equipment) {
+					item = view.focus.pawn.equipment[slot];
+					if (item !== undefined && item.stats !== undefined && item.stats[stat] !== undefined) {
+						total += item.stats[stat];
+					};
+				};
+				textStrings.push(total + " " + stat);
+			};
 		} else if (button == 'morale') {
 			headString = 'Morale ' + Math.floor(view.focus.pawn.morale*100) + "%";
 			textStrings = lineWrap("This measures a character's will to continue the fight.  Wounds deplete morale; some maneuvers replenish it.  If it runs out, the character is out of the fight.",lineLength);
@@ -1669,6 +1667,16 @@ var view = {
 		var tipGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
 		tipLayer.appendChild(tipGroup);
 // 		tipGroup.setAttribute('opacity',0.9);
+		var tipShadow = document.createElementNS('http://www.w3.org/2000/svg','rect');
+		tipGroup.appendChild(tipShadow);
+		tipShadow.setAttribute('x',-22.5 + 1.5);
+		tipShadow.setAttribute('y',11 + 1.5);
+		tipShadow.setAttribute('width',45);
+		tipShadow.setAttribute('height',25);
+		tipShadow.setAttribute('fill','black');
+		tipShadow.setAttribute('opacity',0.5);
+		tipShadow.setAttribute('stroke','black');
+		tipShadow.setAttribute('stroke-width',0.25);
 		var tipBack = document.createElementNS('http://www.w3.org/2000/svg','rect');
 		tipGroup.appendChild(tipBack);
 		tipBack.setAttribute('x',-22.5);
@@ -1759,6 +1767,7 @@ var view = {
 	},
 	
 	animateInteract: function(actor,target,sprite) {
+		console.log(actor,target,sprite);
 		var actorStandeeGroup = document.getElementById('standees_'+actor.tile.x+'_'+actor.tile.y);
 		var targetStandeeGroup = document.getElementById('standees_'+target.tile.x+'_'+target.tile.y);
 		var actorDisplayCoords = view.displayCoords(actor.tile);
@@ -1934,6 +1943,114 @@ var view = {
 			document.getElementById('marksText').innerHTML = 'credit marks.';
 		};
 		
+	},
+	
+	displayEffect: function(pawn,effect) {
+		var string;
+		var angle = 30 * Math.random();
+		if (view.camera.lastEffectAngle > 0) {
+			angle *= -1;
+		}
+		view.camera.lastEffectAngle = angle;
+		var effectGroup = document.getElementById(pawn.id+'EffectsGroup');
+		var delay = effectGroup.children.length * 300;
+		if (effect.type == 'wound') {
+			var magnitude = 0;
+			for (var wound of pawn.wounds[effect.stat]) {
+				if (wound.name == effect.name) {
+					magnitude = wound.strength;
+				};
+			};
+			var descriptorIndex = Math.min((-1 * wound.strength / pawn.stats[effect.stat+"Max"]) * data.wounds[effect.name].length << 0,data.wounds[effect.name].length-1);
+			string = data.wounds[effect.name][descriptorIndex]+"!";
+		} else if (effect.type == 'defend') {
+			string = view.capitalize(effect.name)+"!";
+		} else {
+			string = view.capitalize(effect.type)+"!";
+		};
+		var colors = {
+			wound: 'red',
+			heal: 'deepskyblue',
+			rally: 'cyan',
+			poison: 'lime',
+			refresh: 'white',
+			knockback: 'blue',
+			disarm: 'blue',
+			defend: 'yellow',
+		};
+		var color = colors[effect.type];
+		var text = document.createElementNS('http://www.w3.org/2000/svg','text');
+		effectGroup.appendChild(text);
+		text.innerHTML = string;
+		text.setAttribute('x',0);
+		text.setAttribute('y',-1);
+		text.setAttribute('font-size',20);
+		text.setAttribute('font-weight','bold');
+// 		text.setAttribute('stroke','black');
+		text.setAttribute('fill',color);
+		text.setAttribute('text-anchor','middle');
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		text.appendChild(animateTransform);
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','scale');
+		animateTransform.setAttribute('from','1' );
+		animateTransform.setAttribute('to','5');
+		animateTransform.setAttribute('dur','0.5s');
+		animateTransform.setAttribute('begin','indefinite');
+		animateTransform.setAttribute('fill','freeze');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount',1);
+// 		animateTransform.beginElement();
+		setTimeout(view.startEffectAnimate.bind(this,animateTransform),delay);
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		text.appendChild(animateTransform);
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','rotate');
+		animateTransform.setAttribute('from','0 0 0' );
+		animateTransform.setAttribute('to',angle+' 0 0');
+		animateTransform.setAttribute('dur','0.5s');
+		animateTransform.setAttribute('begin','indefinite');
+		animateTransform.setAttribute('fill','freeze');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount',1);
+// 		animateTransform.beginElement();
+		setTimeout(view.startEffectAnimate.bind(this,animateTransform),delay);
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animate');
+		text.appendChild(animateTransform);
+		animateTransform.setAttribute('attributeName','opacity');
+		animateTransform.setAttribute('from','1' );
+		animateTransform.setAttribute('to','0');
+		animateTransform.setAttribute('dur','1.5s');
+		animateTransform.setAttribute('begin','indefinite');
+		animateTransform.setAttribute('fill','freeze');
+// 		animateTransform.beginElement();
+		setTimeout(view.startEffectAnimate.bind(this,animateTransform),delay);
+		var animateTransform = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+		text.appendChild(animateTransform);
+		animateTransform.setAttribute('attributeName','transform');
+		animateTransform.setAttribute('attributeType','XML');
+		animateTransform.setAttribute('type','translate');
+		animateTransform.setAttribute('from','0 0' );
+		animateTransform.setAttribute('to','0 -50');
+		animateTransform.setAttribute('dur','0.5s');
+		animateTransform.setAttribute('begin','indefinite');
+		animateTransform.setAttribute('fill','freeze');
+		animateTransform.setAttribute('additive','sum');
+		animateTransform.setAttribute('repeatCount',1);
+// 		animateTransform.beginElement();
+		setTimeout(view.startEffectAnimate.bind(this,animateTransform),delay);
+		setTimeout(view.clearEffect.bind(this,pawn),1200);
+	},
+	
+	startEffectAnimate: function(element) {
+		element.beginElement();
+	},
+	
+	clearEffect: function(pawn) {
+		var effectGroup = document.getElementById(pawn.id+'EffectsGroup');
+		effectGroup.innerHTML = '';
 	},
 	
 	passageDisplaying: function() {

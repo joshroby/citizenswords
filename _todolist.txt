@@ -93,10 +93,22 @@ TO DO LIST CITIZEN SWORDS REDUX
 - murder, bind, and loot defeated human pawns
 - bronze hatchet has maneuvers
 - vendors
-
+- archive heroes on switching maps
+- hellpuppy gets un-archived with proper equipment slots
+- looting the well properly charges move
+- contextual actions proximity allows same-tile actions
+- avatar draw functions apply 'defeat' rotation-transform if the pawn is defeated
+- slaughter properly charges move
+- individual power/resist rolls for multiple effect maneuvers
+- maneuvers display verbose results in console, can easily move to player-accessible log
+- list totals for deflection, soak and aegis in inventory
+- ablative-use items (ablates condition)
+- keybinds no longer select disabled maneuvers
+- Avatar.apparentRace()
 
 CORE FUNCTIONALITY
-- split power/resist rolls for multiple effects
+
+
 - archiving maps on switch
 - ai pawns re-arm once disarmed
 - more garb & items
@@ -105,17 +117,24 @@ CORE FUNCTIONALITY
 	- stacks of background-y crates for the wharf?
 - ai heals and rallies
 
-OPTIONAL DISPLAY UPGRADES
+EXPANSION DISPLAY UPGRADES
 - wounds display as little fading pop-ups
-- list totals for deflection, soak and aegis in inventory
-- display cover on map
-- can floor tiles have round edges?
+- display cover on tiles (as in "Take Cover!!!")
 
-OPTIONAL FUNCTIONAL UPGRADES
+EXPANSION FUNCTIONAL UPGRADES
 - multi-hex targets
-- disarm to floor (requires items-on-floor architecture)
-- ablative-use items
-- standardized/frequently-used map events / macros
-- way to export svgs of any character, plus 'group shots'
+- items-on-floor architecture
+	- disarm to floor (requires )
+	- inventory overflow onto floor
+- standardized/frequently-used map events / macros (?)
+
+AT HEADQUARTERS:
+- nextLevel selection
+- hero roster management
+- debts / accounts management
+- news
+- progress-of-the-war counters
+- 'photobooth' to export svgs of any character, plus 'group shots'
+- mirror to change expression
 - salon to change hair
 - armor dummies to display sets of armor (pawns with garb)

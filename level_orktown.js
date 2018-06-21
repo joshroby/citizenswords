@@ -58,8 +58,8 @@ var level_orktown = {
 	],
 	
 	standees: [
-// 		{type:'heroes',locs:[{x:-5,y:-6},{x:-4,y:-4},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
-		{type:'heroes',locs:[{x:0,y:0},{x:1,y:0},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
+// 		{type:'heroes',locs:[{x:-6,y:-2},{x:-8,y:-2},{x:-1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
+		{type:'heroes',locs:[{x:0,y:0},{x:-1,y:0},{x:1,y:0},{x:2,y:0},{x:-2,y:0},{x:3,y:0}]},
 		{type:'pawn',id:'alfie',team:'bystander',priorities:{freeze:true},locs:[{x:-5.5,y:-7}],events:{dialogue:'alfieTalk'}},
 		{type:'landscape',key:'sewerGrate',locs:[{x:-5,y:-6}]},
 		{type:'pawn',id:'aaron',team:'watch',priorities:{freeze:true},locs:[{x:-11.5,y:-1}],events:{dialogue:'aaronTalk'}},
@@ -143,6 +143,7 @@ var level_orktown = {
 			{x:12.5,y:-9}
 		]},
 		{moveCost:2,locs:[
+			{x:7.5,y:-9},{x:8,y:-10},{x:9,y:-10},{x:10,y:-10},{x:11,y:-10},
 			{x:7.5,y:-3},{x:8.5,y:-3},{x:9.5,y:-3},
 			{x:8,y:-2},{x:9,y:-2},
 			{x:7.5,y:-1},{x:8.5,y:-1},{x:9.5,y:-1},
@@ -382,7 +383,7 @@ var level_orktown = {
 			var motherSkullgoblet = game.map.findMob('motherSkullgoblet');
 			var string = "Help!  Looters! Thieves!  They're ransacking my poor shop!  Help!";
 			gamen.displayPassage(new Passage(string,undefined,false,motherSkullgoblet.name,motherSkullgoblet.avatar.svg('bust'),'right'));
-			string = "Look, "+p1.name+", you know I'm always up for a street brawl, but look at those assholes' clothes.  They're not from Orktown, they're slumming it down here and could be more trouble than a few bruises and scorch marks for us. And we've got to find the guildmaster while he's still slumming it in our neighborhood.  Do we really want to involve ourselves in this?";
+			string = "Look, "+p1.name+", you know I'm always up for a street brawl, but look at those assholes' clothes.  They're not from Orktown, they're slumming it down here and could be more trouble than a few bruises and scorch marks for us. And we've got to find the guildmaster while <em>he's</em> still slumming it in our neighborhood.  Do we really want to involve ourselves in this?";
 			gamen.displayPassage(new Passage(string,[new Choice("We'll Get Them, MG!",game.currentLevel.events.stopThief),new Choice("Not Our Problem.",game.currentLevel.events.abdicate)],false,stout.name,stout.avatar.svg('bust'),'left'));
 		},
 		stopThief: function() {
@@ -405,7 +406,7 @@ var level_orktown = {
 			looter2.priorities.freeze = undefined;
 			view.panToTile(looter1.tile);
 			var epithet = 'point-lover';
-			if (p1.avatar.pointness > 2) {
+			if (p1.avatar.apparentRace().index > 2) {
 				epithet = 'pointy';
 			};
 			var string = "Stay out of our way, "+epithet+"!  This city's going to burn, and we're getting ours while we can.  You should, too!";
@@ -477,10 +478,13 @@ var level_orktown = {
 			var iconoclast = game.map.findMob('iconoclast');
 			var vicarKakkel = game.map.findMob('vicarKakkel');
 			iconoclast.priorities.freeze = true;
-			string = "The would-be iconoclast crumples to the ground.  The icon falls from "+iconoclast.pro('poss')+" grip into the soft grass.";
-			gamen.displayPassage(new Passage(string,undefined,true,undefined,iconoclast.avatar.svg('bust'),'right'));
+			var iconSVG = document.createElementNS('http://www.w3.org/2000/svg','svg');
+			iconSVG.setAttribute('viewBox','21 -62 50 50');
+			iconSVG.appendChild(iconoclast.avatar.sovereignIcon(iconoclast.equipment.left,'noHands'));
+			string = "The would-be iconoclast crumples to the ground.  The icon falls from "+iconoclast.pro('possAdj')+" grip into the soft grass.";
+			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,undefined,iconSVG,'right'));
 			string = "The Pantheon's blessings upon you!  Thank you so much, "+p1.name+".  We wouldn't be able to hold proper services without this icon.  What kind of temple would we be with only five shrines?";
-			gamen.displayPassage(new Passage(string,[new Choice('Continue',game.currentLevel.events.stoutOut)],true,vicarKakkel.name,vicarKakkel.avatar.svg('bust'),'right'));
+			gamen.displayPassage(new Passage(string,[new Choice('Continue',game.currentLevel.events.stoutOut)],false,vicarKakkel.name,vicarKakkel.avatar.svg('bust'),'right'));
 		},
 		letsTalk: function() {
 			var p1 = game.map.findMob('p1');
@@ -746,6 +750,7 @@ var level_orktown = {
 		},
 		endOfContent: function() {
 			var josh = new Pawn('josh');
+			game.map.pawns.splice(game.map.pawns.indexOf(josh),1);
 			string = "You've reached the end of current content!<p />Thanks so much for playing.  I'm really looking forward to developing <em>Citizen Swords</em> further.  Next up will be setting up your company headquarters and venturing out on adventures to support the city of Pileas's independence.  I'm hoping to include thrilling heroics, vicious politics, romance, family drama, and a few kitchen sinks.";
 			string += "<p />If you'd like to support the game's development, click on the Patreon button above.";
 			string += "<p />Thanks again for playing!";

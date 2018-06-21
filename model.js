@@ -92,10 +92,16 @@ function Game() {
 		for (var event of game.map.loadEvents) {
 			event();
 		};
+		view.focus = {};
 	};
 	
 	this.switchMaps = function(newLevel) {
 		console.log('archive old map here');
+		for (var pawn of game.map.pawns) {
+			if (game.cast[pawn.id] !== undefined) {
+				game.cast[pawn.id] = pawn.serialize();
+			};
+		};
 		game.loadMap(newLevel);
 	};
 	
@@ -108,42 +114,43 @@ function Game() {
 	};
 	
 	this.updateTrade = function(initialize) {
-		var leftBalance = 0,rightBalance = 0, value;
-		for (var slot in game.currentTrade.leftTrader.equipment) {
-			if (game.currentTrade.leftTrader.equipment[slot] !== undefined) {
-				value = data.items[game.currentTrade.leftTrader.equipment[slot].template].value;
-			} else {
-				value = 0;
+		if (game.currentTrade !== undefined) {
+			var leftBalance = 0,rightBalance = 0, value;
+			for (var slot in game.currentTrade.leftTrader.equipment) {
+				if (game.currentTrade.leftTrader.equipment[slot] !== undefined) {
+					value = data.items[game.currentTrade.leftTrader.equipment[slot].template].value;
+				} else {
+					value = 0;
+				};
+				leftBalance += value;
 			};
-			leftBalance += value;
-		};
-		for (var i=0;i<game.currentTrade.leftTrader.inventory.length;i++) {
-			value = data.items[game.currentTrade.leftTrader.inventory[i].template].value;
-			leftBalance += value;
-		};
-		for (var slot in game.currentTrade.rightTrader.equipment) {
-			if (game.currentTrade.rightTrader.equipment[slot] !== undefined) {
-				value = data.items[game.currentTrade.rightTrader.equipment[slot].template].value;
-			} else {
-				value = 0;
+			for (var i=0;i<game.currentTrade.leftTrader.inventory.length;i++) {
+				value = data.items[game.currentTrade.leftTrader.inventory[i].template].value;
+				leftBalance += value;
 			};
-			rightBalance += value;
+			for (var slot in game.currentTrade.rightTrader.equipment) {
+				if (game.currentTrade.rightTrader.equipment[slot] !== undefined) {
+					value = data.items[game.currentTrade.rightTrader.equipment[slot].template].value;
+				} else {
+					value = 0;
+				};
+				rightBalance += value;
+			};
+			for (var i=0;i<game.currentTrade.rightTrader.inventory.length;i++) {
+				value = data.items[game.currentTrade.rightTrader.inventory[i].template].value;
+				rightBalance += value;
+			};
+			if (initialize) {
+				game.currentTrade.startBalance = leftBalance - rightBalance;
+				game.currentTrade.currentBalance = leftBalance - rightBalance;
+			} else {
+				game.currentTrade.currentBalance = leftBalance - rightBalance;
+			};
+			view.updateTrade();
 		};
-		for (var i=0;i<game.currentTrade.rightTrader.inventory.length;i++) {
-			value = data.items[game.currentTrade.rightTrader.inventory[i].template].value;
-			rightBalance += value;
-		};
-		if (initialize) {
-			game.currentTrade.startBalance = leftBalance - rightBalance;
-			game.currentTrade.currentBalance = leftBalance - rightBalance;
-		} else {
-			game.currentTrade.currentBalance = leftBalance - rightBalance;
-		};
-		view.updateTrade();
 	};
 	
 	this.finalizeTrade = function() {
-		console.log('finalizing');
 		if (game.currentTrade !== undefined) {
 			var traderID = game.currentTrade.leftTrader.id;
 			if (game.players[0].debts[traderID] == undefined) {
@@ -245,6 +252,7 @@ function Map(level) {
 			};
 		};
 		
+		// Standees
 		var heroIndex = 0;
 		for (var standee of level.standees) {
 			for (var loc of standee.locs) {
@@ -586,6 +594,7 @@ function Pawn(template,tile,team,priorities) {
 			source = data.cast[template];
 			if (source.unique) {
 				this.id = template;
+				game.cast[template] = {};
 			} else {
 				this.id = template + '_' + Math.random().toString(36).slice(2);
 			};
@@ -599,6 +608,7 @@ function Pawn(template,tile,team,priorities) {
 			this.human = true;
 		} else if (source.beastType !== undefined) {
 			this.avatar = new AvatarBeast(this,source.beastType);
+			this.beastType = source.beastType;
 		} else {
 			this.avatar = new Avatar(this);
 			this.human = true;
@@ -725,12 +735,14 @@ function Pawn(template,tile,team,priorities) {
 		flatObject.name = this.name;
 		flatObject.pronoun = this.pronoun;
 		flatObject.avatarParameters = this.avatar.parameters;
+		flatObject.beastType = this.beastType;
 		flatObject.stats = {};
 		for (var stat in this.stats) {
 			if (stat.indexOf('Max') !== -1) {
 				flatObject.stats[stat.substr(0,stat.length-3)] = this.stats[stat];
 			};
 		};
+		flatObject.slots = Object.keys(this.equipment);
 		flatObject.equipment = {};
 		for (var slot in this.equipment) {
 			flatObject.equipment[slot] = undefined;
@@ -1042,6 +1054,7 @@ function Pawn(template,tile,team,priorities) {
 		};
 		this.morale +=  2 * effect.strength / (this.stats.moveMax + this.stats.strengthMax + this.stats.focusMax);
 		view.animateNerf(this);
+		view.displayEffect(this,effect);
 		if (oldMorale > 0 && this.morale <= 0) {
 			this.defeat();
 		};
@@ -1054,7 +1067,7 @@ function Pawn(template,tile,team,priorities) {
 		if (oldMorale <= 0 && this.morale > 0) {
 			this.revive();
 		};
-
+		view.displayEffect(this,effect);
 	};
 	
 	this.takeHeal = function(effect) {
@@ -1069,9 +1082,8 @@ function Pawn(template,tile,team,priorities) {
 		if (targetWound.strength == 0) {
 			console.log('no healable wound');
 		} else {
-			this.wounds.move.splice(this.wounds.move.indexOf(targetWound),1);
-			this.wounds.strength.splice(this.wounds.strength.indexOf(targetWound),1);
-			this.wounds.focus.splice(this.wounds.focus.indexOf(targetWound),1);
+			this.wounds[targetWound.stat].splice(this.wounds[targetWound.stat].indexOf(targetWound),1);
+			view.displayEffect(this,effect);
 		};
 		view.animateBuff(this);
 	};
@@ -1079,6 +1091,7 @@ function Pawn(template,tile,team,priorities) {
 	this.takeRefresh = function(effect) {
 		this.stats[effect.stat] = Math.min(this.stats[effect.stat] + effect.num,this.stats[effect.stat+"Max"]);
 		view.animateBuff(this);
+		view.displayEffect(this,effect);
 	};
 	
 	this.takeKnockback = function(effect,enactor) {
@@ -1107,7 +1120,8 @@ function Pawn(template,tile,team,priorities) {
 			this.tile = nearestTile;
 			nearestTile.occupants.unshift(this);
 			view.movePawn(this);
-		this.look();
+			this.look();
+			view.displayEffect(this,effect);
 		};
 		view.animateNerf(this);
 	};
@@ -1125,6 +1139,7 @@ function Pawn(template,tile,team,priorities) {
 		};
 		view.redrawPawn(this);
 		view.animateNerf(this);
+		view.displayEffect(this,effect);
 	};
 	
 	this.defeat = function() {
@@ -1195,6 +1210,8 @@ function Pawn(template,tile,team,priorities) {
 	};
 	
 	this.kill = function() {
+		view.focus.lastPawn.stats.move -= 1;
+		view.updateSheet(view.focus.lastPawn);
 		view.openTrade(this,view.focus.lastPawn);
 		for (var stat in this.stats) {
 			this.stats[stat] = 0;
@@ -1207,17 +1224,20 @@ function Pawn(template,tile,team,priorities) {
 		view.focus.lastPawn.stats.move -= 2;
 		this.wounds.move.push({name:'restraints',stat:'move',strength:-1*this.stats.moveMax,type:'restraints',woundType:'restraints'});
 		this.stats.move = 0;
+		view.updateSheet(view.focus.lastPawn);
 		view.updateSheet(this);
 	};
 	
 	this.loot = function() {
 		view.focus.lastPawn.stats.move -= 3;
+		view.updateSheet(view.focus.lastPawn);
 		view.openTrade(this,view.focus.lastPawn);
 	};
 	
 	this.trade = function() {
 		console.log('trade!');
 		view.focus.lastPawn.stats.move -= 5;
+		view.updateSheet(view.focus.lastPawn);
 		game.currentTrade = {
 			leftTrader: this,
 			rightTrader: view.focus.lastPawn,
@@ -1268,6 +1288,7 @@ function Pawn(template,tile,team,priorities) {
 			itemCount += this.inventory.length;
 			if (itemCount == 0 && this.tile !== undefined) {
 				view.removeStandee(this);
+				this.tile.occupants.splice(this.tile.occupants.indexOf(this),1);
 				this.tile = undefined;
 			};
 		} else {
@@ -1456,6 +1477,8 @@ function Thing(template,tile,inventory,lootable,triggers,id) {
 	this.interact = function() {};
 	
 	this.loot = function() {
+		view.focus.lastPawn.stats.move -= 3;
+		view.updateSheet(view.focus.lastPawn);
 		view.openTrade(this,view.focus.lastPawn);
 	};
 
@@ -1601,7 +1624,7 @@ function Maneuver(maneuver,item) {
 	for (var stat in costs) {
 		this.cost[stat] = data.maneuvers[maneuver].costs[stat](item);
 	};
-	this.consumesUses = data.maneuvers[maneuver].consumesUses;
+	this.consumesCondition = data.maneuvers[maneuver].consumesCondition;
 	
 	this.attack = false;
 	for (var effect of this.effects) {
@@ -1665,9 +1688,9 @@ function Maneuver(maneuver,item) {
 		for (var stat in this.cost) {
 			this.item.pawn.stats[stat] -= this.cost[stat]
 		};
-		if (this.consumesUses) {
-			this.item.uses -= this.consumesUses;
-			if (this.item.uses < 1) {
+		if (this.consumesCondition) {
+			this.item.condition -= this.consumesCondition();
+			if (this.item.condition <= 0) {
 				for (var slot in this.item.pawn.equipment) {
 					if (this.item.pawn.equipment[slot] == this.item) {
 						this.item.pawn.equipment[slot] = undefined;
@@ -1720,8 +1743,9 @@ function Maneuver(maneuver,item) {
 	};
 	
 	this.basic = function(targets) {
-		var actionRoll, reactionRoll, power, penalty = 0;
+		var actionRoll, reactionRoll, power, penalty = 0, effectDescription;
 		for (var target of targets) {
+			var animate = false;
 			if (this.cover) {
 				for (var occupant of target.tile.occupants) {
 					if (occupant.cover !== undefined) {
@@ -1731,14 +1755,37 @@ function Maneuver(maneuver,item) {
 			};
 			actionRoll = this.roll(this.item.pawn,'action',penalty);
 			reactionRoll = this.roll(target,'reaction');
-			console.log(this.id,actionRoll > reactionRoll,'ACT',Math.round(actionRoll*10)/10,'REA',Math.round(reactionRoll*10)/10);
+			var logString = this.item.pawn.name+' uses '+this.name+' on '+target.name;
 			if (actionRoll > reactionRoll) {
-				powerRoll = this.roll(this.item.pawn,'power');
-				resistRoll = this.roll(target,'resist');
-				console.log(this.id,powerRoll > resistRoll,'POW',powerRoll,'RES',resistRoll);
-				if (resistRoll == 0) {resistRoll = 1};
-				strength = Math.max(1,powerRoll / resistRoll);
-				target.applyEffects(this.effects,strength,this.item.pawn);
+				logString += ' and SUCCEEDS, '+Math.round(actionRoll*10)/10+' vs '+Math.round(reactionRoll*10)/10+'!';
+				for (var effect of this.effects) {
+					powerRoll = this.roll(this.item.pawn,'power');
+					resistRoll = this.roll(target,'resist');
+					if (resistRoll == 0) {resistRoll = 1};
+					strength = Math.max(1,powerRoll / resistRoll);
+					target.applyEffects([effect],strength,this.item.pawn);
+					animate = true;
+					if (effect.type == 'wound') {
+						effectDescription = effect.name + " " + effect.type + " effect (" + effect.woundType + "/" + effect.stat+")";
+					} else {
+						effectDescription = effect.type;
+					};
+					logString += " "+target.name+" takes a magnitude "+Math.round(strength*10)/10+" "+effectDescription+" ("+Math.round(powerRoll*10)/10+" vs "+Math.round(resistRoll*10)/10+").";
+				};
+			} else {
+				logString += ' and MISSES, '+Math.round(actionRoll*10)/10+' vs '+Math.round(reactionRoll*10)/10+'!';
+				var effect = {type:'defend'};
+				if (this.rollStats.reaction.itemStat == 'aegis') {
+					effect.name = 'Resist';
+				} else if (this.rollStats.reaction.itemStat == 'deflection') {
+					effect.name = 'Parry';
+				} else if (this.rollStats.reaction.itemStat == 'soak') {
+					effect.name = 'Block';
+				};
+				view.displayEffect(target,effect);
+			};
+			console.log(logString);
+			if (animate) {
 				view.animateInteract(this.item.pawn,target,undefined);
 			};
 		};
