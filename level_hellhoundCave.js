@@ -128,8 +128,12 @@ var hellhoundCave = {
 		event1: function(pawn,tile) {
 			var p1 = game.map.heroes[0];
 			var ms = game.map.heroes[1];
-			var introOne = new Passage("The hellhound that has plagued the locals lurks within this cave!",undefined,undefined,p1.name,p1.avatar.svg('bust'),'left');
-			var introTwo = new Passage("I am skeptical of the wisdom of the two of us, mere youngsters looking to make our mark on a vast and hostile world, trying to take down a hellhound.  Yet, my steadfast loyalty to you, my childhood friend, impels me to join you in this misadventure.",undefined,undefined,ms.name,ms.avatar.svg('bust'),'right');
+// 			p1.avatar.expression('determined');
+			var introOne = new Passage("The hellhound that has plagued the locals lurks within this cave!",undefined,undefined,p1.name,p1.avatar.svg('bust','determined'),'left');
+// 			p1.avatar.expression('resting');
+// 			ms.avatar.expression('cocky');
+			var introTwo = new Passage("I am skeptical of the wisdom of the two of us, mere youngsters looking to make our mark on a vast and hostile world, trying to take down a hellhound.  Yet, my steadfast loyalty to you, my childhood friend, impels me to join you in this misadventure.",undefined,undefined,ms.name,ms.avatar.svg('bust','cocky'),'right');
+// 			ms.avatar.expression('resting');
 			gamen.displayPassage(introOne);
 			gamen.displayPassage(introTwo);
 		},

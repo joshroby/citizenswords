@@ -251,6 +251,11 @@ var level_orktown = {
 				} else if (wagons[0].fire !== undefined && wagons[0].fire.stats.strength > 3) {
 					game.currentLevel.events.silosUpInFlames();
 				};
+				for (var pawn of game.map.pawns) {
+					if (pawn.team == 'fire' && pawn.morale <= 0) {
+						pawn.dead = true;
+					};
+				};
 			};
 			for (var thing of game.map.things) {
 				if (thing.avatar.type == 'well') {
@@ -480,7 +485,7 @@ var level_orktown = {
 			iconoclast.priorities.freeze = true;
 			var iconSVG = document.createElementNS('http://www.w3.org/2000/svg','svg');
 			iconSVG.setAttribute('viewBox','21 -62 50 50');
-			iconSVG.appendChild(iconoclast.avatar.sovereignIcon(iconoclast.equipment.left,'noHands'));
+			iconSVG.appendChild(iconoclast.avatar.sovereignIcon(iconoclast.equipment.left,false));
 			string = "The would-be iconoclast crumples to the ground.  The icon falls from "+iconoclast.pro('possAdj')+" grip into the soft grass.";
 			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,undefined,iconSVG,'right'));
 			string = "The Pantheon's blessings upon you!  Thank you so much, "+p1.name+".  We wouldn't be able to hold proper services without this icon.  What kind of temple would we be with only five shrines?";
@@ -730,6 +735,10 @@ var level_orktown = {
 			var stout = game.map.findMob('mixterStout');
 			var daisy = game.map.findMob('daisy');
 			var guildmasterMoucau = game.map.findMob('guildmasterMoucau');
+			if (daisy.morale <= 0) {
+				daisy.morale = 1;
+				daisy.revive();
+			};
 			string = "I owe you my life!  Thank you, thank you!<p>You know what?  I'll pay your registration fee and get you that charter.  I think this city needs brave heroes like you!";
 			gamen.displayPassage(new Passage(string,[new Choice('Continue')],true,guildmasterMoucau.name,guildmasterMoucau.avatar.svg('bust'),'right'));
 			string = "If you'll be fighting the cowards that tried to kill my father, I'll join your ranks.";

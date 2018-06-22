@@ -524,7 +524,7 @@ var data = {
 			value: 20,
 			stats: {},
 			maneuvers: ['hack'],
-			svgNodes: function(item) {return item.pawn.avatar.simpleAxe(item)},
+			svgNodes: function(item,hands) {return item.pawn.avatar.simpleAxe(item,hands)},
 		},
 		
 		candelabrum: {
@@ -537,7 +537,7 @@ var data = {
 				flame: 'orange',
 			},
 			value: 100,
-			svgNodes: function(item) {return item.pawn.avatar.candelabrum(item)},
+			svgNodes: function(item,hands) {return item.pawn.avatar.candelabrum(item,hands)},
 		},
 		
 		chainsOfOffice: {
@@ -572,7 +572,7 @@ var data = {
 				weight: 1,
 			},
 			maneuvers: ['hook','gouge'],
-			svgNodes: function(item) {return item.pawn.avatar.cargoHook(item)},
+			svgNodes: function(item,hands) {return item.pawn.avatar.cargoHook(item,hands)},
 		},
 		
 		circleMedallion: {
@@ -725,7 +725,7 @@ var data = {
 				weight: 4,
 			},
 			maneuvers: ['batter','swing'],
-			svgNodes: function(item) {return item.pawn.avatar.hammer(item)},
+			svgNodes: function(item,hands) {return item.pawn.avatar.hammer(item,hands)},
 		},
 		
 		initiatesRobes: {
@@ -765,7 +765,7 @@ var data = {
 				weight: 2,
 			},
 			maneuvers: ['beam','quickTrance'],
-			svgNodes: function(item) {return item.pawn.avatar.book(item)},
+			svgNodes: function(item,hands) {return item.pawn.avatar.book(item,hands)},
 		},
 		
 		knife: {
@@ -786,7 +786,7 @@ var data = {
 				weight: 2,
 			},
 			maneuvers: ['slash','feint'],
-			svgNodes: function(item) {return item.pawn.avatar.simpleKnife(item)},
+			svgNodes: function(item,hands) {return item.pawn.avatar.simpleKnife(item,hands)},
 		},
 		
 		mothersSword: {
@@ -808,7 +808,7 @@ var data = {
 				weight: 3,
 			},
 			maneuvers: ['slash','lunge','feint'],
-			svgNodes: function(item) {return item.pawn.avatar.simpleSword(item)},
+			svgNodes: function(item,hands) {return item.pawn.avatar.simpleSword(item,hands)},
 		},
 		
 		nightworkArmor: {
@@ -876,7 +876,7 @@ var data = {
 				weight: 8,
 			},
 			maneuvers: ['beam','quickTrance'],
-			svgNodes: function(item) {return item.pawn.avatar.book(item)},
+			svgNodes: function(item,hands) {return item.pawn.avatar.book(item,hands)},
 		},
 	
 		ratHide: {
@@ -1006,7 +1006,7 @@ var data = {
 				weight: 3,
 			},
 			maneuvers: ['lunge'],
-			svgNodes: function(item) {return item.pawn.avatar.simpleSpear(item)},
+			svgNodes: function(item,hands) {return item.pawn.avatar.simpleSpear(item,hands)},
 		},
 	
 		shortSword: {
@@ -1027,7 +1027,7 @@ var data = {
 				weight: 3,
 			},
 			maneuvers: ['slash','lunge'],
-			svgNodes: function(item) {return item.pawn.avatar.simpleSword(item)},
+			svgNodes: function(item,hands) {return item.pawn.avatar.simpleSword(item,hands)},
 		},
 		
 		skoglandArmor: {
@@ -1070,7 +1070,7 @@ var data = {
 			value: 0,
 			stats: {},
 			maneuvers: [],
-			svgNodes: function(item) {return item.pawn.avatar.sovereignIcon(item)},
+			svgNodes: function(item,hands) {return item.pawn.avatar.sovereignIcon(item,hands)},
 		},
 		
 		staff: {
@@ -1083,7 +1083,7 @@ var data = {
 			stats: {
 			},
 			maneuvers: [],
-			svgNodes: function(item) {return item.pawn.avatar.simpleStaff(item)},
+			svgNodes: function(item,hands) {return item.pawn.avatar.simpleStaff(item,hands)},
 		},
 		
 		vicarRobes: {
@@ -1120,7 +1120,7 @@ var data = {
 				weight: 1,
 			},
 			maneuvers: ['beam'],
-			svgNodes: function(item) {return item.pawn.avatar.wand(item)},
+			svgNodes: function(item,hands) {return item.pawn.avatar.wand(item,hands)},
 		},
 		
 		watchArmor: {
@@ -1165,7 +1165,7 @@ var data = {
 				capacity: 3,
 			},
 			maneuvers: ['douse'],
-			svgNodes: function(item) {return item.pawn.avatar.bucket(item)},
+			svgNodes: function(item,hands) {return item.pawn.avatar.bucket(item,hands)},
 		},
 	},
 	
@@ -1576,7 +1576,7 @@ var data = {
 				resist: {pawnStat: 'strength',itemStat: 'soak'},
 			},
 			effects: [
-				{type:'wound',stat:'move',name:'blunt',woundType:'physical'},
+				{type:'wound',stat:'move',name:'crush',woundType:'physical'},
 				{type:'wound',stat:'focus',name:'blunt',woundType:'physical'},
 				{type:'knockback'},
 			],
@@ -1752,8 +1752,9 @@ var data = {
 		orktownShanty: {
 			sprite: 'orktownShanty',
 			path: 'sprites/orktownShanty.svg',
+			height: 150,
 			width: 200,
-			yOffset: 0,
+			yOffset: -50,
 			blockView: true,
 			exclusive: true,
 			cover: 0,
@@ -1891,6 +1892,7 @@ var data = {
 		bite: ["Nibbled","Bitten","Savaged","Mauled",'Chewed Up'],
 		blunt: ["Dazed","Battered","Bruised","Concussion"],
 		confuse: ["Misled","Distracted","Confused","Frazzled","Baffled","Bewildered","Disoriented"],
+		crush: ["Bruised","Staggered","Limping"],
 		fire: ["Singed","Toasty","Burnt","Charred"],
 		cold: ["Frostbitten","Chilled","Frozen"],
 		sharp: ["Scratched","Cut Up","Lacerated","Blood Everywhere"],

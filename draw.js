@@ -227,11 +227,75 @@ function Avatar(pawn,heritages) {
 		return {index:pointness,string:raceString};
 	};
 	
+	this.currentExpression = 'resting';
+	this.expressions = {};
+	this.expression = function(expression) {
+		var expressionParameters = [
+			'insideEyelidCurve',
+			'leftBrowTilt',
+			'lowerEyelidCurve',
+			'mouthOpen',
+			'outsideEyelidCurve',
+			'rightBrowTilt',
+			'smile',
+			'teeth',
+		];
+		if (expression !== 'resting' && this.currentExpression == 'resting') {
+			this.expressions.resting = {};
+			for (var parameter of expressionParameters) {
+				this.expressions.resting[parameter] = this.parameters[parameter];
+			};
+		};
+		if (this.expressions[expression] !== undefined) {
+			for (var parameter in this.expressions.resting) {
+				this.parameters[parameter] = (this.expressions.resting[parameter] + this.expressions[expression][parameter]*2) /3;
+			};
+			this.currentExpression = expression;
+		};
+	};
+// 	this.expressions.min = {
+// 		insideEyelidCurve: -2,
+// 		outsideEyelidCurve: 2,
+// 		lowerEyelidCurve: 4,
+// 		leftBrowTilt: -4,
+// 		rightBrowTilt: -4,
+// 		mouthOpen: 0,
+// 		smile: -7,
+// 		teeth: 0,
+// 	};
+// 	this.expressions.max = {
+// 		insideEyelidCurve: 5,
+// 		outsideEyelidCurve: 8,
+// 		lowerEyelidCurve: 7,
+// 		leftBrowTilt: 5,
+// 		rightBrowTilt: 5,
+// 		mouthOpen: 5,
+// 		smile: 7,
+// 		teeth: 4,
+// 	};
+	this.expressions.angry = {"insideEyelidCurve":-2,"outsideEyelidCurve":8,"lowerEyelidCurve":4,"leftBrowTilt":-2,"rightBrowTilt":-3,"mouthOpen":0,"smile":-4,"teeth":4};
+	this.expressions.cocky = {"insideEyelidCurve":-2,"outsideEyelidCurve":6,"lowerEyelidCurve":7,"leftBrowTilt":5,"rightBrowTilt":-3,"mouthOpen":2,"smile":2,"teeth":4};
+	this.expressions.determined = {"insideEyelidCurve":-2,"outsideEyelidCurve":8,"lowerEyelidCurve":5,"leftBrowTilt":1,"rightBrowTilt":1,"mouthOpen":4,"smile":2,"teeth":4};
+	this.expressions.happy = {"insideEyelidCurve":5,"outsideEyelidCurve":8,"lowerEyelidCurve":4,"leftBrowTilt":5,"rightBrowTilt":5,"mouthOpen":5,"smile":3,"teeth":4};
+	this.expressions.horror = {"insideEyelidCurve":5,"outsideEyelidCurve":8,"lowerEyelidCurve":5,"leftBrowTilt":0,"rightBrowTilt":0,"mouthOpen":5,"smile":-7,"teeth":0};
+	this.expressions.placid = {"insideEyelidCurve":-2,"outsideEyelidCurve":2,"lowerEyelidCurve":7,"leftBrowTilt":-2,"rightBrowTilt":-2,"mouthOpen":0,"smile":0,"teeth":0};
+	this.expressions.unamused = {"insideEyelidCurve":-2,"outsideEyelidCurve":2,"lowerEyelidCurve":4,"leftBrowTilt":-4,"rightBrowTilt":-4,"mouthOpen":0,"smile":-2,"teeth":0};
+	this.expressions.sad = {"insideEyelidCurve":5,"outsideEyelidCurve":2,"lowerEyelidCurve":4,"leftBrowTilt":-4,"rightBrowTilt":-4,"mouthOpen":2,"smile":-3,"teeth":0};
+	this.expressions.surprsise = {"insideEyelidCurve":5,"outsideEyelidCurve":8,"lowerEyelidCurve":7,"leftBrowTilt":5,"rightBrowTilt":5,"mouthOpen":5,"smile":-2,"teeth":0};
+	this.exportExpression = function() {
+		var expressionParameters = Object.keys(this.expressions.min);
+		var expression = {};
+		for (var parameter of expressionParameters) {
+			expression[parameter] = this.parameters[parameter];
+		};
+		console.log(JSON.stringify(expression));
+	};
+	
 	
 	
 	// The Monster
 	
-	this.svg = function(shot) {
+	this.svg = function(shot,expression) {
 		var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
 		if (shot == undefined || shot == 'fullBody') {
 			svg.setAttribute('viewBox','-25 -50 50 50');
@@ -240,12 +304,17 @@ function Avatar(pawn,heritages) {
 		} else if (shot == 'bust') {
 			svg.setAttribute('viewBox','-50 -50 100 100');
 		};
-		svg.appendChild(this.draw());
+		svg.appendChild(this.draw(expression));
 		return svg;
 	};
 	
 	
-	this.draw = function() {
+	this.draw = function(expression) {
+
+		if (expression !== undefined) {
+			this.expression(expression);
+			setTimeout(this.expression.bind(this,'resting'),10);
+		};
 
 		this.bodyConstants = {eyeline:-172,neck:-115};
 		var muzzle = false;
@@ -2459,7 +2528,7 @@ function Avatar(pawn,heritages) {
 		
 		this.bodyConstants.wrist = rightWristPivot;
 		if (rightEquip !== undefined) {
-			var rightEquipSVGNodes = rightEquip.svgNodes(rightEquip);
+			var rightEquipSVGNodes = rightEquip.svgNodes(rightEquip,true);
 			rightHandGroup.appendChild(rightEquipSVGNodes);
 		} else {
 			// draw empty hands
@@ -2471,7 +2540,7 @@ function Avatar(pawn,heritages) {
 		
 		this.bodyConstants.wrist = leftWristPivot;
 		if (leftEquip !== undefined) {
-			var leftEquipSVGNodes = leftEquip.svgNodes(leftEquip);
+			var leftEquipSVGNodes = leftEquip.svgNodes(leftEquip,true);
 			leftHandGroup.appendChild(leftEquipSVGNodes);
 		} else {
 			// draw empty hands
@@ -5201,7 +5270,7 @@ function Avatar(pawn,heritages) {
 		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
 		svgNodes.setAttribute('stroke-linejoin','round');
 		
-		if (hands !== 'noHands') {
+		if (hands) {
 			svgNodes.appendChild(this.palm());
 		};
 		
@@ -5281,7 +5350,7 @@ function Avatar(pawn,heritages) {
 		head.setAttribute('stroke','black');
 		head.setAttribute('fill',item.colors.figure);
 		
-		if (hands !== 'noHands') {
+		if (hands) {
 			svgNodes.appendChild(this.straightThumb());
 		};
 		

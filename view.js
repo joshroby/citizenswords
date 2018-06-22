@@ -300,6 +300,8 @@ var view = {
 				} else {
 					imageDimensions.yOffset = data[standee.type+'s'][standee.key].yOffset;
 				};
+				externalSprite.setAttribute('width',imageDimensions.width);
+				externalSprite.setAttribute('height',imageDimensions.height);
 				var xOffset = imageDimensions.width/-2;
 				var yOffset = (imageDimensions.height + imageDimensions.yOffset) * -1;
 				externalSprite.setAttribute('transform','translate('+xOffset+','+yOffset+')');

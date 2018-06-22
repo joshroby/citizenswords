@@ -1144,8 +1144,12 @@ function Pawn(template,tile,team,priorities) {
 	
 	this.defeat = function() {
 		if (this.events !== undefined && this.events.defeat !== undefined) {
-			console.log('defeat event:',this.events.defeat);
 			game.currentLevel.events[this.events.defeat](this);
+		};
+		for (var slot in this.equipment) {
+			if (this.equipment[slot] !== undefined) {
+				this.equipment[slot].condition *= Math.random();
+			};
 		};
 		this.exclusive = false;
 		view.refreshManeuvers(this);
