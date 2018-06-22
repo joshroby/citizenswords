@@ -105,10 +105,16 @@ TO DO LIST CITIZEN SWORDS REDUX
 - ablative-use items (ablates condition)
 - keybinds no longer select disabled maneuvers
 - Avatar.apparentRace()
+- expressions
+- silosUpInFlames resets level instead of moving you to start with water buckets
+- removes dead fires from model (game.map.tiles.occupants) in endTurn orktown event
 
 CORE FUNCTIONALITY
+- sigma on trade
 
 
+- condition loss on hits
+- condition affects value on trade
 - archiving maps on switch
 - ai pawns re-arm once disarmed
 - more garb & items
@@ -127,6 +133,7 @@ EXPANSION FUNCTIONAL UPGRADES
 	- disarm to floor (requires )
 	- inventory overflow onto floor
 - standardized/frequently-used map events / macros (?)
+- Alfie needs to produce rat armor
 
 AT HEADQUARTERS:
 - nextLevel selection

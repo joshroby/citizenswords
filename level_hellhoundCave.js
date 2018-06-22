@@ -87,7 +87,7 @@ var hellhoundCave = {
 		{check:'load',event:'event1'},
 		{check:'always',event:'signpost',locs:[{x:-1,y:0}]},
 		{check:'caveEntrance',event:'caveEntrance',locs:[{x:6.5,y:5}]},
-		{check:'undergroundRiver',event:'undergroundRiver',locs:[{x:9,y:0}]},
+		{check:'undergroundRiver',event:'undergroundRiver',locs:[{x:8,y:0},{x:9,y:0}]},
 		{check:'chestSpotted',event:'chestSpotted',locs:[{x:9.5,y:-1},{x:10.5,y:-1},{x:11,y:0}]},
 		{check:'whatElse',event:'whatElse',locs:[{x:12,y:0}]},
 		{check:'hellpuppy',event:'hellpuppy',locs:[{x:12.5,y:1}]},
@@ -129,7 +129,7 @@ var hellhoundCave = {
 			var p1 = game.map.heroes[0];
 			var ms = game.map.heroes[1];
 // 			p1.avatar.expression('determined');
-			var introOne = new Passage("The hellhound that has plagued the locals lurks within this cave!",undefined,undefined,p1.name,p1.avatar.svg('bust','determined'),'left');
+			var introOne = new Passage("The hellhound that has plagued the locals lurks within this cave!",undefined,undefined,p1.name,p1.avatar.svg('bust'),'left');
 // 			p1.avatar.expression('resting');
 // 			ms.avatar.expression('cocky');
 			var introTwo = new Passage("I am skeptical of the wisdom of the two of us, mere youngsters looking to make our mark on a vast and hostile world, trying to take down a hellhound.  Yet, my steadfast loyalty to you, my childhood friend, impels me to join you in this misadventure.",undefined,undefined,ms.name,ms.avatar.svg('bust','cocky'),'right');
@@ -147,7 +147,7 @@ var hellhoundCave = {
 			gamen.displayPassage(signpostPassage);
 		},
 		caveEntrance: function(pawn,tile) {
-			var passage = new Passage("Ugh, I see rat droppings.  Is this cave filled with giant rats?  What is this, the first level of a fantasy RPG?",undefined,undefined,pawn.name,pawn.avatar.svg('bust'),'left');
+			var passage = new Passage("Ugh, I see rat droppings.  Is this cave filled with giant rats?  What is this, the first level of a fantasy RPG?",undefined,undefined,pawn.name,pawn.avatar.svg('bust','disgust'),'left');
 			gamen.displayPassage(passage);
 			game.currentLevel.flags.caveEntrance = false;
 			for (var pawn of game.map.pawns) {
@@ -157,32 +157,32 @@ var hellhoundCave = {
 			};
 		},
 		ratNest: function(pawn) {
-			gamen.displayPassage(new Passage("Eugh, looks like their nest.  Gross.  Oh, but what's this?",undefined,true,pawn.name,pawn.avatar.svg('bust'),'left'));
+			gamen.displayPassage(new Passage("Eugh, looks like their nest.  Gross.  Oh, but what's this?",undefined,true,pawn.name,pawn.avatar.svg('bust','surprise'),'left'));
 			var bauble = new Item('bauble');
 			pawn.inventory.push(bauble);
 			gamen.displayPassage(new Passage("You found a "+bauble.name+"!"));
 			view.refreshItems(pawn);
 		},
 		undergroundRiver: function(pawn,tile) {
-			var passage = new Passage("Wow, look at all that water!  Fast-flowing, too.  Do you think it's an underground river?" ,undefined,undefined,pawn.name,pawn.avatar.svg('bust'),'left');
+			var passage = new Passage("Wow, look at all that water!  Fast-flowing, too.  Do you think it's an underground river?" ,undefined,undefined,pawn.name,pawn.avatar.svg('bust','surprise'),'left');
 			gamen.displayPassage(passage);
 			game.currentLevel.flags.undergroundRiver = false;
 		},
 		chestSpotted: function(pawn,tile) {
-			var passage = new Passage("Wait up.  Is that a strongbox?  With the sigil of the King on it?  What the heck is it doing down here?",undefined,undefined,pawn.name,pawn.avatar.svg('bust'),'left');
+			var passage = new Passage("Wait up.  Is that a strongbox?  With the sigil of the King on it?  What the heck is it doing down here?",undefined,undefined,pawn.name,pawn.avatar.svg('bust','curious'),'left');
 			gamen.displayPassage(passage);
 			var otherPawn = game.map.heroes[0];
 			if (pawn == game.map.heroes[0]) {otherPawn = game.map.heroes[1]};
-			var passage = new Passage("They say there are two underground rivers in Skogland: the Silver and the Gold.  And they're called that because the ogre kings stash their treasures in vaults along the river.  Maybe the chest came from a royal vault?",undefined,undefined,otherPawn.name,otherPawn.avatar.svg('bust'),'right');
+			var passage = new Passage("They say there are two underground rivers in Skogland: the Silver and the Gold.  And they're called that because the ogre kings stash their treasures in vaults along the river.  Maybe the chest came from a royal vault?",undefined,undefined,otherPawn.name,otherPawn.avatar.svg('bust','cocky'),'right');
 			gamen.displayPassage(passage);
 			game.currentLevel.flags.chestSpotted = true;
 		},
 		whatElse: function(pawn,tile) {
-			var passage = new Passage("Those vaults are guarded tighter than a drum, including summoning all sorts of protection with forbidden magic.  So if they've lost a treasure chest..." ,undefined,undefined,pawn.name,pawn.avatar.svg('bust'),'left');
+			var passage = new Passage("Those vaults are guarded tighter than a drum, including summoning all sorts of protection with forbidden magic.  So if they've lost a treasure chest..." ,undefined,undefined,pawn.name,pawn.avatar.svg('bust','cocky'),'left');
 			gamen.displayPassage(passage);
 			var otherPawn = game.map.heroes[0];
 			if (pawn == game.map.heroes[0]) {otherPawn = game.map.heroes[1]};
-			var passage = new Passage("...they might have lost a hellhound, too.",undefined,undefined,otherPawn.name,otherPawn.avatar.svg('bust'),'right');
+			var passage = new Passage("...they might have lost a hellhound, too.",undefined,undefined,otherPawn.name,otherPawn.avatar.svg('bust','determined'),'right');
 			gamen.displayPassage(passage);
 			game.currentLevel.flags.whatElse = false;
 		},
@@ -195,7 +195,7 @@ var hellhoundCave = {
 			};
 			hellpuppy.moveTo(game.map.findTile(12,2));
 			gamen.displayPassage(new Passage("Growl? >snurfle< Woof.",undefined,true,"Terrifying Hellhound... Whelp",hellpuppy.avatar.svg(),'left'));
-			gamen.displayPassage(new Passage(">Gasp!<  Aren't you just the cutest little puppy?  Yes you are!  YES YOU ARE!!!<p />That's it, I'm taking you home!",undefined,true,pawn.name,pawn.avatar.svg('bust'),'right'));
+			gamen.displayPassage(new Passage(">Gasp!<  Aren't you just the cutest little puppy?  Yes you are!  YES YOU ARE!!!<p />That's it, I'm taking you home!",undefined,true,pawn.name,pawn.avatar.svg('bust','happy'),'right'));
 			gamen.displayPassage(new Passage("Hellpuppy has joined the party!",undefined,true,undefined,hellpuppy.avatar.svg(),'left'));
 			hellpuppy.team = 'p1';
 			game.map.heroes.push(hellpuppy);

@@ -96,9 +96,8 @@ function Game() {
 	};
 	
 	this.switchMaps = function(newLevel) {
-		console.log('archive old map here');
 		for (var pawn of game.map.pawns) {
-			if (game.cast[pawn.id] !== undefined) {
+			if (pawn.unique) {
 				game.cast[pawn.id] = pawn.serialize();
 			};
 		};
@@ -594,7 +593,7 @@ function Pawn(template,tile,team,priorities) {
 			source = data.cast[template];
 			if (source.unique) {
 				this.id = template;
-				game.cast[template] = {};
+				this.unique = true;
 			} else {
 				this.id = template + '_' + Math.random().toString(36).slice(2);
 			};

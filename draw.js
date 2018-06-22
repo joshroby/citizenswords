@@ -251,6 +251,8 @@ function Avatar(pawn,heritages) {
 				this.parameters[parameter] = (this.expressions.resting[parameter] + this.expressions[expression][parameter]*2) /3;
 			};
 			this.currentExpression = expression;
+		} else {
+			console.log('could not find "'+expression+'" in the expressions library.');
 		};
 	};
 // 	this.expressions.min = {
@@ -275,15 +277,20 @@ function Avatar(pawn,heritages) {
 // 	};
 	this.expressions.angry = {"insideEyelidCurve":-2,"outsideEyelidCurve":8,"lowerEyelidCurve":4,"leftBrowTilt":-2,"rightBrowTilt":-3,"mouthOpen":0,"smile":-4,"teeth":4};
 	this.expressions.cocky = {"insideEyelidCurve":-2,"outsideEyelidCurve":6,"lowerEyelidCurve":7,"leftBrowTilt":5,"rightBrowTilt":-3,"mouthOpen":2,"smile":2,"teeth":4};
+	this.expressions.curious = {"insideEyelidCurve":5,"outsideEyelidCurve":8,"lowerEyelidCurve":5,"leftBrowTilt":5,"rightBrowTilt":-4,"mouthOpen":0,"smile":-1,"teeth":0};
 	this.expressions.determined = {"insideEyelidCurve":-2,"outsideEyelidCurve":8,"lowerEyelidCurve":5,"leftBrowTilt":1,"rightBrowTilt":1,"mouthOpen":4,"smile":2,"teeth":4};
+	this.expressions.disgust = {"insideEyelidCurve":2,"outsideEyelidCurve":8,"lowerEyelidCurve":4,"leftBrowTilt":2,"rightBrowTilt":-2,"mouthOpen":5,"smile":-7,"teeth":0};
 	this.expressions.happy = {"insideEyelidCurve":5,"outsideEyelidCurve":8,"lowerEyelidCurve":4,"leftBrowTilt":5,"rightBrowTilt":5,"mouthOpen":5,"smile":3,"teeth":4};
+	this.expressions.hope = {"insideEyelidCurve":5,"outsideEyelidCurve":8,"lowerEyelidCurve":4,"leftBrowTilt":2,"rightBrowTilt":2,"mouthOpen":0,"smile":1,"teeth":1};
 	this.expressions.horror = {"insideEyelidCurve":5,"outsideEyelidCurve":8,"lowerEyelidCurve":5,"leftBrowTilt":0,"rightBrowTilt":0,"mouthOpen":5,"smile":-7,"teeth":0};
 	this.expressions.placid = {"insideEyelidCurve":-2,"outsideEyelidCurve":2,"lowerEyelidCurve":7,"leftBrowTilt":-2,"rightBrowTilt":-2,"mouthOpen":0,"smile":0,"teeth":0};
+	this.expressions.pleasant = {"insideEyelidCurve":1,"outsideEyelidCurve":4,"lowerEyelidCurve":5,"leftBrowTilt":1,"rightBrowTilt":1,"mouthOpen":0,"smile":1,"teeth":0};
 	this.expressions.unamused = {"insideEyelidCurve":-2,"outsideEyelidCurve":2,"lowerEyelidCurve":4,"leftBrowTilt":-4,"rightBrowTilt":-4,"mouthOpen":0,"smile":-2,"teeth":0};
 	this.expressions.sad = {"insideEyelidCurve":5,"outsideEyelidCurve":2,"lowerEyelidCurve":4,"leftBrowTilt":-4,"rightBrowTilt":-4,"mouthOpen":2,"smile":-3,"teeth":0};
-	this.expressions.surprsise = {"insideEyelidCurve":5,"outsideEyelidCurve":8,"lowerEyelidCurve":7,"leftBrowTilt":5,"rightBrowTilt":5,"mouthOpen":5,"smile":-2,"teeth":0};
+	this.expressions.surprise = {"insideEyelidCurve":5,"outsideEyelidCurve":8,"lowerEyelidCurve":7,"leftBrowTilt":5,"rightBrowTilt":5,"mouthOpen":5,"smile":-2,"teeth":0};
+	this.expressions.worry = {"insideEyelidCurve":5,"outsideEyelidCurve":2,"lowerEyelidCurve":5,"leftBrowTilt":-2,"rightBrowTilt":-2,"mouthOpen":0,"smile":-3,"teeth":1};
 	this.exportExpression = function() {
-		var expressionParameters = Object.keys(this.expressions.min);
+		var expressionParameters = Object.keys(this.expressions.angry);
 		var expression = {};
 		for (var parameter of expressionParameters) {
 			expression[parameter] = this.parameters[parameter];
@@ -1828,6 +1835,7 @@ function Avatar(pawn,heritages) {
 		newPath.setAttribute("stroke","#000000");
 		newPath.setAttribute("stroke-width","1");
 		newPath.setAttribute("stroke-linecap","round");
+		newPath.setAttribute("stroke-linejoin","round");
 		
 		// Start at Right Side
 		x = 0 - this.parameters.mouthWidth;
@@ -2274,6 +2282,7 @@ function Avatar(pawn,heritages) {
 		newPath.setAttribute("stroke","#000000");
 		newPath.setAttribute("stroke-width","1");
 		newPath.setAttribute("stroke-linecap","round");
+		newPath.setAttribute("stroke-linejoin","round");
 		
 		// Start at Right Side
 		x = 0 - this.parameters.mouthWidth;
@@ -4467,6 +4476,23 @@ function Avatar(pawn,heritages) {
 		return svgNodes;
 	
 	};
+	
+	this.shoulderCircles = function(color) {
+		var svgNodes = document.createElementNS('http://www.w3.org/2000/svg',"g");
+		svgNodes.setAttribute('stroke','none');
+		svgNodes.setAttribute('fill',this.parameters.skinColor);
+		var rightShoulder = document.createElementNS('http://www.w3.org/2000/svg',"circle");
+		svgNodes.appendChild(rightShoulder);
+		rightShoulder.setAttribute('cx',this.parameters.shoulders * 0.93);
+		rightShoulder.setAttribute('cy',this.bodyConstants.neck + 15);
+		rightShoulder.setAttribute('r',6.2);
+		var leftShoulder = document.createElementNS('http://www.w3.org/2000/svg',"circle");
+		svgNodes.appendChild(leftShoulder);
+		leftShoulder.setAttribute('cx',this.parameters.shoulders * -0.93);
+		leftShoulder.setAttribute('cy',this.bodyConstants.neck + 15);
+		leftShoulder.setAttribute('r',6.2);
+		return svgNodes;
+	};
 
 	this.simpleAxe = function(item) {
 		if (this.bodyConstants.wrist.id === 'rightWristPivot') {var reflect = 1} else {var reflect = -1};
@@ -5444,7 +5470,17 @@ function Avatar(pawn,heritages) {
 		
 		dress.setAttributeNS(null,"d",path);
 		
+		svgNodes.appendChild(this.shoulderCircles());
+		
 		if (this.parameters.bust > this.parameters.shoulders * 0.7) {
+		
+			var rightBreast = this.torso().rightBreastPath;
+			rightBreast.setAttribute('fill',this.parameters.skinColor);
+			svgNodes.appendChild(rightBreast);
+			var leftBreast = this.torso().leftBreastPath;
+			leftBreast.setAttribute('fill',this.parameters.skinColor);
+			svgNodes.appendChild(leftBreast);
+			
 			var rightBreastPath = document.createElementNS('http://www.w3.org/2000/svg',"path");
 			var leftBreastPath = document.createElementNS('http://www.w3.org/2000/svg',"path");
 			rightBreastPath.setAttribute("fill",'inherit');
@@ -5460,12 +5496,16 @@ function Avatar(pawn,heritages) {
 			var startX = 12;
 
 			// start 
-			x = 0 - startX;
+			x = 0 ;
 			y = this.bodyConstants.neck;
 			path = 'm '+x+','+y;
 		
-			x = 0 + startX;
+			x = 0 ;
 			otherPath = 'm '+x+','+y;
+			
+			// to collar
+			path += 'h-'+startX;
+			otherPath += 'h'+startX;
 
 			// to outside of bust
 			x = startX - this.parameters.bust;
@@ -5606,6 +5646,7 @@ function AvatarBeast(pawn,type) {
 		// Effects Scroll
 		var effectsGroup = document.createElementNS('http://www.w3.org/2000/svg',"g");
 		effectsGroup.id = this.pawn.id + 'EffectsGroup';
+		effectsGroup.setAttribute('transform','scale(4)');
 		effectsGroup.setAttributeNS('null','z-index',102);
 		svgNodes.appendChild(effectsGroup);
 

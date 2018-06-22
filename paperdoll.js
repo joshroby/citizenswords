@@ -3,16 +3,16 @@ var paperdoll = {
 
 	init: function() {
 		
-// 		setTimeout(paperdoll.reload,2000)
+		setTimeout(paperdoll.reload,2000)
 
 		game = new Game();
 		
 		pawn = new Pawn();
-		pawn.avatar.parameters.feet = 5;
-		pawn.equipment.right = new Item('shield',pawn);
-		pawn.equipment.left = new Item('mothersSword',pawn);
-		pawn.equipment.garb = new Item('watchArmor',pawn);
-// 		pawn.equipment.neck = new Item('bauble',pawn);
+// 		pawn.avatar.parameters.bust = 32;
+		pawn.equipment.right = new Item('sovereignIcon',pawn);
+		pawn.equipment.left = new Item('sovereignIcon',pawn);
+		pawn.equipment.garb = new Item('eleanorDress',pawn);
+		pawn.equipment.neck = new Item('bauble',pawn);
 		var svg = pawn.avatar.svg();
 		svg.id = 'paperdoll';
 		document.body.innerHTML = '';
