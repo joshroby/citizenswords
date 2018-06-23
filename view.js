@@ -134,7 +134,7 @@ var view = {
 			headShape: ["Head Shape","templePosition", "templeWidth", "templeHeight", "cheekbonePosition", "cheekboneWidth", "cheekboneHeight", "chinHeight", "chinWidth"],
 			eyes: ['Eyes',"eyeDistance", "eyeSize", "browSize", "insideEyelidCurve", "outsideEyelidCurve", "lowerEyelidCurve","leftBrowTilt", "rightBrowTilt"],
 			nose: ['Nose',"noseHeight", "noseSize", "noseWidth", "nostrilHeight", "noseBump"],
-			mouth: ['Mouth',"mouthWidth", "lipSize", "teeth", "leftTusk", "rightTusk","smile", "mouthOpen"],
+			mouth: ['Mouth',"mouthWidth", "mouthOpen", "lipSize", "teeth", "leftTusk", "rightTusk","smile"],
 			ears: ['Ears',"earSize", "earDip", "earTilt", "earWidth", "earLobe"],
 			hair: ['Hair',"hairCurl","hairLength", "hairPart", "hairBangs", "hairBangsLength", "hairSweep", "topHairHeight", "topHairBase", "topHairWidth","horns"],
 			body: ['Body',"shoulders", "bust", "belly", "hips", "feet", "hindquarters"],
@@ -993,7 +993,7 @@ var view = {
 		
 		var sigmaGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
 		inventoryBack.appendChild(sigmaGroup);
-		sigmaGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,'sigma'));
+		sigmaGroup.addEventListener('mouseenter',view.displayToolTip.bind(this,'sigma',pawn));
 		sigmaGroup.addEventListener('mouseleave',view.clearToolTip);
 		var sigmaY = 151 + i * 10;
 		var circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
@@ -1624,7 +1624,7 @@ var view = {
 		};
 	},
 	
-	displayToolTip: function(button) {
+	displayToolTip: function(button,pawn) {
 		var headString, textStrings = [], item, total, italicBottom=false, lineLength = 37;
 		
 		if (button == 'swap') {
@@ -1635,8 +1635,8 @@ var view = {
 			textStrings = [];
 			for (var stat of ['aegis','deflection','fashion','healing','soak']) {
 				total = 0;
-				for (var slot in view.focus.pawn.equipment) {
-					item = view.focus.pawn.equipment[slot];
+				for (var slot in pawn.equipment) {
+					item = pawn.equipment[slot];
 					if (item !== undefined && item.stats !== undefined && item.stats[stat] !== undefined) {
 						total += item.stats[stat];
 					};

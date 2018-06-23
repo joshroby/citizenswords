@@ -70,6 +70,8 @@ function Game() {
 		game.avatar.pawn.team = 'p1';
 		this.cast.p1 = game.avatar.pawn.serialize();
 		this.cast.mixterStout = data.cast.mixterStout;
+		this.cast.p1.unique = true;
+		this.cast.mixterStout.unique = true;
 		this.players[0].heroes = ['p1','mixterStout'];
 		game.avatar = undefined;
 		game.costumes = undefined;
@@ -589,6 +591,7 @@ function Pawn(template,tile,team,priorities) {
 		if (game.cast[template] !== undefined) {
 			source = game.cast[template];
 			this.id = template;
+			this.unique = true;
 		} else if (data.cast[template] !== undefined) {
 			source = data.cast[template];
 			if (source.unique) {
@@ -733,6 +736,7 @@ function Pawn(template,tile,team,priorities) {
 		var flatObject = {}, item;
 		flatObject.name = this.name;
 		flatObject.pronoun = this.pronoun;
+		flatObject.unique = this.unique;
 		flatObject.avatarParameters = this.avatar.parameters;
 		flatObject.beastType = this.beastType;
 		flatObject.stats = {};
@@ -1147,7 +1151,7 @@ function Pawn(template,tile,team,priorities) {
 		};
 		for (var slot in this.equipment) {
 			if (this.equipment[slot] !== undefined) {
-				this.equipment[slot].condition *= Math.random();
+				this.equipment[slot].condition = Math.ceil(this.equipment[slot].condition * Math.random());
 			};
 		};
 		this.exclusive = false;
