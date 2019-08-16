@@ -5,63 +5,88 @@ var model = {
 	],
 	supportLink: 'http://patreon.com/joshroby',
 	supportLinkLabel: 'Patreon',
+	gameSavePrefix: 'csatok_',
 	
 	gameDivContents: function() {return view.gameDivContents()},
-
-	newGame: function() {
-		game = undefined;
-		game = new Game();
-		view.displayCreation();
-		view.clearMap();
+	
+	
+	gameIsSaveable: function() {
+		return (game !== undefined && game.map !== undefined);
+	},
+	
+	flatGame: function() {
+		handlers.saveGame();
+	},
+	
+	unflattenGame: function(saveGame) {
+		handlers.loadGame(saveGame);
 	},
 
 };
+var missions = {};
 
 var game;
-function Game() {
-	
-	this.players = [new Player()];
-	this.cast = {};
-	
-	this.day = 1;
-	
-	this.levels = {
-		hellhoundCave: hellhoundCave,
-	};
+function Game(saveGame) {
 
-	// Character Creation Prepwork
-	this.costumes = {
-		work: new Pawn(),
-		fight: new Pawn(),
-		pray: new Pawn(),
-	};
-	this.avatar = this.costumes.work.avatar;
-	for (var costume in this.costumes) {
-		this.costumes[costume].avatar = this.avatar;
-		this.costumes[costume].equipment.left = new Item('mothersSword',this.costumes[costume]);
-	};
-	
-	this.costumes.work.equipment.right = new Item('cargoHook',this.costumes.work);
-	this.costumes.work.equipment.garb = new Item('roughspun',this.costumes.work);
-	this.costumes.work.equipment.garb.colors.shirt = 'firebrick';
-	this.costumes.work.equipment.garb.colors.upperArms.fill = 'firebrick';
-	this.costumes.work.equipment.neck = undefined;
-	this.costumes.work.stats = {move:8,moveMax:8,strength:11,strengthMax:11,focus:10,focusMax:10};
-	
-	this.costumes.fight.equipment.garb = new Item('scrapArmor',this.costumes.fight);
-	this.costumes.fight.equipment.right = new Item('shield',this.costumes.fight);
-	this.costumes.fight.equipment.neck = undefined;
-	this.costumes.fight.stats = {move:11,moveMax:11,strength:10,strengthMax:10,focus:8,focusMax:8};
-	
-	this.costumes.pray.equipment.right = new Item('initiatesTome',this.costumes.pray);
-	this.costumes.pray.equipment.garb = new Item('initiatesRobes',this.costumes.pray);
-	this.costumes.pray.equipment.neck = undefined;
-	this.costumes.pray.stats = {move:9,moveMax:9,strength:9,strengthMax:9,focus:11,focusMax:11};
-	
-	this.avatar.pawn = this.costumes[['work','fight','pray'][Math.random() * 3 << 0]];
+	this.logArray = [];
 
+	if (saveGame == undefined) {
+	
+		this.players = [new Player()];
+		this.options = {};
+		this.cast = {};
+		this.day = 1;
+
+		// Character Creation Prepwork
+		this.costumes = {
+			work: new Pawn(),
+			fight: new Pawn(),
+			pray: new Pawn(),
+		};
+		this.avatar = this.costumes.work.avatar;
+		for (var costume in this.costumes) {
+			this.costumes[costume].avatar = this.avatar;
+			this.costumes[costume].equipment.left = new Item('mothersSword',this.costumes[costume]);
+		};
+	
+		this.costumes.work.equipment.right = new Item('cargoHook',this.costumes.work);
+		this.costumes.work.equipment.garb = new Item('roughspun',this.costumes.work);
+		this.costumes.work.equipment.garb.colors.shirt = 'firebrick';
+		this.costumes.work.equipment.garb.colors.upperArms.fill = 'firebrick';
+		this.costumes.work.equipment.neck = undefined;
+		this.costumes.work.stats = {move:8,moveMax:8,strength:11,strengthMax:11,focus:10,focusMax:10};
+	
+		this.costumes.fight.equipment.garb = new Item('scrapArmor',this.costumes.fight);
+		this.costumes.fight.equipment.right = new Item('shield',this.costumes.fight);
+		this.costumes.fight.equipment.neck = undefined;
+		this.costumes.fight.stats = {move:11,moveMax:11,strength:10,strengthMax:10,focus:8,focusMax:8};
+	
+		this.costumes.pray.equipment.right = new Item('initiatesTome',this.costumes.pray);
+		this.costumes.pray.equipment.garb = new Item('initiatesRobes',this.costumes.pray);
+		this.costumes.pray.equipment.neck = undefined;
+		this.costumes.pray.stats = {move:9,moveMax:9,strength:9,strengthMax:9,focus:11,focusMax:11};
+	
+		this.avatar.pawn = this.costumes[['work','fight','pray'][Math.random() * 3 << 0]];
+	
+	} else {
+		this.players = saveGame.players;
+		this.options = saveGame.options;
+		this.cast = saveGame.cast;
+		this.day = saveGame.day;
+	};
 
 	// Functions
+	this.serialize = function() {
+		var saveGame = {};
+		saveGame.map = this.map.serialize();
+		saveGame.day = this.day;
+		saveGame.options = this.options;
+		saveGame.players = this.players;
+		saveGame.cast = this.cast;
+		saveGame.saveDate = new Date();
+		saveGame = JSON.stringify(saveGame);
+		return saveGame;
+	};
 	
 	this.confirmCreation = function(name,pronoun) {
 		this.name = name;
@@ -69,18 +94,37 @@ function Game() {
 		game.avatar.pawn.pronoun = pronoun;
 		game.avatar.pawn.team = 'p1';
 		this.cast.p1 = game.avatar.pawn.serialize();
-		this.cast.mixterStout = data.cast.mixterStout;
 		this.cast.p1.unique = true;
+		this.cast.mixterStout = data.cast.mixterStout;
 		this.cast.mixterStout.unique = true;
-		this.players[0].heroes = ['p1','mixterStout'];
+		this.cast.hellpuppy = data.cast.hellpuppy;
+		this.cast.hellpuppy.unique = true;
+		this.cast.daisy = data.cast.daisy;
+		this.cast.daisy.unique = true;
+		this.players[0].heroes = ['p1','mixterStout','hellpuppy','daisy'];
 		game.avatar = undefined;
 		game.costumes = undefined;
 	};
 
-	this.loadMap = function(level) {
-		game.map = new Map(level);
-		game.map.loadLevel(level);
-		var mapSVG = view.buildMapSVG(level);
+	this.loadMap = function(mission,heroStarts) {
+		if (heroStarts instanceof Array) {
+			console.log('heroStarts is Array');
+			for (var entry of mission.standees) {
+				if (entry.type == 'heroes') {
+					entry.locs = heroStarts;
+				};
+			};
+		} else if (typeof heroStarts == 'string' && mission.heroStarts && mission.heroStarts[heroStarts]) {
+			console.log('heroStarts is String');
+			for (var entry of mission.standees) {
+				if (entry.type == 'heroes') {
+					entry.locs = mission.heroStarts[heroStarts];
+				};
+			};
+		};
+		game.map = new Map(mission);
+		game.map.loadMission(mission);
+		var mapSVG = view.buildMapSVG(mission);
 		view.displayMap(mapSVG);
 		view.buildStandees();
 		for (var pawn of game.map.pawns) {
@@ -89,7 +133,7 @@ function Game() {
 			};
 		};
 		view.panToTile(game.map.tiles[game.map.tiles.length-1]);
-		view.panToTile(game.map.pawns[0].tile);
+		view.panToTile(game.map.heroes[0].tile);
 		view.clearMoveOptions();
 		for (var event of game.map.loadEvents) {
 			event();
@@ -97,13 +141,31 @@ function Game() {
 		view.focus = {};
 	};
 	
-	this.switchMaps = function(newLevel) {
+	this.switchMaps = function(newMission,heroStarts) {
 		for (var pawn of game.map.pawns) {
 			if (pawn.unique) {
 				game.cast[pawn.id] = pawn.serialize();
 			};
 		};
-		game.loadMap(newLevel);
+		var purgeList = [];
+		for (var id in game.cast) {
+			pawn = game.cast[id];
+			console.log(pawn);
+			if (pawn.unique) {} else {
+				purgeList.push(pawn);
+			};
+		};
+		for (pawn of purgeList) {
+			delete game.cast[pawn.id];
+		};
+		game.loadMap(newMission,heroStarts);
+	};
+	
+	this.signpost = function(missionKey,heroStart,buttonLabel,discoveryString,oldDiscoveryString) {
+		view.signpostPassage(missionKey,heroStart,buttonLabel,discoveryString,oldDiscoveryString);
+		if (missionKey && game.players[0].availableMissions.indexOf(missionKey) == -1) {
+				game.players[0].availableMissions.push(missionKey);
+		};
 	};
 	
 	this.heroJoins = function(pawn) {
@@ -165,36 +227,56 @@ function Game() {
 			game.currentTrade = undefined;
 		};
 	};
+	
+	this.log = function(string) {
+		this.logArray.push(new Date().valueOf() + " " + string);
+	};
 };
 
 function Player() {
+	this.heroes = [];
+	this.bench = [];
+	this.availableMissions = ['mission_silverAndGold'];
 	this.plotkeys = {};
-	this.debts = {};
+	this.debts = {alfie:4.5,motherSkullgoblet:-2,guildmasterMoucau:1000};
+	this.news = [{id:'refusalOfSubjection',release:1,read:false},{id:'callForCharteredCompanies',release:1,read:false}];
+	this.addNews = function(id) {
+		var newNews = {
+			id: id,
+			release: game.day,
+			read:false,
+		};
+		this.news.push(newNews);
+	};
 };
 
-function Map(level) {
+function Map(mission) {
 	this.tiles = [];
 	this.pawns = [];
 	this.heroes = [];
 	this.things = [];
 	this.loadEvents = [];
 	this.eventKeys = {};
-	if (level == undefined) {
+	if (mission == undefined) {
 		this.bounds = {
 			minX: -10,
 			minY: -7,
 			maxX: 10,
 			maxY: 7,
 		};
+	} else if (mission.template) {
+		this.bounds = missions[mission.template].bounds;
 	} else {
-		this.bounds = level.bounds;
+		this.bounds = mission.bounds;
 	};
-	for (var y=this.bounds.minY;y<this.bounds.maxY;y++) {
-		for (var x=this.bounds.minX;x<this.bounds.maxX;x++) {
-			tile = {x:x,y:y};
-			if (y % 2 !== 0) {
-				tile.x += 0.5;
+	for (var y=this.bounds.minY;y<=this.bounds.maxY;y++) {
+		for (var x=this.bounds.minX;x<=this.bounds.maxX;x++) {
+			if (y%2==0 && x !== Math.round(x)) {
+				x = Math.round(x);
+			} else if (y%2 !== 0 && x == Math.round(x)) {
+				x = Math.round(x)+0.5;
 			};
+			tile = {x:x,y:y};
 			this.tiles.push(new Tile(tile.x,tile.y));
 		};
 	};
@@ -209,53 +291,68 @@ function Map(level) {
 	
 	// Init Functions
 	
-	this.loadLevel = function(level) {
+	this.loadMission = function(mission) {
+		console.log('loading',mission);
+		game.log('loading '+mission.title);
 		var standees, events, moveCosts, tile, pawn, bystander, trigger;
 		var titleX,titleY;
 		
-		if (level == undefined) {
-			level = {};
-			level.title = 'Random Level!';
-			level.tileBackgroundFills = [{fill:'red',locs:[]}];
-			level.standees = this.randomStandees();
-			level.moveCosts = this.randomMoveCosts();
-			level.triggers = [];
-			level.checks = {};
-			level.events = {};
-			level.cameraStart = {x: 100,y: 100,};
-			level.startLoc = {x:0,y:0};
-			level.id = Math.random().toString(36).slice(2);
-			game.levels[level.id] = level;
+		if (mission == undefined) {
+			mission = {};
+			mission.title = 'Random Mission!';
+			mission.tileBackgroundFills = [{fill:'red',locs:[]}];
+			mission.standees = this.randomStandees();
+			mission.moveCosts = this.randomMoveCosts();
+			mission.triggers = [];
+			mission.checks = {};
+			mission.events = {};
+			mission.cameraStart = {x: 100,y: 100,};
+			mission.startLoc = {x:0,y:0};
+			mission.id = Math.random().toString(36).slice(2);
+			game.missions[mission.id] = mission;
+		} else if (mission.template !== undefined) {
+			var restore = mission;
+			mission = missions[mission.template];
+			mission.flags = restore.flags;
+			mission.moveCosts = restore.moveCosts;
+			mission.standees = restore.standees;
+			mission.teams = restore.teams;
+			mission.tileBackgroundFills = restore.tileBackgroundFills;
 		};
-		game.currentLevel = level;
+		game.currentMission = mission;
 		
-		view.camera.x = level.cameraStart.x;
-		view.camera.y = level.cameraStart.y;
+		view.camera.x = mission.cameraStart.x;
+		view.camera.y = mission.cameraStart.y;
 		
-		titleX = (2*level.cameraStart.x + 8*level.startLoc.x) / 10;
-		titleY = (2*(level.cameraStart.y + view.camera.offsetY) + 8*level.startLoc.y) / 10 ;
+		titleX = (2*mission.cameraStart.x + 8*mission.startLoc.x) / 10;
+		titleY = (2*(mission.cameraStart.y + view.camera.offsetY) + 8*mission.startLoc.y) / 10 ;
 		var titleTile = new Tile(titleX,titleY);
 		titleTile.seen = true;
 		this.tiles.push(titleTile);
 				
 		// Default Tile Background Color
 		for (var tile of game.map.tiles) {
-			tile.fill = level.tileBackgroundFills[0].fill;
+			tile.fill = mission.tileBackgroundFills[0].fill;
 		};
 		
-		for (var entry of level.tileBackgroundFills) {
+		for (var entry of mission.tileBackgroundFills) {
 			if (entry.locs !== undefined) {
 				for (var loc of entry.locs) {
 // 					console.log(loc);
 					tile = this.findTile(loc.x,loc.y);
-					tile.fill = entry.fill;
+					if (tile == undefined) {
+						console.log(game.map.tiles);
+						console.log('cannot find and apply fill to',loc);
+					} else {
+						tile.fill = entry.fill;
+					};
 				};
 			};
 		};
-		
+						
 		// Standees
 		var heroIndex = 0;
-		for (var standee of level.standees) {
+		for (var standee of mission.standees) {
 			for (var loc of standee.locs) {
 				tile = this.findTile(loc.x,loc.y);
 				if (tile == undefined) {console.log('cannot find ('+loc.x+','+loc.y+')')};
@@ -271,7 +368,23 @@ function Map(level) {
 					};
 					heroIndex++;
 				} else if (standee.type == 'pawn') {
-					pawn = new Pawn(standee.id,tile,standee.team,standee.priorities);
+					var pawnID = standee.id;
+					if (standee.template !== undefined) {
+						pawnID = standee.template;
+					};
+					pawn = new Pawn(pawnID,tile,standee.team,standee.priorities);
+					if (standee.avatarParameters && standee.template !== undefined) {
+						pawn.avatar.parameters = standee.avatarParameters;
+					};
+					if (standee.stats && standee.stats.moveMax) {
+						pawn.stats = standee.stats;
+					};
+					if (standee.wounds) {
+						pawn.wounds = standee.wounds;
+					};
+					if (standee.morale !== undefined) {
+						pawn.morale = standee.morale;
+					};
 					pawn.compileManeuvers();
 					tile.occupants.push(pawn);
 					if (standee.team == 'p1') {
@@ -288,25 +401,28 @@ function Map(level) {
 					tile.occupants.push(bystander);
 					bystander.team = 'bystanders';
 				} else if (standee.type == 'thing') {
-					thing = new Thing(standee.key,tile,standee.inventory,standee.lootable,standee.triggers);
+					thing = new Thing(standee.template,tile,standee.inventory,standee.lootable,standee.triggers,standee.id,standee.colors,standee.flip);
 					tile.occupants.push(thing);
 					game.map.things.push(thing);
+					if (standee.events !== undefined) {
+						thing.events = standee.events;
+					};
 				};
 			};
 		};
-		for (var trigger of level.triggers) {
+		for (var trigger of mission.triggers) {
 			if (trigger.check == 'load') {
-				this.loadEvents.push(level.events[trigger.event]);
+				this.loadEvents.push(mission.events[trigger.event]);
 			} else if (trigger.check == 'endTurn') {
-			} else {
+			} else if (trigger.locs) {
 				for (var loc of trigger.locs) {
 					tile = this.findTile(loc.x,loc.y);
 					if (trigger.check == undefined) {
 						check = function() {return true};
 					} else {
-						check = level.checks[trigger.check].bind(game.map);
+						check = mission.checks[trigger.check].bind(game.map);
 					};
-					event = level.events[trigger.event].bind(game.map);
+					event = mission.events[trigger.event].bind(game.map);
 					newTrigger = {
 						check : check,
 						event: event,
@@ -315,14 +431,120 @@ function Map(level) {
 				};
 			};
 		};
-		for (var entry of level.moveCosts) {
-			for (var loc of entry.locs) {
-				tile = this.findTile(loc.x,loc.y);
-				tile.moveCost = entry.moveCost
+		for (var entry of mission.moveCosts) {
+			if (entry.locs) {
+				for (var loc of entry.locs) {
+					tile = this.findTile(loc.x,loc.y);
+					tile.moveCost = entry.moveCost
+				};
 			};
 		};
+// 		console.log(game.map.tiles);
 	};
-	
+
+	this.serialize = function() { // Map Serialization
+		var flat = {};
+		flat.template = game.currentMission.key;
+		flat.teams = game.currentMission.teams;
+		flat.flags = game.currentMission.flags;
+		flat.standees = [];
+		flat.tileBackgroundFills = [];
+		flat.moveCosts = [];
+		var loc,standees,tileBackgroundFill, moveCost, logged;
+		for (var tile of game.map.tiles) {
+			loc = {x:tile.x,y:tile.y};
+			tileBackgroundFill = tile.fill;
+			standees = tile.occupants;
+			moveCost = tile.moveCost;
+			
+			// Log Background Fills
+			logged = false;
+			for (var entry of flat.tileBackgroundFills) {
+				if (entry.fill == tileBackgroundFill) {
+					entry.locs.push(loc);
+					logged = true;
+				};
+			};
+			if (logged == false) {
+				entry = {fill:tileBackgroundFill,locs:[loc]}
+				flat.tileBackgroundFills.push(entry);
+			};
+			
+			// Log Move Costs
+			logged = false;
+			for (var entry of flat.moveCosts) {
+				if (entry.moveCost == moveCost) {
+					entry.locs.push(loc);
+					logged = true;
+				};
+			};
+			if (logged == false) {
+				entry = {moveCost:moveCost,locs:[loc]}
+				flat.moveCosts.push(entry);
+			};
+			
+			// Log Standees
+			for (var standee of standees) {
+				logged = false;
+				if (standee instanceof Pawn) {
+					key = 'id';
+				} else if (standee instanceof Thing) {
+					key = 'key';
+				} else if (standee instanceof Landscape) {
+					key = 'sprite';
+				};
+				for (var entry of flat.standees) {
+					if (entry.key == standee.sprite) {
+						entry.locs.push(loc);
+						logged = true;
+					};
+				};
+				if (logged == false) {
+					if (standee instanceof Pawn) {
+						entry = standee.serialize();
+// 						entry = {type:'pawn',id:standee.id,stats:standee.stats,wounds:standee.wounds,team:standee.team};
+// 						var id = standee.id;
+// 						if (game.cast[id] == undefined) {
+// 							game.cast[id] = {};
+// 							game.cast[id].name = standee.name;
+// 							game.cast[id].unique = standee.unique;
+// 							game.cast[id].pronoun = standee.pronoun;
+// 							game.cast[id].description = standee.description;
+// 							game.cast[id].avatarParameters = standee.avatar.parameters;
+// 							game.cast[id].equipment = {};
+// 							game.cast[id].stats = standee.stats;
+// 							game.cast[id].wounds = standee.wounds;
+// 							game.cast[id].beastType = standee.beastType;
+// 						};
+// 						game.cast[id].inventory = [];
+// 						for (var item of standee.inventory) {
+// 							game.cast[id].inventory.push(item.serialize());
+// 						};
+// 						for (var slot of Object.keys(game.cast[id].equipment)) {
+// 							game.cast[id].equipment[slot] = undefined;
+// 						};
+// 						for (slot in standee.equipment) {
+// 							if (standee.equipment[slot] == undefined) {
+// 								game.cast[id].equipment[slot] = undefined;
+// 							} else {
+// 								game.cast[id].equipment[slot] = standee.equipment[slot].serialize();
+// 							};
+// 						};
+					} else if (standee instanceof Thing) {
+						entry = standee.serialize();
+					} else if (standee instanceof Landscape) {
+						entry = {type:'landscape',key:standee.sprite};
+					};
+					if (standee.events !== undefined) {entry.events = standee.events};
+					entry.locs = [loc];
+					flat.standees.push(entry);
+				};
+			};
+			
+		};
+		return flat;
+	};
+
 	this.findTile = function(x,y) {
 		var closestTile;
 		for (var tile of this.tiles) {
@@ -440,6 +662,15 @@ function Map(level) {
 	
 	// Play Functions
 	
+	this.getPlotKey = function(key) {
+		return game.players[0].plotKeys[key];
+	};
+	
+	this.setPlotKey = function(key,value) {
+		if (value == undefined) {value = true};
+		game.players[0].plotKeys[key] = value;
+	};
+	
 	this.findMob = function(id) {
 		var result = undefined;
 		for (var pawn of this.pawns) {
@@ -457,6 +688,14 @@ function Map(level) {
 	};
 	this.removedPawns = [];
 	
+	this.removeOccupant = function(occupant) {
+		var index = occupant.tile.occupants.indexOf(occupant);
+		if (index !== -1) {
+			occupant.tile.occupants.splice(index,1);
+			view.removeStandee(occupant);
+		};
+	};
+	
 	this.endTurn = function() {
 		for (var pawn of this.pawns) {
 			if (pawn.team !== 'p1') {
@@ -468,9 +707,38 @@ function Map(level) {
 				pawn.refreshStats();
 			};
 		};
-		for (var trigger of game.currentLevel.triggers) {
+		for (var trigger of game.currentMission.triggers) {
 			if (trigger.check == 'endTurn') {
-				game.currentLevel.events[trigger.event]();
+				game.currentMission.events[trigger.event]();
+			};
+		};
+		handlers.saveGame();
+	};
+	
+	this.checkTrigger = function(type,arg1,arg2,arg3,arg4,arg5,arg6) {
+		var triggers = [];
+		for (var trigger of game.currentMission.triggers) {
+			if (type == 'tile revealed' && trigger.type == type && arg1.x == trigger.x && arg1.y == trigger.y) {
+				game.currentMission.events[trigger.event](arg1,arg2);
+			} else if (type == 'pawn sighted' && trigger.type == type && (arg1.id == trigger.id || arg1.id.indexOf(trigger.id+"_") == 0 || (trigger.team && arg1.team == trigger.team)) ) {
+				game.currentMission.events[trigger.event](arg1,arg2);
+			} else if (type == 'target acquired' && trigger.type == type && (arg1.id == trigger.id || arg1.id.indexOf(trigger.id+"_") == 0 || (trigger.team && arg1.team == trigger.team)) && (trigger.targetter == undefined || trigger.targetter == arg2.team || trigger.targetter == arg2.id || arg2.id.indexOf(trigger.targetter+"_") == 0) ) {
+				game.currentMission.events[trigger.event](arg1,arg2);
+			} else if (type == 'pawn defeat' && trigger.type == type && (arg1.id == trigger.id || arg1.id.indexOf(trigger.id+"_") == 0 || (trigger.team && arg1.team == trigger.team)) ) {
+				game.currentMission.events[trigger.event](arg1);
+			} else if (type == 'team defeat' && trigger.type == type && arg1 == trigger.team ) {
+				game.currentMission.events[trigger.event](arg1);
+			};
+		};
+		if (type == 'pawn defeat') {
+			var teamDefeat = true;
+			for (var pawn of game.map.pawns) {
+				if (pawn.team == arg1.team && pawn.morale > 0) {
+					teamDefeat = false;
+				};
+			};
+			if (teamDefeat) {
+				this.checkTrigger('team defeat',arg1.team);
 			};
 		};
 	};
@@ -521,6 +789,12 @@ function Pawn(template,tile,team,priorities) {
 		if (priorities.freeze == true) {
 			this.priorities.freeze = true;
 		};
+		if (priorities.follow !== undefined) {
+			this.priorities.follow = priorities.follow;
+		};
+		if (priorities.target !== undefined) {
+			this.priorities.target = priorities.target;
+		};
 		if (priorities.post !== undefined) {
 			this.priorities.post = game.map.findTile(priorities.post.x,priorities.post.y);
 		};
@@ -541,6 +815,12 @@ function Pawn(template,tile,team,priorities) {
 	this.wounds = {move:[],strength:[],focus:[]};
 	this.morale = 1;
 	
+	this.disposition = {
+		attraction: Math.random(),
+		affection: Math.random() * 0.1,
+		enmity: 0,
+		trust: Math.random() * 0.5,
+	};
 	this.debts = {};
 
 	this.randomName = function() {
@@ -549,7 +829,7 @@ function Pawn(template,tile,team,priorities) {
 		return firstNames[Math.random() * firstNames.length << 0] + ' ' + lastNames[Math.random() * lastNames.length << 0];
 	};
 
-	if (template == undefined) {
+	if (template == undefined) { // random bystander
 		var id = Math.random().toString(36).slice(2);
 		this.id = id;
 		
@@ -569,9 +849,6 @@ function Pawn(template,tile,team,priorities) {
 		for (var i=0;i<statList.length*5;i++) {
 			var stat = statList[Math.random() * statList.length << 0];
 			this.stats[stat]++;
-		};
-		for (var stat in this.stats) {
-			this.stats[stat+"Max"] = this.stats[stat];
 		};
 		this.equipment = {
 			left: undefined,
@@ -599,6 +876,7 @@ function Pawn(template,tile,team,priorities) {
 				this.unique = true;
 			} else {
 				this.id = template + '_' + Math.random().toString(36).slice(2);
+				this.template = template;
 			};
 		};
 		this.name = undefined;
@@ -618,7 +896,9 @@ function Pawn(template,tile,team,priorities) {
 		if (source.avatarParameters !== undefined) {
 			this.avatar.parameters = source.avatarParameters;
 		};
-		if (source.name !== undefined) {
+		if (source.name !== undefined && source.isTitle) {
+			this.name = source.name + " " + this.randomName();
+		} else if (source.name !== undefined) {
 			this.name = source.name;
 		} else {
 			this.name = this.randomName();
@@ -627,7 +907,9 @@ function Pawn(template,tile,team,priorities) {
 		this.stats = {};
 		for (var stat in source.stats) {
 			this.stats[stat] = source.stats[stat];
-			this.stats[stat+"Max"] = source.stats[stat];
+			if (stat.indexOf("Max") == -1 && source.stats[stat+"Max"] == undefined) {
+				this.stats[stat+"Max"] = source.stats[stat];
+			};
 		};
 		if (source.slots !== undefined) {
 			this.equipment = {};
@@ -734,29 +1016,44 @@ function Pawn(template,tile,team,priorities) {
 	
 	this.serialize = function() {
 		var flatObject = {}, item;
+		flatObject.type = 'pawn';
+		flatObject.id = this.id;
 		flatObject.name = this.name;
-		flatObject.pronoun = this.pronoun;
 		flatObject.unique = this.unique;
+		flatObject.template = this.template;
+		flatObject.pronoun = this.pronoun;
+		flatObject.team = this.team;
 		flatObject.avatarParameters = this.avatar.parameters;
 		flatObject.beastType = this.beastType;
-		flatObject.stats = {};
-		for (var stat in this.stats) {
-			if (stat.indexOf('Max') !== -1) {
-				flatObject.stats[stat.substr(0,stat.length-3)] = this.stats[stat];
-			};
-		};
+		flatObject.stats = this.stats;
+		flatObject.wounds = this.wounds;
+		flatObject.morale = this.morale;
 		flatObject.slots = Object.keys(this.equipment);
 		flatObject.equipment = {};
 		for (var slot in this.equipment) {
 			flatObject.equipment[slot] = undefined;
 			if (this.equipment[slot] !== undefined) {
 				item = this.equipment[slot];
-				flatObject.equipment[slot] = {template:item.template,colors:item.colors,stats:item.stats};
+				flatObject.equipment[slot] = item.serialize();
 			};
 		};
 		flatObject.inventory = [];
 		for (item of this.inventory) {
-			flatObject.inventory.push({template:item.template,colors:item.colors,stats:item.stats});
+			flatObject.inventory.push(item.serialize());
+		};
+		flatObject.events = this.events;
+		
+		flatObject.priorities = {};
+		if (this.priorities.freeze !== undefined) {flatObject.priorities = this.priorities.freeze};
+		if (this.priorities.target !== undefined) {flatObject.priorities.target = this.priorities.target.id};
+		if (this.priorities.follow !== undefined) {flatObject.priorities.follow = this.priorities.target.id};
+		if (this.priorities.destination !== undefined) {flatObject.priorities.destination = {x:this.priorities.destination.x,y:this.priorities.destination.y}};
+		if (this.priorities.post !== undefined) {flatObject.priorities.post = {x:this.priorities.post.x,y:this.priorities.post.y}};
+		if (this.priorities.patrol !== undefined) {
+			flatObject.priorities.patrol = [];
+			for (var loc in this.priorities.patrol) {
+				flatObject.priorities.patrol.push({x:loc.x,y:loc.y});
+			};
 		};
 	
 		return flatObject;
@@ -861,6 +1158,14 @@ function Pawn(template,tile,team,priorities) {
 					tile.seen = true;
 					view.strokeTile(tile);
 					view.revealTile(tile);
+					game.map.checkTrigger('tile revealed',tile,this);
+					if (tile.occupants.length > 0) {
+						for (var occupant of tile.occupants) {
+							if (occupant.id) {
+								game.map.checkTrigger('pawn sighted',occupant,this);
+							};
+						};
+					};
 				};
 			};
 		};
@@ -911,7 +1216,7 @@ function Pawn(template,tile,team,priorities) {
 							passable = false;
 						};
 					};
-					if (neighbor.moveCost <= tile.remainingMove && passable && neighbor !== this.tile && (this.team !== 'p1' || neighbor.seen)) {
+					if (neighbor.moveCost !== null && neighbor.moveCost <= tile.remainingMove && passable && neighbor !== this.tile && (this.team !== 'p1' || neighbor.seen)) {
 						nextTiles.push({tile:neighbor,route:tile.route.concat([neighbor]),remainingMove:tile.remainingMove - neighbor.moveCost});
 					};
 				};
@@ -1123,7 +1428,9 @@ function Pawn(template,tile,team,priorities) {
 			this.tile = nearestTile;
 			nearestTile.occupants.unshift(this);
 			view.movePawn(this);
-			this.look();
+			if (this.team == 'p1') {
+				this.look();
+			};
 			view.displayEffect(this,effect);
 		};
 		view.animateNerf(this);
@@ -1147,7 +1454,7 @@ function Pawn(template,tile,team,priorities) {
 	
 	this.defeat = function() {
 		if (this.events !== undefined && this.events.defeat !== undefined) {
-			game.currentLevel.events[this.events.defeat](this);
+			game.currentMission.events[this.events.defeat](this);
 		};
 		for (var slot in this.equipment) {
 			if (this.equipment[slot] !== undefined) {
@@ -1157,6 +1464,7 @@ function Pawn(template,tile,team,priorities) {
 		this.exclusive = false;
 		view.refreshManeuvers(this);
 		view.animateDefeat(this);
+		game.map.checkTrigger('pawn defeat',this);
 	};
 	
 	this.revive = function() {
@@ -1172,6 +1480,20 @@ function Pawn(template,tile,team,priorities) {
 			item: {pawn:this},
 			textStrings: function(lineLength) {return lineWrap('Bind this character to prevent them from trying to escape or cause any other trouble.',lineLength)},
 			execute: function() {this.item.pawn.bind()},
+		},
+		disentangle: {
+			name: "Disentangle",
+			cost: {move:1,focus:3},
+			item: {pawn:this},
+			textStrings: function(lineLength) {return lineWrap('Disentangle this character so they can get back in the fight.',lineLength)},
+			execute: function() {this.item.pawn.disentangle(view.focus.pawn,view.focus.lastPawn)},
+		},
+		disentangleSelf: {
+			name: "Disentangle Self",
+			cost: {move:1,focus:3},
+			item: {pawn:this},
+			textStrings: function(lineLength) {return lineWrap('Disentangle yourself and get back in the fight.',lineLength)},
+			execute: function() {this.item.pawn.disentangle(view.focus.pawn,view.focus.pawn)},
 		},
 		murder: {
 			name: "Murder",
@@ -1213,7 +1535,7 @@ function Pawn(template,tile,team,priorities) {
 	this.talk = function(pawn) {
 		view.focus.lastPawn.stats.move--;
 		view.updateSheet(view.focus.lastPawn);
-		game.currentLevel.events[this.events.dialogue]();
+		game.currentMission.events[this.events.dialogue]();
 	};
 	
 	this.kill = function() {
@@ -1233,6 +1555,19 @@ function Pawn(template,tile,team,priorities) {
 		this.stats.move = 0;
 		view.updateSheet(view.focus.lastPawn);
 		view.updateSheet(this);
+	};
+	
+	this.disentangle = function(entangled,disentangler) {
+		console.log(entangled,disentangler);
+		disentangler.stats.move -= 1;
+		disentangler.stats.focus -= 3;
+		for (var wound of entangled.wounds.move) {
+			if (wound.woundType == 'restraints' || wound.woundType == 'entangled') {
+				wound.strength = Math.floor(wound.strength * 0.5);
+			};
+		};
+		view.updateSheet(entangled);
+		view.updateSheet(disentangler);
 	};
 	
 	this.loot = function() {
@@ -1271,10 +1606,10 @@ function Pawn(template,tile,team,priorities) {
 			for (var wound of this.wounds[stat]) {
 				if (wound.woundType == 'poison') {
 					var worse = Math.floor(Math.random() * wound.potence);
-					if (worse > 0 && wound.strength * -1 < this.stats[wound.stat+'Max']) {
+					if (worse > 0 && wound.strength < wound.potence * 2 && wound.strength * -1 < this.stats[wound.stat+'Max']) {
 						wound.strength -= worse;
 						this.morale -= 2 * worse / (this.stats.moveMax + this.stats.strengthMax + this.stats.focusMax);
-						if (this.moral < 0) {
+						if (this.morale < 0) {
 							this.defeat();
 						};
 					};
@@ -1285,6 +1620,12 @@ function Pawn(template,tile,team,priorities) {
 	};
 	
 	this.turn = function() {
+		if (this.priorities.target && typeof this.priorities.target =='string') {
+			this.priorities.target = game.map.findMob(this.priorities.target);
+		};
+		if (this.priorities.follow && typeof this.priorities.follow =='string') {
+			this.priorities.follow = game.map.findMob(this.priorities.follow);
+		};
 		if (this.dead) {
 			var itemCount = 0;
 			for (var slot in this.equipment) {
@@ -1301,11 +1642,11 @@ function Pawn(template,tile,team,priorities) {
 		} else {
 			this.refreshStats();
 			if (this.priorities.freeze == true) {
-				console.log(this.id+' frozen');
+				game.log(this.id+' frozen');
 			} else if (this.morale <= 0) {
 				this.wander();
 			} else if (this.priorities.target !== undefined && this.priorities.target.morale > 0 && this.inLOS(this.priorities.target.tile)) {
-				console.log(this.id+' target: '+this.priorities.target.id);
+				game.log(this.id+' target: '+this.priorities.target.id);
 				this.attack(this.priorities.target);
 				this.approach(this.priorities.target.tile);
 				this.attack(this.priorities.target);
@@ -1314,25 +1655,25 @@ function Pawn(template,tile,team,priorities) {
 					this.priorities.destination = undefined;
 				};
 			} else if (this.priorities.follow !== undefined) {
-				console.log(this.id+' follow');
+				game.log(this.id+' follow');
 				this.approach(this.priorities.follow.tile);
 				if (this.inLOS(this.priorities.follow.tile)) {
 					this.priorities.destination = this.priorities.follow.tile;
 				};
 			} else if (this.priorities.destination !== undefined) {
-				console.log(this.id+' destination: '+this.priorities.destination.x+','+this.priorities.destination.y);
+				game.log(this.id+' destination: '+this.priorities.destination.x+','+this.priorities.destination.y);
 				this.approach(this.priorities.destination);
 				if (this.tile == this.priorities.destination) {
 					this.priorities.destination = undefined;
 				};
 			} else if (this.priorities.patrol !== undefined) {
-				console.log(this.id+' patrol');
+				game.log(this.id+' patrol');
 				this.approach(this.priorities.patrol[0]);
 				if (this.tile == this.priorities.patrol[0]) {
 					this.priorities.patrol = this.priorities.patrol.concat(this.priorities.patrol.shift());
 				};
 			} else if (this.priorities.post !== undefined) {
-				console.log(this.id+' returning to post ',this.priorities.post);
+				game.log(this.id+' returning to post ',this.priorities.post);
 				this.approach(this.priorities.post);
 			} else {
 				this.wander();
@@ -1341,6 +1682,7 @@ function Pawn(template,tile,team,priorities) {
 				var closestTarget = this.findClosestTarget();
 				if (closestTarget !== undefined) {
 					this.acquireTarget(closestTarget);
+					game.map.checkTrigger('target acquired',closestTarget,this);
 				};
 	// 			should also check for heal/rally targets'
 			};
@@ -1358,7 +1700,7 @@ function Pawn(template,tile,team,priorities) {
 	};
 	
 	this.attack = function(target) {
-		console.log(this.id + ' attacking ' + target.id);
+		game.log(this.id + ' attacking ' + target.id);
 		var distance = Math.pow(Math.pow(this.tile.x - target.tile.x,2) + Math.pow(this.tile.y - target.tile.y,2),0.5);
 		for (var maneuver of this.maneuvers) {
 			if (maneuver.maxRange >= distance && this.canAfford(maneuver.cost)) {
@@ -1405,17 +1747,19 @@ function Pawn(template,tile,team,priorities) {
 	
 	this.findClosestTarget = function() {
 		var targets = [], distance, shortestDistance = Infinity, closest;
-		var hostileTeams = game.currentLevel.teams[this.team].hostile;
-		for (var pawn of game.map.pawns) {
-			if (hostileTeams.indexOf(pawn.team) !== -1 && pawn.morale > 0 && this.inLOS(pawn.tile)) {
-				targets.push(pawn);
+		var hostileTeams = game.currentMission.teams[this.team].hostile;
+		if (hostileTeams !== undefined) {
+			for (var pawn of game.map.pawns) {
+				if (hostileTeams.indexOf(pawn.team) !== -1 && pawn.morale > 0 && this.inLOS(pawn.tile)) {
+					targets.push(pawn);
+				};
 			};
-		};
-		for (pawn of targets) {
-			distance = Math.pow(Math.pow(this.tile.x - pawn.tile.x,2)+Math.pow(this.tile.y - pawn.tile.y,2),0.5);
-			if (distance < shortestDistance) {
-				shortestDistance = distance;
-				closest = pawn;
+			for (pawn of targets) {
+				distance = Math.pow(Math.pow(this.tile.x - pawn.tile.x,2)+Math.pow(this.tile.y - pawn.tile.y,2),0.5);
+				if (distance < shortestDistance) {
+					shortestDistance = distance;
+					closest = pawn;
+				};
 			};
 		};
 		return closest;
@@ -1427,7 +1771,7 @@ function Pawn(template,tile,team,priorities) {
 	};
 };
 
-function Thing(template,tile,inventory,lootable,triggers,id) {
+function Thing(template,tile,inventory,lootable,triggers,id,colors,flip) {
 	
 	if (id == undefined) {id = Math.random().toString(36).slice(2)};
 	this.id = id;
@@ -1437,15 +1781,39 @@ function Thing(template,tile,inventory,lootable,triggers,id) {
 	this.selectable = true;
 	
 	if (template == undefined) {template = 'chest'};
+	this.id += template;
+	this.template = template;
 	
 	this.sprite = data.things[template].sprite;
 	this.name = data.things[template].name;
 	this.description = data.things[template].description;
 	this.cover = data.things[template].cover;
 	
-	this.inventory = inventory;
+	this.flip = flip;
+	
+	if (colors == undefined && data.things[template].colors !== undefined) {
+		this.colors = data.things[template].colors;
+	} else if (colors !== undefined) {
+		this.colors = colors;
+	} else {
+		this.colors = {};
+	};
+	
 	this.lootable = lootable;
 	this.triggers = triggers;
+	
+	this.inventory = [];
+	if (inventory) {
+		for (var item of inventory) {
+			var newItem;
+			if (typeof item == 'string') {
+				newItem = new Item(item);
+			} else {
+				newItem = new Item(item.template,undefined,undefined,item.id,item.condition);
+			};
+			this.inventory.push(newItem);
+		};
+	};
 	
 	this.swapItems = function() {return true};
 	
@@ -1460,7 +1828,13 @@ function Thing(template,tile,inventory,lootable,triggers,id) {
 	
 	this.equipment = {};
 	
-	this.avatar = new AvatarThing(this,template);
+	if (template == 'mannequin') {
+		this.avatar = new Avatar(this);
+		this.avatar.parameters.mannequin = true;
+		this.avatar.parameters.skinColor = ['sandybrown','goldenrod','darkgoldenrod','peru','saddlebrown','sienna','maroon'][7 * Math.random() << 0];
+	} else {
+		this.avatar = new AvatarThing(this,template);
+	};
 	
 	this.contextualManeuvers = {
 		interact: {
@@ -1468,7 +1842,7 @@ function Thing(template,tile,inventory,lootable,triggers,id) {
 			cost: {move:1},
 			item: {pawn:this},
 			textStrings: function(lineLength) {return lineWrap("Interact with this thing in some obvious fashion.",lineLength)},
-			execute: function() {this.item.pawn.loot()},
+			execute: function() {game.currentMission.events[this.item.pawn.events.interact](view.focus.lastPawn);},
 		},
 		loot: {
 			name: "Loot",
@@ -1477,6 +1851,12 @@ function Thing(template,tile,inventory,lootable,triggers,id) {
 			textStrings: function(lineLength) {return lineWrap("Loot this container of the no-doubt fabulous treasures hidden within.",lineLength)},
 			execute: function() {this.item.pawn.loot()},
 		},
+	};
+	if (data.things[template].interactLabel !== undefined) {
+		this.contextualManeuvers.interact.name = data.things[template].interactLabel;
+	};
+	if (data.things[template].interactTooltip !== undefined) {
+		this.contextualManeuvers.interact.textStrings = function(lineLength) {return lineWrap(data.things[template].interactTooltip,lineLength)};
 	};
 	
 	this.select = function() {};
@@ -1531,12 +1911,33 @@ function Thing(template,tile,inventory,lootable,triggers,id) {
 		view.refreshItems(this);
 // 		view.redrawPawn(this);
 	};
+	
+	this.serialize = function() {
+		var flat = {};
+		flat.type = 'thing';
+		flat.template = this.template;
+		flat.colors = this.colors;
+		flat.id = this.id;
+		flat.equipment = {};
+		for (var key in this.equipment) {
+			flat.equipment[key] = this.equipment[key].serialize();
+		};
+		flat.events = this.events;
+		flat.flip = this.flip;
+		flat.inventory = [];
+		for (var item of this.inventory) {
+			flat.inventory.push(item.serialize());
+		};
+		flat.lootable = this.lootable;
+		flat.sprite = this.sprite;
+		flat.triggers = this.triggers;
+		return flat;
+	};
 
 
 };
 
-function Item(template,pawn,colors,id) {
-
+function Item(template,pawn,colors,id,condition) {
 	if (id == undefined) {id = Math.random().toString(36).slice(2)};
 	this.id = id;
 	
@@ -1548,7 +1949,9 @@ function Item(template,pawn,colors,id) {
 	};
 	this.colors = {};
 	for (var key in data.items[template].colors) {
-		if (Array.isArray(data.items[template].colors[key])) {
+		if (colors !== undefined && colors[key] !== undefined) {
+			this.colors[key] = colors[key];
+		} else if (Array.isArray(data.items[template].colors[key])) {
 			var colorList = data.items[template].colors[key];
 			this.colors[key] = colorList[Math.random() * colorList.length << 0];
 		} else if (data.items[template].colors[key].fill !== undefined && data.items[template].colors[key].fill.indexOf('match') == 0) {
@@ -1581,7 +1984,11 @@ function Item(template,pawn,colors,id) {
 		this.stats[key] = data.items[template].stats[key];
 	};
 	
-	this.condition = 100;
+	if (condition) {
+		this.condition = condition;
+	} else {
+		this.condition = 100;
+	};
 	
 	this.maneuvers = [];
 	for (var m in data.items[template].maneuvers) {
@@ -1610,6 +2017,15 @@ function Item(template,pawn,colors,id) {
 		if (this.slots == ['belt','pouch','knapsack']) {textStrings[5] = 'auxillary slots'};
 		if (this.slots.length == 0) {textStrings[5] = 'unequippable'};
 		return textStrings;
+	};
+	
+	this.serialize = function() {
+		var flat = {};
+		flat.template = this.template;
+		flat.colors = this.colors;
+		flat.id = this.id;
+		flat.condition = this.condition;
+		return flat;
 	};
 };
 
@@ -1791,10 +2207,24 @@ function Maneuver(maneuver,item) {
 				};
 				view.displayEffect(target,effect);
 			};
-			console.log(logString);
+			game.log(logString);
 			if (animate) {
 				view.animateInteract(this.item.pawn,target,undefined);
 			};
 		};
+	};
+};
+
+function newsStory(id) {
+	this.id = id;
+	if (news[id].titleFunction == undefined) {
+		this.title = function() {return news[id].title};
+	} else {
+		this.title = news[i].titleFunction;
+	};
+	if (news[id].textFunction == undefined) {
+		this.text = function() {return news[id].text};
+	} else {
+		this.text = news[i].textFunction;
 	};
 };

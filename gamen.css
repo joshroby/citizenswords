@@ -156,6 +156,7 @@ div:after {
 #gamenModalTextDiv {
 	text-align: left;
 	font-size: 1.2em;
+	max-height: 50vh;
 	overflow-y: auto;
 	}
 

@@ -32,6 +32,12 @@ var view = {
 	
 	gameDivContents: function() {
 	
+		document.getElementById('saveGameButton').disabled = true;
+	
+		var loadGameDiv = document.createElement('div');
+		loadGameDiv.id = 'loadGameDiv';
+		loadGameDiv.style.display = 'none';
+	
 		var introDiv = document.createElement('div');
 		introDiv.id = 'introDiv';
 		introDiv.innerHTML = "<h2>Citizen Swords Against the Ogre King</h2><p>Defend your beautiful, cosmopolitain fantasy city of Pileas from the tyranny of the despotic Ogre King.</p><p>Have adventures!  Recruit colorful characters!  Indulge in politics and skullduggery!  Romance!  Theological discussions!  This game has everything, and possibly too much!</p><p><em>Citizen Swords</em> is a tactical, 'digital minis' roleplaying game, which means you mostly move little characters around on a map to stage little battles.</p>";
@@ -137,7 +143,7 @@ var view = {
 			mouth: ['Mouth',"mouthWidth", "mouthOpen", "lipSize", "teeth", "leftTusk", "rightTusk","smile"],
 			ears: ['Ears',"earSize", "earDip", "earTilt", "earWidth", "earLobe"],
 			hair: ['Hair',"hairCurl","hairLength", "hairPart", "hairBangs", "hairBangsLength", "hairSweep", "topHairHeight", "topHairBase", "topHairWidth","horns"],
-			body: ['Body',"shoulders", "bust", "belly", "hips", "feet", "hindquarters"],
+			body: ['Body',"shoulders", "armWidth", "bust", "belly", "hips", "feet", "hindquarters"],
 			social: ['Social'],
 		};
 		for (var category in characterParameters) {
@@ -191,7 +197,15 @@ var view = {
 		var svgDiv = document.createElement('div');
 		svgDiv.id = 'svgDiv';
 		
-		return [introDiv,creationDiv,svgDiv];
+		return [introDiv,creationDiv,svgDiv,loadGameDiv];
+	},
+	
+	disableSaveGame: function() {
+		document.getElementById('saveGameButton').disabled = true;
+	},
+	
+	enableSaveGame: function() {
+		document.getElementById('saveGameButton').disabled = false;
 	},
 
 	capitalize: function(string) {
@@ -200,6 +214,10 @@ var view = {
 	
 	clearMap: function() {
 		document.getElementById('svgDiv').innerHTML = '';
+	},
+	
+	hideIntro: function() {
+		document.getElementById('introDiv').style.display = 'none';
 	},
 	
 	displayCreation: function() {
@@ -263,7 +281,7 @@ var view = {
 		element.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href',string);
 	},
 	
-	buildMapSVG: function(level) {
+	buildMapSVG: function(mission) {
 	
 		var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
 		svg.id = 'gameSVG';		
@@ -278,7 +296,7 @@ var view = {
 		defs.id = 'globalDefs';
 		svg.appendChild(defs);
 		
-		for (var standee of level.standees) {
+		for (var standee of mission.standees) {
 			if (standee.key !== undefined && data[standee.type+'s'][standee.key].path !== undefined) {
 				var externalSprite = document.createElementNS('http://www.w3.org/2000/svg','image');
 				defs.appendChild(externalSprite);
@@ -342,6 +360,17 @@ var view = {
 			var sheetsLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
 			sheetsLayer.id = 'sheetsLayer';		
 			uiLayer.appendChild(sheetsLayer);
+			
+			var coordsText = document.createElementNS('http://www.w3.org/2000/svg','text');
+			coordsText.id = 'coordsText';		
+			uiLayer.appendChild(coordsText);
+			coordsText.setAttribute('x',98);
+			coordsText.setAttribute('y',-52);
+			coordsText.setAttribute('fill','white');
+			coordsText.setAttribute('stroke','none');
+			coordsText.setAttribute('text-anchor','end');
+			coordsText.setAttribute('font-size',2);
+			coordsText.setAttribute('visibility','hidden');
 	
 		var tipLayer = document.createElementNS('http://www.w3.org/2000/svg','g');
 		tipLayer.id = 'tipLayer';		
@@ -607,6 +636,8 @@ var view = {
 			for (var occupant of tile.occupants) {
 				view.addStandee(occupant,tile);
 			};
+// 			var tileLabelGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+// 			tile.standeeGroup.appendChild(tileLabelGroup);
 			var costSphere = document.createElementNS('http://www.w3.org/2000/svg','use');
 			tile.standeeGroup.appendChild(costSphere);
 			view.setHref(costSphere,'moveCostSphere'+tile.moveCost);
@@ -627,16 +658,17 @@ var view = {
 		titleText.setAttribute('font-size',70);
 		titleText.setAttribute('text-anchor','middle');
 		titleText.setAttribute('visibility','inherit');
+		titleText.setAttribute('class','missionTitle');
 		tile.standeeGroup.setAttribute('visibility','visible');
 		tile.svg.setAttribute('visibility','hidden');
-		titleText.innerHTML = game.currentLevel.title;
+		titleText.innerHTML = game.currentMission.title;
 	},
 	
 	addStandee: function(occupant,tile) {
 		var displayCoords = view.displayCoords(tile);
 		if (occupant.avatar !== undefined) {
 			document.getElementById('globalDefs').appendChild(occupant.avatar.draw());
-			occupant.sprite = occupant.id
+			occupant.sprite = occupant.id;
 		};
 		var occupantUse = document.createElementNS('http://www.w3.org/2000/svg','use');
 		tile.standeeGroup.appendChild(occupantUse);
@@ -671,7 +703,9 @@ var view = {
 	},
 	
 	removeStandee: function(standee) {
-		standee.svg.parentNode.removeChild(standee.svg);
+		if (standee.svg.parentNode !== null) {
+			standee.svg.parentNode.removeChild(standee.svg);
+		};
 	},
 	
 	redrawPawn: function(pawn) {
@@ -732,7 +766,7 @@ var view = {
 				text.setAttribute('text-anchor','middle');
 				text.setAttribute('font-size',3);
 				text.setAttribute('fill',view.colors[statNames[i]+'Secondary']);
-				text.setAttribute('class','bold');
+				text.setAttribute('class','boxHead');
 				text.setAttribute('stroke',view.colors[statNames[i]+'Primary']);
 				text.setAttribute('paint-order','stroke');
 				text.innerHTML = statNames[i];
@@ -774,7 +808,9 @@ var view = {
 		portrait.setAttribute('x',-75);
 		portrait.setAttribute('y',160);
 		portrait.addEventListener('click',handlers.inventory);
-		if (pawn.stats == undefined) {
+		if (pawn.avatar.parameters !== undefined && pawn.avatar.parameters.mannequin) {
+			portrait.setAttribute('transform','translate(-56 122) scale(0.25)');
+		} else if (pawn.stats == undefined) {
 			portrait.setAttribute('transform','translate(-27.5 70) scale(0.5)');
 		} else if (pawn.avatar.parameters !== undefined) {
 			portrait.setAttribute('transform','translate(-56 122) scale(0.25)');
@@ -1110,7 +1146,7 @@ var view = {
 		text.setAttribute('x',x + 15);
 		text.setAttribute('y',y + 4);
 		text.setAttribute('font-size',3);
-		text.setAttribute('class','bold');
+		text.setAttribute('class','itemName');
 		text.setAttribute('text-anchor','middle');
 // 		text.setAttribute('textLength',28);
 // 		text.setAttribute('lengthAdjust','spacingAndGlyphs');
@@ -1153,8 +1189,16 @@ var view = {
 			} else if (swapButton !== null) { // disable swap button
 				swapButton.setAttribute('opacity',0.5);
 			};
+			
+			var maneuversList = pawn.maneuvers;
+			var entangled = false;
+			for (var wound of pawn.wounds.move) {
+				if ((wound.woundType == 'restraints' || wound.woundType == 'entangled') && maneuversList.indexOf(pawn.contextualManeuvers.disentangleSelf) == -1) {
+					maneuversList.unshift(pawn.contextualManeuvers.disentangleSelf);
+				};
+			};
 
-			for (var i in pawn.maneuvers) {
+			for (var i in maneuversList) {
 				var canPerform = true;
 				for (var stat in pawn.maneuvers[i].cost) {
 					if (pawn.maneuvers[i].cost[stat] > pawn.stats[stat]) {
@@ -1180,8 +1224,8 @@ var view = {
 			maneuversPane.appendChild(nameText);
 			nameText.setAttribute('x',8);
 			nameText.setAttribute('y',143);
-			nameText.setAttribute('font-size',3.5);
-			nameText.setAttribute('class','bold');
+			nameText.setAttribute('font-size',4);
+			nameText.setAttribute('class','npcName');
 			nameText.innerHTML = pawn.name;
 			i = 0;
 			for (var string of pawn.textStrings(90)) {
@@ -1196,8 +1240,18 @@ var view = {
 			var maneuverList = [];
 			if (pawn.morale <= 0 && pawn.human) {
 				maneuverList.push(pawn.contextualManeuvers.murder);
-				maneuverList.push(pawn.contextualManeuvers.bind);
-					maneuverList.push(pawn.contextualManeuvers.loot);
+				var isBound = false;
+				for (var wound of pawn.wounds.move) {
+					if (wound.woundType == 'entangled' || wound.woundType == 'restraints') {
+						isBound = true;
+					};
+				};
+				if (isBound) {
+					maneuverList.push(pawn.contextualManeuvers.disentangle);
+				} else {
+					maneuverList.push(pawn.contextualManeuvers.bind);
+				};
+				maneuverList.push(pawn.contextualManeuvers.loot);
 			} else if (pawn.morale <= 0) {
 				maneuverList.push(pawn.contextualManeuvers.slaughter);
 			} else {
@@ -1209,6 +1263,9 @@ var view = {
 				};
 				if (pawn.lootable !== undefined) {
 					maneuverList.push(pawn.contextualManeuvers.loot);
+				};
+				if (pawn.events !== undefined && pawn.events.interact !== undefined) {
+					maneuverList.push(pawn.contextualManeuvers.interact);
 				};
 			};
 			x = 7, y = 155, i = 0;
@@ -1440,10 +1497,10 @@ var view = {
 	panBackground: function(init) {
 		var pointsString = '';
 		var corners = [
-			{x:game.map.bounds.minX - 1,y:game.map.bounds.minY - 2},
-			{x:game.map.bounds.minX - 1,y:Math.min(view.camera.y-.001,game.map.bounds.maxY) },
-			{x:game.map.bounds.maxX + 1.5,y:Math.min(view.camera.y-.001,game.map.bounds.maxY) },
-			{x:game.map.bounds.maxX + 1.5,y:game.map.bounds.minY - 2},
+			{x:game.map.bounds.minX - 1, y:game.map.bounds.minY - 2},
+			{x:game.map.bounds.minX - 1, y:Math.min(view.camera.y-.001,game.map.bounds.maxY+1) },
+			{x:game.map.bounds.maxX + 1.5, y:Math.min(view.camera.y-.001,game.map.bounds.maxY+1) },
+			{x:game.map.bounds.maxX + 1.5, y:game.map.bounds.minY - 2},
 		];
 		for (var corner of corners) {
 			displayCoords = view.displayCoords(corner);
@@ -1463,7 +1520,8 @@ var view = {
 			tile.hover = true;
 			view.strokeTile(tile);
 		};
-// 		console.log('tile',tile.x,tile.y);
+		var coordsText = document.getElementById('coordsText');
+		coordsText.innerHTML = '('+tile.x+','+tile.y+')';
 	},
 	
 	unhoverTile: function(tile) {
@@ -1531,6 +1589,23 @@ var view = {
 			};
 			var timedEvent = setTimeout(view.panToTile,5);
 		};
+	},
+	
+	slowPan: function(x,y,speed) {
+		if (speed == undefined) {speed = 0.1};
+		var start = {x:view.camera.x,y:view.camera.y-view.camera.offsetY};
+		var distance = Math.pow(Math.pow(view.camera.x-x,2)+Math.pow(view.camera.y-y,2),0.5);
+		var steps = Math.ceil(distance/speed);
+		for (var i=0;i<steps;i++) {
+			var timedEvent = setTimeout(view.moveCamera.bind(view,start.x + (x-start.x)*(i/steps),start.y + (y-start.y)*(i/steps)),i*100);
+		};
+		return steps*100;
+	},
+	
+	moveCamera: function(x,y) {
+		view.camera.x = x;
+		view.camera.y = y + view.camera.offsetY;
+		view.updateMap();
 	},
 	
 	displaySheet: function(pawn) {
@@ -1693,7 +1768,7 @@ var view = {
 		tipHead.setAttribute('x',-21);
 		tipHead.setAttribute('y',15);
 		tipHead.setAttribute('font-size',4);
-		tipHead.setAttribute('class','bold');
+		tipHead.setAttribute('class','tipHead');
 		tipHead.innerHTML = headString;
 		for (var i in textStrings) {
 			var text = document.createElementNS('http://www.w3.org/2000/svg','text');
@@ -1769,7 +1844,7 @@ var view = {
 	},
 	
 	animateInteract: function(actor,target,sprite) {
-		console.log(actor,target,sprite);
+// 		console.log(actor,target,sprite);
 		var actorStandeeGroup = document.getElementById('standees_'+actor.tile.x+'_'+actor.tile.y);
 		var targetStandeeGroup = document.getElementById('standees_'+target.tile.x+'_'+target.tile.y);
 		var actorDisplayCoords = view.displayCoords(actor.tile);
@@ -1987,7 +2062,8 @@ var view = {
 		text.setAttribute('x',0);
 		text.setAttribute('y',-1);
 		text.setAttribute('font-size',20);
-		text.setAttribute('font-weight','bold');
+		text.setAttribute('class','maneuverEffect');
+// 		text.setAttribute('font-weight','bold');
 // 		text.setAttribute('stroke','black');
 		text.setAttribute('fill',color);
 		text.setAttribute('text-anchor','middle');
@@ -2063,6 +2139,58 @@ var view = {
 	passageDismissed: function() {
 		document.getElementById('uiLayer').setAttribute('visibility','visibile');
 		document.getElementById('tipLayer').setAttribute('visibility','visibile');
+	},
+	
+	coordsToggle: function() {
+		var coordsText = document.getElementById('coordsText');
+		if (game.options.coords) {
+			game.options.coords = false;
+			coordsText.setAttribute('visibility','hidden');
+		} else {
+			game.options.coords = true;
+			coordsText.setAttribute('visibility','visible');
+		};
+	},
+	
+	parseUnlockedMission: function(missionKey) {
+		var p = document.createElement('p');
+		p.className = 'unlockedMission';
+		p.innerHTML = "You've unlocked a new mission: "+missions[missionKey].title+"!";
+		return p;
+	},
+	
+	signpostPassage: function(missionKey,heroStart,buttonLabel,discoveryString,oldDiscoveryString) {
+		if (buttonLabel == undefined) {buttonLabel = 'Venture Forth!'};
+		if (discoveryString == undefined) {discoveryString = "You've discovered a new area!"};
+		if (oldDiscoveryString == undefined && missionKey) {oldDiscoveryString = "This is the way back to "+missions[missionKey].title+"."};
+		var div = document.createElement('div');
+		var p = document.createElement('p');
+		div.appendChild(p);
+		if (missionKey) {
+			if (game.players[0].availableMissions.indexOf(missionKey) == -1) {
+				p.innerHTML = discoveryString;
+				div.prepend(view.parseUnlockedMission(missionKey));
+			} else {
+				p.innerHTML = oldDiscoveryString;
+			};
+			var p = document.createElement('p');
+			div.appendChild(p);
+			p.innerHTML = "Would you like to leave this area?"
+			var choiceArray = [new Choice('Stay here'),new Choice(buttonLabel,game.switchMaps.bind(game,missions[missionKey],heroStart)),new Choice('Return to the city',game.switchMaps.bind(game,mission_headquarters))];
+		} else {
+			p.innerHTML = "Do you want to head home?"
+			var choiceArray = [new Choice('Stay here'),new Choice('Return to the city',game.switchMaps.bind(game,mission_headquarters))];
+		};
+		gamen.displayPassage(new Passage(div,choiceArray,false));
+	},
+	
+	gameOver: function() {
+		var choiceArray = [new Choice("Main Menu",handlers.reload)];
+		if (localStorage.csatok_autosave) {
+			choiceArray.push(new Choice("Load Autosave",handlers.continueAutosave));
+		};
+		var gameOverString = "You and your team have fallen; you have been cut down in your prime, stolen away from your fated destiny, sent to an early grave.  Pileus will struggle on without you, but you will not see her successes, her failures, or her future.  Your story ends here.";
+		gamen.displayPassage(new Passage(gameOverString,choiceArray,false,'Game Over'));
 	},
 };
 

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="200px" height="200px" viewBox="0 0 200 200" enable-background="new 0 0 200 200" xml:space="preserve">
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="80.4688" y1="17.7715" x2="91.822" y2="66.9477">
+	<stop  offset="0" style="stop-color:#D49000"/>
+	<stop  offset="1" style="stop-color:#9A5600"/>
+</linearGradient>
+<polygon fill="url(#SVGID_1_)" points="0,85.07 133.458,57.335 172.371,0 47.509,25.382 "/>
+<polygon fill="#BE1E2D" stroke="#231F20" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+	131.939,175.216 0,200 0,85.07 143.202,55.311 "/>
+<rect x="131.939" y="59.573" fill="#EBC230" stroke="#231F20" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" width="5.239" height="115.643"/>
+<polygon fill="#D29F00" stroke="#231F20" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+	137.179,59.573 144.679,56.779 144.679,172.422 137.179,175.216 "/>
+<polygon fill="#D29F00" stroke="#231F20" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+	144.679,56.779 183.931,0 177.96,0 137.179,59.573 "/>
+<polygon fill="#EBC230" stroke="#231F20" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+	131.939,59.573 172.371,0 177.96,0 137.179,59.573 "/>
+<rect x="131.939" y="59.573" fill="#EBC230" stroke="#231F20" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" width="68.061" height="5.661"/>
+<polygon fill="#D29F00" stroke="#231F20" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+	200,59.573 137.179,59.573 144.679,56.779 200,56.779 "/>
+<polygon fill="#EBC230" stroke="#231F20" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+	158.514,28.177 185.088,59.573 191.08,59.573 161.134,24.322 "/>
+<polygon fill="#D29F00" stroke="#231F20" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+	167.561,23.375 161.134,24.322 191.08,59.573 195.168,56.779 "/>
+</svg>

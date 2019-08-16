@@ -1,7 +1,39 @@
 var handlers = {
 
-	newGame: function() {
-		model.newGame();
+	newGame: function(saveGame) {
+		if (saveGame.isTrusted) {saveGame = undefined}; // fucking mouse event
+		game = undefined;
+		game = new Game(saveGame);
+		view.displayCreation();
+		view.clearMap();
+		view.disableSaveGame();
+	},
+	
+	saveGame: function(saveName) {
+		if (saveName == undefined) {saveName = 'autosave'};
+		localStorage[model.gameSavePrefix+saveName] = game.serialize();
+	},
+	
+	loadGameListing: function() {
+		gamen.displayLoadGameDiv();
+		document.getElementById('loadGameDiv').style.display = 'block';
+	},
+	
+	loadGame: function(saveGame) {
+		game = undefined;
+		game = new Game(saveGame);
+		view.hideIntro();
+		view.hideCreation();
+		game.loadMap(saveGame.map);
+		view.enableSaveGame();
+	},
+	
+	continueAutosave: function() {
+		handlers.loadGame(JSON.parse(localStorage[model.gameSavePrefix+"autosave"]) );
+	},
+	
+	reload: function() {
+		location.reload(true);
 	},
 	
 	// Character Creation Handlers
@@ -66,8 +98,9 @@ var handlers = {
 	confirmAndPlay: function() {
 		game.confirmCreation(document.getElementById('nameInput').value,document.getElementById('pronounSelect').value);
 		view.hideCreation();
-		game.loadMap(hellhoundCave);
-// 		game.loadMap(level_orktown);
+		view.enableSaveGame();
+// 		game.loadMap(mission_hellhoundCave);
+		game.loadMap(mission_headquarters);
 	},
 	
 	// Map Handlers
@@ -186,6 +219,7 @@ var handlers = {
 				game.updateTrade();
 			};
 			view.redrawPawn(view.focus.pawn);
+			view.itemDrag.item = undefined;
 		};
 	},
 	
@@ -320,11 +354,10 @@ var handlers = {
 		handlers.closeTrade();
 	},
 	
-	endLevel: function() {
-		console.log("Ending Level");
+	endMission: function() {
+		console.log("Ending Mission");
 	},
-
-
+	
 	// Debugging
 
 	revealMap: function() {
